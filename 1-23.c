@@ -70,7 +70,7 @@ int findComment(char line[], int notation)
 		if (line[i] == '\"' && line[i - 1] != '\\' && lookForQuote == YES) {
 			quoteStart = i;
 			for (j = i + 1; line[j] != '\0'; ++j)
-				if (line[j] == '\"' & line[j - 1] != '\\')
+				if (line[j] == '\"' && line[j - 1] != '\\')
 					quoteEnd = j;
 			lookForQuote = NO;
 		}
