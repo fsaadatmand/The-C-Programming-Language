@@ -11,11 +11,12 @@
 #define NO                      0
 #define SLASH_ASTERISK          1
 #define ASTERISK_SLASH          0
+#define IN                      1
+#define OUT                     0  
 
 int  readline(char s[], int lim);
 int  findComment(char line[], int notation);
 int  delComment(char line[], char modLine[], int start, int end);
-int  lineLen(char line[]);
 
 /* readline function: read a line into s, return length */
 int readline(char s[], int lim)
@@ -69,7 +70,7 @@ int findComment(char line[], int notation)
 		if (line[i] == '\"' && line[i - 1] != '\\' && lookForQuote == YES) {
 			quoteStart = i;
 			for (j = i + 1; line[j] != '\0'; ++j)
-				if (line[j] == '\"' & line[j - 1] != '\\')
+				if (line[j] == '\"' && line[j - 1] != '\\')
 					quoteEnd = j;
 			lookForQuote = NO;
 		}
@@ -141,25 +142,53 @@ int delComment(char line[], char modLine[], int start, int end)
 	return status;
 }
 
-/* lineLen function: calculates the length of line */
-int lineLen(char line[])
+/* findCharcter function: counts the occurrence of a characters from symbol in
+ * line and stores results in charsCount. len is the length of symbol array */
+int findCharacter(char line[], char symbol[], int charsCount[], int len)
 {
-	int i = 0;
-	
-	while (line[i] != '\0')
-		++i;
+	int  i, j;
+	static int quoteState;               /* double quote state flag */
 
-	return i;
+	quoteState = OUT;
+	for (i = 0; i <= len ; ++i)
+		/* line[x - 1] check handles escape squences. */
+		for (j = 0; line[j] != '\0'; ++j)
+			if (quoteState == OUT && line[j] == '\"' && line[j - 1] != '\\')
+				quoteState = IN;
+			else if (quoteState == IN && line[j] == '\"' && line[j - 1] != '\\')
+				quoteState = OUT;
+			else if (line[j] == symbol[i] && line[j + 1] != '\'' && quoteState
+					== OUT)
+				++charsCount[i];
 }
 
+void checkSyntax(char symbol[], int charsCount[], int len)
+{
+	int i, syntaxError = 0;
+
+	for (i = 0; i <= len; i += 2)
+		if (charsCount[i] != charsCount[i + 1]) {
+			printf("Syntax ERROR: unbalanced number of %c %c\n",
+					symbol[i], symbol[i + 1]);
+			syntaxError = 1;
+		}
+	if (syntaxError != 1)
+		printf("Syntax check: no error found\n");
+}
 int main(void)
 {
 	int  len;                              /* current line length */
 	int  start;                            /* comment's beginning */
 	int  end;                              /* comment's end */
+	int  status;                           /* multi-line comments flag */
 	char line[MAXLINE];                    /* current input line */
 	char modLine[MAXLINE];                 /* modified output line */
-	int  status;                           /* multi-line comments flag */
+	int  charsCount[6];
+	char symbol[6] = { '{', '}', '(', ')', '[', ']' };
+	
+	int i;
+	for (len = 0; len <= 6 ; ++len)
+		charsCount[len] = 0;
 
 	status = 0;
 
@@ -169,12 +198,12 @@ int main(void)
 		end   = findComment(line, ASTERISK_SLASH);
 
 		if (start < 0 && end < 0 && status == 0)    /* no comment found */
-			findSymbol(line);
+			findCharacter(line, symbol, charsCount, 5);
 		else {
 			status = delComment(line, modLine, start, end);
-			findSymbol(modLine);
+			findCharacter(modLine, symbol, charsCount, 5);
 		}
 	}
-	checkSyntax();
+	checkSyntax(symbol, charsCount, 5);
 	return 0;
 }
