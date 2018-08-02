@@ -1,6 +1,6 @@
 /* 
- * program that removes all comments from a C program
- * note: full embeded comments with proceeding text are not supported yet.
+ * A program that that checks for rudimentary syntax error, such as unbalanced
+ * braces, parenteses and brackets. 
  * By Faisal Saadatmand
  */
 
@@ -187,7 +187,7 @@ int main(void)
 	char symbol[6] = { '{', '}', '(', ')', '[', ']' };
 	
 	int i;
-	for (len = 0; len <= 6 ; ++len)
+	for (len = 0; len <= 6 ; ++len)        /* use len temporarily as an index */
 		charsCount[len] = 0;
 
 	status = 0;
@@ -204,6 +204,8 @@ int main(void)
 			findCharacter(modLine, symbol, charsCount, 5);
 		}
 	}
+
 	checkSyntax(symbol, charsCount, 5);
+
 	return 0;
 }
