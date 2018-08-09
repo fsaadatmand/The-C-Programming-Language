@@ -3,6 +3,7 @@
 #include <string.h>
 
 #define MAXLINE 1000
+#define MINUS '-'
 #define SPACE ' '
 #define TAB '\t'
 #define COMMA ','
@@ -26,51 +27,47 @@ int readline(char s[], int lim)
 	return i;
 }
 
-void expand(char s1[], char s2[])
-{
-	int i;                /* current input line index */
-	int j;                /* current output line index */
-	int p;                /* temp index for minus positon */
-	int position = 0;         /* position of the minus char */
-	int notShortHand = 0;
-	int isShortHand = 0;
-	char minus = '-';
+int expand(char s1[], char s2[]) {
+	int i;
+	int j;
+	int p;
+	int position;
+	int isShortHand;
 
+	isShortHand = 0;
+	for (i = 0, j = 0; s1[i] != '\0'; ++i) {
+		if (s1[i - 1] != MINUS && s1[i - 1] != MINUS)
+			if (s1[i] == MINUS)
+				if (isalnum(s1[i - 1]) && isalnum(s1[i + 1]))
+					if (isspace(s1[i - 2]) && isspace(s1[i + 2])) {
+						isShortHand = 1;
+						position = i;
+					}
 
-	for (i = 0; s1[i] != '\0'; ++i) {
-		if (s1[i] == minus && s1[i - 1] != SPACE && s1[i + 1] != SPACE)  /* skip leading & trailing minus */
-			if (s1[i - 2] == SPACE || s1[i - 2] == TAB && s1[i + 2] == SPACE || s1[i + 2] == '\t') {
-				isShortHand = 1;
-				position = i;
-			}
-//			else
-//				for (p = i + 1; s1[p] != ' ' && s1[p] != '\t'; ++p)     /* check for more minuses - */
-//					if (s1[p] == minus)
-//						isShortHand = 0;
-//					else {
-//						isShortHand = 1;
-//						position = i;
-//					}
-
-		if (isShortHand) {
-			for (p = s1[position - 1]; p < s1[position + 1]; ++p) {
+		if (isShortHand == 1) {
+			--j;
+			for (p = s1[position - 1]; p <= s1[position + 1]; ++p) {
 				s2[j] = p;
 				++j;
+				isShortHand = 0;
 			}
+			--j;
 			++i;
 		} else
 			s2[j] = s1[i];
-		++j;
+			++j;
 	}
+	s2[j] = '\0';
 }
+
 int main(void)
 {
-	int position;
-	char line[MAXLINE] = { " -a th-i-s a-b is a test for a-b.\n" };
+//	int len;
+	char line[MAXLINE];
 	char modLine[MAXLINE];
 
-	expand(line, modLine);
-	printf("%s\n", modLine);
-	
+	while (readline(line, MAXLINE) > 0)
+		expand(line, modLine);
+		printf("%s", modLine);
 	return 0;
 }
