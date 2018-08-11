@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <string.h>
-#include <limits.h>
-#include <math.h>
 
 void reverse(char s[]);
-int towsComplement(int number);
-void itoab(int number, char convertedNumber[], int base);
+void itob(int number, char convertedNumber[], int base);
 
 /* reverse function: reverse string s in place */
 void reverse(char s[])
@@ -16,72 +13,37 @@ void reverse(char s[])
 		c = s[i];
 		s[i] = s[j];
 		s[j] = c;
+		--j;
 	}
 }
 
-/* towsComplement: converts a number to its two's complement value in decimal */
-int towsComplement(int number)
+/* itob: convert number into a base base character representation in the string  s */
+void itob(int number, char convertedNumber[], int base)
 {
-	unsigned int i, nextDigit, result;
-	int binaryValue[64];
-
-	number += 1;
-	number = -number;
-
-	i = 0;
-	do {                           /* convert to binary */
-		nextDigit = number % 2;	
-		binaryValue[i] = ~nextDigit;
-		number /= 2;
-		++i;
-	} while (number != 0);
-
-	result = 0;
-	for (--i; i >= 0; --i)
-		result += binaryValue[i] * pow(2, i);
-	printf("%f\n", result);
-	
-	return result;
-}
-
-/* itoab: convert number into a base base character representation in the string  s */
-void itoab(int number, char convertedNumber[], int base)
-{
-
-	int i, sign, lastDigit = 0, nextDigit;
-	unsigned int negativeNumber;
+	int i, sign;
+	unsigned int uNumber, nextDigit;
 	const char baseDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8',
 		                          '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
-	if (number == INT_MIN) {           /* check for size */
-		lastDigit = number % base * -1;  /* save the last digit */
-		number -= 1;                   /* reduce number to fit INT_MAX */
-	}
+	sign = 0;
+	if (number < 0)                    /* record sign */
+		sign = 1;
 
-	if ((sign = number) < 0)           /* record sign */
-		if (base == 10)
-			number = -number;
-		else {                /* two's complement */
-		//	number = towsComplement(number);
-		printf("%x\n", number);
-		}
-
-	//	printf("%i\n", number);
-
+	uNumber = (unsigned) number;       /* work in two's complement */
+	
+	if (sign > 0 && base == 10)        /* convert back to decimal for base 10 */
+		uNumber = ~uNumber + 1;
 
 	i = 0;
-	do {                 /* generate digits in reverse order */
-		nextDigit = number % base;    /* get next digit */
-		number /= base;
+	do {                               /* generate digits in reverse order */
+		nextDigit = uNumber % base;    /* get next digit */
+		uNumber /= base;
 		convertedNumber[i] = baseDigits[nextDigit];
 		++i;
-	} while (number != 0);
+	} while (uNumber != 0);
 
-	if (sign < 0 && base == 10)
+	if (sign > 0 && base == 10)        /* add sign symbol for base 10 */
 		convertedNumber[i++] = '-';
-
-	if (lastDigit > 0)
-		convertedNumber[0] = lastDigit + '0';
 
 	convertedNumber[i] = '\0';
 
@@ -90,9 +52,18 @@ void itoab(int number, char convertedNumber[], int base)
 
 int main(void)
 {
+	int number, base;
 	char stringNumber[64];
 
-	itoab(-1, stringNumber, 16);
+	printf("Enter an integer to convert: ");
+	scanf("%i", &number); 
+
+	printf("Enter base: ");
+	scanf("%i", &base); 
+
+	itob(number, stringNumber, base);
+	
+	printf("%s\n", stringNumber);
 
 	return 0;
 }
