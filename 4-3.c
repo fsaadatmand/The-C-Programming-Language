@@ -1,6 +1,7 @@
 /* 
  * Exercise 4-3. Given the basick framwork, it's straightforward to extend the
  * calculator. Add the modulos (%) operator and provisions for negative numbers
+ * By Faisal Saadatmand
  */
 
 #include <stdio.h>
@@ -49,32 +50,21 @@ double pop(void)
 /* getop: get next operator or numeric operand */
 int getop(char s[])
 {
-	int i, c, temp;
+	int i, c;
 
-	while ((s[0] = c = getch()) == ' ' || c == '\t' || c == '-')
-		if (c == '-')
-			sign = -1;
+	while ((s[0] = c = getch()) == ' ' || c == '\t')
 	s[1] = '\0';
 
-	if (sign == -1)
-		s[0] = '-';
-	/*
-	if (c == '\n') {
-		printf("buffer %i\n", buf[bufp]);
-		printf("bufp %i\n", bufp);
-	}
-	*/
-
-	if (c == '\n' && sign == -1) {
-		ungetch(c);
-		sign = 1;
-		return '-';
-	} else (sign == -1) {
-		s[0] = '-';
-		s[1] = c;
-	} else if (!isdigit(c) && c != '.' && sign != -1)
+	if (!isdigit(c) && c != '.' && c != '-')
 		return c;            /* not a number */
 
+	if (c == '-')                          /* negative numbers provision */
+		if (isdigit(s[0] = c = getch()))   /* peak at the next character */
+			sign = -1;
+		else {
+			ungetch(c);                    /* push char back for next cycle */
+			return '-';
+		}
 
 	i = 0;
 	if (isdigit(c))
