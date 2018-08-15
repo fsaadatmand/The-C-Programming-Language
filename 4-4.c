@@ -21,7 +21,10 @@ void   push(double);
 double pop(void);
 int    getch(void);
 void   ungetch(int);
+void   printTop(void);
+void   duplicateTop(void);
 void   swapTop(void);
+void   clearStack(void)
 
 /* external variables */
 int    sp = 0;               /* next free stack position */
@@ -29,8 +32,8 @@ double val[MAXVAL];          /* value stack */
 char   buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp = 0;             /* next free position in buf */
 int    sign = 1;             /* positive or negative */
-double top;
-char   execCommand[10];            /* exucuted command */
+double top;                  /* top element in the stack */
+char   execCommand[10];      /* current exucuted command */
 
 /* push: push f onto value stack */
 void push(double f)
@@ -185,7 +188,7 @@ int main(void)
 		case COMMAND:
 			if (strcmp(execCommand, "print") == 0)
 				printTop();
-			else if (strcmp(execCommand, "dp") == 0)
+			else if (strcmp(execCommand, "dpl") == 0)
 				duplicateTop();
 			else if (strcmp(execCommand, "swap") == 0)
 				swapTop();
