@@ -24,7 +24,7 @@ void   ungetch(int);
 void   printTop(void);
 void   duplicateTop(void);
 void   swapTop(void);
-void   clearStack(void)
+void   clearStack(void);
 
 /* external variables */
 int    sp = 0;               /* next free stack position */
