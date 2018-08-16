@@ -118,19 +118,19 @@ void printTop(void)
 /* deleteTop: deletes the top element in the stack */
 void duplicateTop(void)
 {
-		push(top);
-		printTop();
+	push(top);
+	printTop();
 }
 
 /* swapTopTwo: swaps top two elements */
  void swapTop(void)
  {
 	 double top1, top2;
+
 	 top1 = pop();
 	 top2 = pop();
 	 push(top1);
 	 push(top2);
-//	 printf("swaped %.8g with %.8g\n", top2, top1);
 	 printTop();
  }
 
