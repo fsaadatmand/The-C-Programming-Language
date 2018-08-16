@@ -36,9 +36,6 @@ int    bufp = 0;             /* next free position in buf */
 int    sign = 1;             /* positive or negative */
 double top;                  /* top element in the stack */
 char   execCommand[10];      /* current exucuted command */
-/* we don't know about pointers yet, so we have to have this: */
-char   operationCMD[MAXOP] = { "print dpl swap clear" };
-char   mathCDM[MAXOP] = { "sin cos exp pow" };
 
 /* push: push f onto value stack */
 void push(double f)
@@ -133,7 +130,7 @@ void duplicateTop(void)
 	 top2 = pop();
 	 push(top1);
 	 push(top2);
-	 printf("swaped %.8g with %.8g\n", top2, top1);
+//	 printf("swaped %.8g with %.8g\n", top2, top1);
 	 printTop();
  }
 
@@ -202,7 +199,7 @@ int main(void)
 		case COMMAND:
 			if (strcmp(execCommand, "print") == 0)
 				printTop();
-			else if (strcmp(execCommand, "dpl") == 0)
+			else if (strcmp(execCommand, "dup") == 0)
 				duplicateTop();
 			else if (strcmp(execCommand, "swap") == 0)
 				swapTop();
