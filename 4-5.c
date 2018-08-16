@@ -209,13 +209,13 @@ int main(void)
 				printf("error: unknown command %s\n", s);
 			break;
 		case MATH:
-			if (strcmp(execCommand, "sin") == 0) {
+			if (strcmp(execCommand, "sin") == 0)
 				push(sin(pop()));
-			} else if (strcmp(execCommand, "cos") == 0) {
+			else if (strcmp(execCommand, "cos") == 0)
 				push(cos(pop()));
-			} else if (strcmp(execCommand, "exp") == 0) {
+			else if (strcmp(execCommand, "exp") == 0)
 				push(exp(pop()));
-			} else if (strcmp(execCommand, "pow") == 0) {
+			else if (strcmp(execCommand, "pow") == 0) {
 				op2 = pop();
 				push(pow(pop(), op2));
 			} else
