@@ -2,9 +2,11 @@
 
 #include <stdio.h>
 
+#define OUT 0
+
 int main(void)
 {
-	int c, 
+	int c, state;
 
 	state = OUT;
 
