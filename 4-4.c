@@ -7,13 +7,13 @@
 #include <stdio.h>
 #include <stdlib.h>          /* for atof() */
 #include <ctype.h>
-#include <string.h>
 
 #define MAXOP   100          /* max size of operand or operator */
 #define NUMBER  '0'          /* signal that a number was found */
-#define COMMAND '1'          /* signal that a number was found */
 #define MAXVAL  100          /* maximum depth of val stack */
 #define BUFSIZE 100
+#define MATCH   0
+#define TOP     val[sp - 1]  /* top of the stack element */ 
 
 /* function decleration */
 int    getop(char []);
@@ -32,14 +32,12 @@ double val[MAXVAL];          /* value stack */
 char   buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp = 0;             /* next free position in buf */
 int    sign = 1;             /* positive or negative */
-double top;                  /* top element in the stack */
-char   execCommand[10];      /* current exucuted command */
 
 /* push: push f onto value stack */
 void push(double f)
 {
 	if (sp < MAXVAL)
-		val[sp++] = top = f;
+		val[sp++] = f;
 	else
 		printf("error: stack full, can't push %g\n", f);
 }
@@ -48,7 +46,6 @@ void push(double f)
 double pop(void)
 {
 	if (sp > 0) {
-		top = val[sp - 2];
 		return val[--sp];
 	} else {
 		printf("error: stack empty\n");
@@ -64,26 +61,18 @@ int getop(char s[])
 	while ((s[0] = c = getch()) == ' ' || c == '\t')
 	s[1] = '\0';
 
-	if (!isdigit(c) && !isalpha(c) && c != '.' && c != '-')
+	if (!isdigit(c) && c != '.' && c != '-')
 		return c;                           /* not a number */
 
-	if (c == '-')                           /* negative numbers provision */
+	if (c == '-') {                         /* negative numbers provision */
 		if (isdigit(s[0] = c = getch()))    /* peak at the next character */
 			sign = -1;
 		 else {
 			ungetch(c);                     /* push char back for next cycle */
-			return '-';
+			return '-';                     /* not a negative number */
 		}
-	
-	if (isalpha(c)) {
-		i = 0;
-		execCommand[i++] = c;
-		while (isalpha(execCommand[i] = c = getch()))
-			++i;
-		execCommand[i] = '\0';
-		return COMMAND;
 	}
-
+	
 	i = 0;
 	if (isdigit(c))
 		while (isdigit(s[++i] = c = getch()))
@@ -98,40 +87,6 @@ int getop(char s[])
 	return NUMBER;
 }
 
-/* printTop: prints the top element in the stack */
-void printTop(void)
-{
-	printf("top\t%.8g\n", top);
-}
-
-/* deleteTop: deletes the top element in the stack */
-void duplicateTop(void)
-{
-		push(top);
-		printTop();
-}
-
-/* swapTopTwo: swaps top two elements */
- void swapTop(void)
- {
-	 double top1, top2;
-	 top1 = pop();
-	 top2 = pop();
-	 push(top1);
-	 push(top2);
-	 printf("swaped %.8g with %.8g\n", top2, top1);
-	 printTop();
- }
-
-/* clear: clears the entire stack */
-void clearStack(void)
-{
-	while (sp > 0)
-		pop();
-	printf("stack cleared\n");
-	printTop();
-}
-
 int getch(void)              /* get a (possibly pushed back) character */
 {
 	return (bufp > 0) ? buf[--bufp] : getchar();
@@ -143,6 +98,43 @@ void ungetch(int c)          /* push character back on input */
 		printf("ungetch: too many characters\n");
 	else
 		buf[bufp++] = c;
+}
+
+/* printTop: prints the top element in the stack */
+void printTop(void)
+{
+	if (sp > 0)
+		printf("\t%.8g\n", TOP);
+	else
+		printf("stack is empty\n");
+}
+
+/* deleteTop: deletes the top element in the stack */
+void duplicateTop(void)
+{
+	if (sp > 0)
+		push(TOP);
+}
+
+/* swapTopTwo: swaps top two elements */
+ void swapTop(void)
+ {
+	 double top1, top2;
+
+	 if (sp > 1) {
+		 top1 = pop();
+		 top2 = pop();
+		 push(top1);
+		 push(top2);
+	 } else
+		 printf("not enough elements\n");
+}
+
+/* clear: clears the entire stack */
+void clearStack(void)
+{
+	while (sp > 0)
+		pop();
 }
 
 /* reverse Polish Calculator */
@@ -182,22 +174,22 @@ int main(void)
 			else
 				printf("error: zero divisor\n");
 			break;
+		case '!':
+			printTop();
+			break;
+		case '#':
+			duplicateTop();
+			break;
+		case '&':
+			swapTop();
+			break;
+		case '~':
+			clearStack();
+			break;
 		case '\n':
 			printf("\t%.8g\n", pop());
 			break;
-		case COMMAND:
-			if (strcmp(execCommand, "print") == 0)
-				printTop();
-			else if (strcmp(execCommand, "dpl") == 0)
-				duplicateTop();
-			else if (strcmp(execCommand, "swap") == 0)
-				swapTop();
-			else if (strcmp(execCommand, "clear") == 0)
-				clearStack();
-			else
-				printf("error: unknown command %s\n", s);
-			break;
-		defualt:
+		default:
 			printf("error: unknown command %s\n", s);
 			break;
 		}
