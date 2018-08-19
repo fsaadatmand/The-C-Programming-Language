@@ -2,6 +2,9 @@
 #include <string.h>
 #include <limits.h>
 
+void reverse(char s[]);
+void itoa(int n, char s[], int w);
+
 /* reverse function: reverse string s in place */
 void reverse(char s[])
 {
