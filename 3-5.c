@@ -26,23 +26,23 @@ void itob(int number, char convertedNumber[], int base)
 		                          '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 	sign = 0;
-	if (number < 0)                    /* record sign */
+	if (number < 0)                  /* record sign */
 		sign = 1;
 
-	uNumber = (unsigned) number;       /* work in two's complement */
-	
-	if (sign > 0 && base == 10)        /* convert back to decimal for base 10 */
+	uNumber = (unsigned) number;     /* work in two's complement number system */
+
+	if (sign > 0 && base == 10)      /* convert back to decimal for base 10 */
 		uNumber = ~uNumber + 1;
 
 	i = 0;
-	do {                               /* generate digits in reverse order */
-		nextDigit = uNumber % base;    /* get next digit */
+	do {                             /* generate digits in reverse order */
+		nextDigit = uNumber % base;  /* get next digit */
 		uNumber /= base;
 		convertedNumber[i] = baseDigits[nextDigit];
 		++i;
 	} while (uNumber != 0);
 
-	if (sign > 0 && base == 10)        /* add sign symbol for base 10 */
+	if (sign > 0 && base == 10)      /* add sign symbol for base 10 */
 		convertedNumber[i++] = '-';
 
 	convertedNumber[i] = '\0';
@@ -59,7 +59,7 @@ int main(void)
 	scanf("%i", &number); 
 
 	printf("Enter base: ");
-	scanf("%i", &base); 
+	scanf("%i", &base);
 
 	itob(number, stringNumber, base);
 	

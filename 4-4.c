@@ -13,7 +13,7 @@
 #define MAXVAL  100          /* maximum depth of val stack */
 #define BUFSIZE 100
 #define MATCH   0
-#define TOP     val[sp - 1]  /* top of the stack element */ 
+#define TOP     val[sp - 1]  /* top element in stack */ 
 
 /* function decleration */
 int    getop(char []);
@@ -23,7 +23,7 @@ int    getch(void);
 void   ungetch(int);
 void   printTop(void);
 void   duplicateTop(void);
-void   swapTop(void);
+void   swapTopTwo(void);
 void   clearStack(void);
 
 /* external variables */
@@ -117,7 +117,7 @@ void duplicateTop(void)
 }
 
 /* swapTopTwo: swaps top two elements */
- void swapTop(void)
+ void swapTopTwo(void)
  {
 	 double top1, top2;
 
@@ -181,7 +181,7 @@ int main(void)
 			duplicateTop();
 			break;
 		case '&':
-			swapTop();
+			swapTopTwo();
 			break;
 		case '~':
 			clearStack();

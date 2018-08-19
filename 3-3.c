@@ -4,10 +4,9 @@
 
 #define MAXLINE 1000
 #define MINUS '-'
-#define SPACE ' '
-#define TAB '\t'
-#define COMMA ','
-#define DOT '.'
+
+int readline(char s[], int lim);
+int expand(char s1[], char s2[]);
 
 /* readline function: read a line into s, return length */
 int readline(char s[], int lim)
@@ -27,7 +26,8 @@ int readline(char s[], int lim)
 	return i;
 }
 
-int expand(char s1[], char s2[]) {
+int expand(char s1[], char s2[])
+{
 	int i;
 	int j;
 	int p;
@@ -62,7 +62,6 @@ int expand(char s1[], char s2[]) {
 
 int main(void)
 {
-//	int len;
 	char line[MAXLINE];
 	char modLine[MAXLINE];
 

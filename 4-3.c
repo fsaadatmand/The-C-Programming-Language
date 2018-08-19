@@ -132,7 +132,7 @@ int main(void)
 		case '\n':
 			printf("\t%.8g\n", pop());
 			break;
-		defualt:
+		default:
 			printf("error: unknown comman %s\n", s);
 			break;
 		}

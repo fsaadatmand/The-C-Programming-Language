@@ -2,6 +2,9 @@
 #include <string.h>
 #include <limits.h>
 
+void reverse(char s[]);
+void itoa(int n, char s[]);
+
 /* reverse function: reverse string s in place */
 void reverse(char s[])
 {
@@ -19,6 +22,7 @@ void itoa(int n, char s[])
 {
 	int i, sign, lastDigit;
 
+	lastDigit = 0;
 	if (n == INT_MIN) {           /* Add check for size */
 		lastDigit = n % 10 * -1;  /* save the last digit */
 		n -= 1;                   /* reduce n to fit INT_MAX */
@@ -45,8 +49,11 @@ void itoa(int n, char s[])
 
 int main(void)
 {
-	int intValue = -2147483648;
-	char stringNumber[100];
+	int intValue;
+	char stringNumber[64];
+
+	printf("Enter integer to convert to a string: ");
+	scanf("%i", &intValue);
 
 	itoa(intValue, stringNumber);
 
