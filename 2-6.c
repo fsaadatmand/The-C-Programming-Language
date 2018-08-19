@@ -6,6 +6,8 @@
 
 #include <stdio.h>
 
+unsigned int setbits(unsigned int x, int p, int n, unsigned y);
+
 unsigned int setbits(unsigned int x, int p, int n, unsigned y)
 {
 	unsigned mask = ~(~0 << n);    /* mask to extract n bits from y */
