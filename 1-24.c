@@ -62,11 +62,12 @@ int findComment(char line[], int notation)
 	/* line[x - 1] check handles escape squences. It is unnecessary for the
 	 * start of the quote but is added for the sake of correctness. */
 	for (i = 0; line[i] != '\0'; ++i) {
-		if (line[i] == comment[0] && line[i + 1] == comment[1])
+		if (line[i] == comment[0] && line[i + 1] == comment[1]) {
 			if (notation == ASTERISK_SLASH)
 				location = i + 1;      /* end of comment including notation */
 			else
 				location = i;          /* start of comment including notation */
+		}
 		if (line[i] == '\"' && line[i - 1] != '\\' && lookForQuote == YES) {
 			quoteStart = i;
 			for (j = i + 1; line[j] != '\0'; ++j)
