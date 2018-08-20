@@ -1,7 +1,6 @@
 /*
  * Exercise 4-9. Suppose that there will never be more than one character of
  * pushback. Modify getch and ungetch accordingly.
- * Answer: Change BUFSIZE to 1.
  * Faisal Saadatmand
  */
 
