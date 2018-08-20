@@ -14,8 +14,6 @@
 #define MAXOP       100          /* max size of operand or operator */
 #define NUMBER      '0'          /* signal that a number was found */
 #define MATH        '1'          /* signal that an operation was found */
-#define STOREMEM    '2'          /* signal to be store variable in memory */
-#define FETCHMEM    '3'          /* signal to fetch variable from memory */
 #define MAXVAL      100          /* maximum depth of val stack */
 #define BUFSIZE     1
 #define MATCH       0
