@@ -41,7 +41,6 @@ int    sp = 0;               /* next free stack position */
 double val[MAXVAL];          /* value stack */
 char   buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp = 0;             /* next free position in buf */
-int    sign = 1;             /* positive or negative */
 char   variable;             /* current input variable */ 
 double lastPrint;            /* last printed value */
 
@@ -68,9 +67,9 @@ double pop(void)
 /* getop: get next operator or numeric operand */
 int getop(char s[])
 {
-	static int    i, len;
+	static int    i, len;                  /* note static in type */
+	static char   line[MAXLINE];           /* note static in type */
 	int           j; 
-	static char   line[MAXLINE];
 
 	if (i == len) {          /* check if the previous line is read completely */
 		len = readline(line, MAXLINE);	    /* read the next line */
@@ -83,10 +82,8 @@ int getop(char s[])
 	while (isblank(line[i]))                /* skip blanks */
 		++i;
 
-	if (line[i] == '-' && isdigit(line[i + 1])) { /* negative numbers */
+	if (line[i] == '-' && isdigit(line[i + 1]))  /* negative numbers */
 			s[j++] = line[i++];
-			sign = -1;
-		}
 	
 	if (!isdigit(line[i]) && !isalpha(line[i]) && line[i] != '.')
 		return line[i++];                   /* not a number */
@@ -211,8 +208,7 @@ int main(void)
 	while ((type = getop(s)) != END) {
 		switch (type) {
 		case NUMBER:
-			push(sign * atof(s));
-			sign = 1;
+			push(atof(s));
 			break;
 		case '+':
 			push(pop() + pop());
