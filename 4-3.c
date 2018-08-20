@@ -1,5 +1,5 @@
 /* 
- * Exercise 4-3. Given the basick framwork, it's straightforward to extend the
+ * Exercise 4-3. Given the basic framwork, it's straightforward to extend the
  * calculator. Add the modulos (%) operator and provisions for negative numbers
  * By Faisal Saadatmand
  */
@@ -58,13 +58,14 @@ int getop(char s[])
 	if (!isdigit(c) && c != '.' && c != '-')
 		return c;            /* not a number */
 
-	if (c == '-')                          /* negative numbers provision */
+	if (c == '-') {                        /* negative numbers provision */
 		if (isdigit(s[0] = c = getch()))   /* peak at the next character */
 			sign = -1;
 		else {
 			ungetch(c);                    /* push char back for next cycle */
 			return '-';
 		}
+	}
 
 	i = 0;
 	if (isdigit(c))
