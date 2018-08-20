@@ -1,8 +1,10 @@
 /*
  * Exercise 4-7. Write a routine ungets(s) that will push back an entire string
  * onto the input. Should ungets know about buf and bufp, or should it just use
- * ungetch?  It could just use ungetch since ungets routine is just ungetch
- * wrapped in a loop.
+ * ungetch?  Given the current implementation of the reverse Polish calculator,
+ * we could just use ungetch(), since ungets routine is just ungetch wrapped in
+ * a loop.  However, having direct access to buf[] and bufp is beneficial in
+ * cases were ungetch is superfluous. See Exercise 4-10.
  * Faisal Saadatmand
  */
 
