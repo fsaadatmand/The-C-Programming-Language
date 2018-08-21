@@ -215,7 +215,8 @@ int main(void)
 			else if (strcmp(s, "pow") == MATCH) {
 				op2 = pop();
 				push(pow(pop(), op2));
-			}
+			} else
+				printf("error: unknown command %s\n", s);
 			break;
 		default:
 			printf("error: unknown command %s\n", s);

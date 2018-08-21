@@ -70,7 +70,7 @@ int getop(char s[])
 	static char   line[MAXLINE];           /* note static in type */
 	int           j; 
 
-	if (i == len) {          /* check if the previous line is read completely */
+	if (i == len) {         /* check if the previous line was read completely */
 		len = readline(line, MAXLINE);	    /* read the next line */
 		i = 0;                              /* reset index */
 		if (len < 0)                        /* line to read */
@@ -272,7 +272,8 @@ int main(void)
 			} else if (strcmp(s, "mc") == MATCH) {
 				clearMemory(mem, MAXVAR);
 				printf("memory cleared\n");		
-			}
+			} else
+				printf("error: unknown command %s\n", s);
 			break;
 		default:
 			printf("error: unknown command %s\n", s);

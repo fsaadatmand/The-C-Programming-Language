@@ -282,7 +282,8 @@ int main(void)
 			} else if (strcmp(s, "mc") == MATCH) {
 				clearMemory(mem, MAXVAR);
 				printf("memory cleared\n");		
-			}
+			} else
+				printf("error: unknown command %s\n", s);
 			break;
 		default:
 			printf("error: unknown command %s\n", s);
