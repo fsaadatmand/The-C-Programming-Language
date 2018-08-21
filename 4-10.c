@@ -6,10 +6,10 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>          /* for atof() */
+#include <stdlib.h>              /* for atof() */
 #include <ctype.h>
-#include <string.h>          /* for strcmp() */
-#include <math.h>            /* for math commands */
+#include <string.h>              /* for strcmp() */
+#include <math.h>                /* for math commands */
 
 #define MAXLINE     1000
 #define MAXOP       100          /* max size of operand or operator */
