@@ -56,22 +56,21 @@ double pop(void)
 /* getop: get next operator or numeric operand */
 int getop(char s[])
 {
-	int i, c;
+	int i, c, nextC;
 
 	while ((s[0] = c = getch()) == ' ' || c == '\t')
 	s[1] = '\0';
 
-	if (!isdigit(c) && c != '.' && c != '-')
-		return c;                           /* not a number */
-
-	if (c == '-') {                         /* negative numbers provision */
-		if (isdigit(s[0] = c = getch()))    /* peak at the next character */
-			sign = -1;
-		 else {
-			ungetch(c);                     /* push char back for next cycle */
-			return '-';                     /* not a negative number */
-		}
+	if (c == '-') {                        /* possible negative number */
+		if (isdigit(nextC = getch())) {    /* peak at the next character */
+			s[0] = c = nextC;              /* a negative number */
+			sign = -1;                     /* set sign */
+		} else if (nextC != EOF)           /* an operator, let c fall-through */
+			ungetch(nextC);                /* push back nextC onto input */
 	}
+
+	if (!isdigit(c) && c != '.') 
+		return c;                          /* not a number */
 	
 	i = 0;
 	if (isdigit(c))
