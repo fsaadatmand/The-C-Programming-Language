@@ -173,6 +173,7 @@ void storeVariable(double mem[], char variable)
 		value = pop();                /* variable value - top of the stack */
 		variable = tolower(variable);
 		mem[variable - 'a'] = value;
+		push(value);
 	}
 }
 
