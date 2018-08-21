@@ -36,7 +36,6 @@ void   fetchVariable(double mem[], char variable);
 void   clearMemory(double mem[], int size);
 
 /* external variables */
-char   previousLine[MAXLINE];
 int    sp = 0;               /* next free stack position */
 double val[MAXVAL];          /* value stack */
 char   buf[BUFSIZE];         /* buffer from ungetch */
