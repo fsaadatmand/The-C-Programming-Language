@@ -23,24 +23,24 @@ void itoa(int n, char s[])
 	int i, sign, lastDigit;
 
 	lastDigit = 0;
-	if (n == INT_MIN) {           /* Add check for size */
-		lastDigit = n % 10 * -1;  /* save the last digit */
-		n -= 1;                   /* reduce n to fit INT_MAX */
+	if (n == INT_MIN) {                   /* add check for size */
+		lastDigit = (n % 10 * -1) + '0';  /* extract save the last digit */
+		n -= 1;                           /* reduce n to fit INT_MAX */
 	}
 
-	if ((sign = n) < 0)           /* record sign */
+	if ((sign = n) < 0)                   /* record sign */
 		n = -n;
 
 	i = 0;
-	do {                 /* generate digits in reverse order */
-		s[i++] = n % 10 + '0';    /* get next digit */
+	do {                                  /* generate digits in reverse order */
+		s[i++] = n % 10 + '0';            /* get next digit */
 	} while ((n /= 10) > 0);
 
 	if (sign < 0)
 		s[i++] = '-';
 
-	if (lastDigit > 0)
-		s[0] = lastDigit + '0';
+	if (lastDigit > 0)                    /* put back saved last digit */
+		s[0] = lastDigit;
 
 	s[i] = '\0';
 

@@ -24,20 +24,20 @@ void itoa(int n, char s[], int w)
 
 	sign = lastDigit = padLeft = 0;
 
-	if (n == INT_MIN) {           /* Add check for size */
-		lastDigit = n % 10 * -1;  /* save the last digit */
-		n -= 1;                   /* reduce n to fit INT_MAX */
+	if (n == INT_MIN) {                   /* add check for size */
+		lastDigit = (n % 10 * -1) + '0';  /* extract and save the last digit */
+		n -= 1;                           /* reduce n to fit INT_MAX */
 	}
 
-	if ((sign = n) < 0)           /* record sign */
+	if ((sign = n) < 0)                   /* record sign */
 		n = -n;
 
 		i = 0;
-	do {                 /* generate digits in reverse order */
-		s[i++] = n % 10 + '0';    /* get next digit */
+	do {                                  /* generate digits in reverse order */
+		s[i++] = n % 10 + '0';            /* get next digit */
 	} while ((n /= 10) > 0);
 
-	padLeft = w - i % w;  /* pad n digits to the left */
+	padLeft = w - i % w;                  /* pad n digits to the left */
 	if (padLeft != w)
 		while (padLeft > 0) {
 			s[i++] = '0';
@@ -48,7 +48,7 @@ void itoa(int n, char s[], int w)
 		s[i++] = '-';
 
 	if (lastDigit > 0)
-		s[0] = lastDigit + '0';
+		s[0] = lastDigit;                 /* put back saved last digit */
 
 	s[i] = '\0';
 
