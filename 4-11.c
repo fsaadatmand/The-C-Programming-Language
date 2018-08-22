@@ -24,7 +24,6 @@ int    getop(char []);
 void   push(double);
 double pop(void);
 int    getch(void);
-void   ungetch(int);
 void   printTop(void);
 void   duplicateTop (void);
 void   swapTopTwo(void);
@@ -67,10 +66,10 @@ double pop(void)
 int getop(char s[])
 {
 	int i, c;
-	static int  prevC = -1;            /* over-read character */
+	static int  prevC;            /* over-read character */
 
 	/* check if there was a previously over-read character */
-	(prevC >= 0) ? (c = prevC) : (s[0] = c = getch());
+	(prevC > 0) ? (c = prevC) : (s[0] = c = getch());
 
 	if (c == ' ' || c == '\t')
 		while ((s[0] = c = getch()) == ' ' || c == '\t')
@@ -84,7 +83,7 @@ int getop(char s[])
 	}
 
 	if (!isdigit(c) && !isalpha(c) && c != '.') {
-		prevC = -1;
+		prevC = 0;                     /* no over-read character */
 		return c;                      /* not a number */
 	}
 
@@ -123,15 +122,6 @@ void ungetch(int c)          /* push character back on input */
 		printf("ungetch: too many characters\n");
 	else
 		buf[bufp++] = c;
-}
-
-/* ungets: push back s onto the input */
-void ungets(char s[])
-{
-	int i;
-
-	for (i = strlen(s); i >= 0 ; --i)
-		ungetch(s[i]);
 }
 
 /* printTop: prints the top element in the stack without poping */
