@@ -11,7 +11,7 @@
 
 void itoa(int n, char s[]);
 
-/* itoa: convert n to characters in s */
+/* itoa: convert n to characters in s. Recursive version */
 void itoa(int n, char s[])
 {
 	int sign, lastDigit;
