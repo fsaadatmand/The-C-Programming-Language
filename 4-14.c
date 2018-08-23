@@ -12,7 +12,7 @@
 
 /* alternatively we can use bitwise XOR 
 #define SWAP(t, x, y) if (sizeof(x) == sizeof(t) && sizeof(y) == sizeof(t)) \
-{(x) ^= (y), y ^= x, x ^= y;}
+{(x) ^= (y), (y) ^= (x), (x) ^= (y);}
 */
 
 int main(void)
