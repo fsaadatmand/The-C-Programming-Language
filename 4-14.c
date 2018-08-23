@@ -8,7 +8,7 @@
 
 
 #define SWAP(t, x, y) if (sizeof(x) == sizeof(t) && sizeof(y) == sizeof(t)) \
-{t temp = (x); temp = (x),  (x) = (y), (y) = temp;}
+{t temp = (x); temp = (x), (x) = (y), (y) = temp;}
 
 /* alternatively we can use bitwise XOR 
 #define SWAP(t, x, y) if (sizeof(x) == sizeof(t) && sizeof(y) == sizeof(t)) \
