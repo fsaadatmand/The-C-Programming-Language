@@ -6,11 +6,16 @@
 
 #include <stdio.h>
 
-
 #define SWAP(t, x, y) if (sizeof(x) == sizeof(t) && sizeof(y) == sizeof(t)) \
 {t temp = (x); temp = (x), (x) = (y), (y) = temp;}
 
-/* alternatively we can use bitwise XOR 
+/* simpler but no type check */
+/*
+#define SWAP(t, x, y) if (x != y) {t temp = (x); temp = (x), (x) = (y), (y) = temp;}
+*/
+
+/* alternatively we can use bitwise XOR, though it is considered bad practice */
+/*
 #define SWAP(t, x, y) if (sizeof(x) == sizeof(t) && sizeof(y) == sizeof(t)) \
 {(x) ^= (y), (y) ^= (x), (x) ^= (y);}
 */
