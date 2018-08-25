@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <ctype.h>
-#include <string.h>
 
 #define MAXLINE 1000
 #define MINUS '-'
 
-int readline(char s[], int lim);
-int expand(char s1[], char s2[]);
+#define YES 1
+#define NO  0
 
 /* readline function: read a line into s, return length */
 int readline(char s[], int lim)
@@ -28,36 +27,32 @@ int readline(char s[], int lim)
 
 int expand(char s1[], char s2[])
 {
-	int i;
-	int j;
-	int p;
-	int position;
-	int isShortHand;
+	int i;                     /* read from s1 index */
+	int j;                     /* write to s2 index */
+	int expChar;               /* expanded charater */
+	int shorthand;             /* shorthand match flag */
+	int modified;              /* return value flag */
 
-	isShortHand = 0;
+	modified = NO;
 	for (i = 0, j = 0; s1[i] != '\0'; ++i) {
-		if (s1[i - 1] != MINUS && s1[i - 1] != MINUS)
-			if (s1[i] == MINUS)
+	shorthand = NO;
+		if (s1[i] == MINUS)
+			if (s1[i - 2] != MINUS && s1[i + 2] != MINUS) /* no leading/trailing - */
 				if (isalnum(s1[i - 1]) && isalnum(s1[i + 1]))
-					if (isspace(s1[i - 2]) && isspace(s1[i + 2])) {
-						isShortHand = 1;
-						position = i;
+					if (!isalnum(s1[i - 2]) && !isalnum(s1[i + 2])) {
+						shorthand = YES;
+						for (--j, expChar = s1[i - 1]; expChar <= s1[i + 1]; ++expChar) {
+							s2[j++] = expChar;
+							modified = YES;   /* optional */
+						}
 					}
-
-		if (isShortHand == 1) {
-			--j;
-			for (p = s1[position - 1]; p <= s1[position + 1]; ++p) {
-				s2[j] = p;
-				++j;
-				isShortHand = 0;
-			}
-			--j;
-			++i;
-		} else
-			s2[j] = s1[i];
-			++j;
+	if (!shorthand)
+		s2[j++] = s1[i];
 	}
+
 	s2[j] = '\0';
+
+	return modified;
 }
 
 int main(void)
@@ -66,7 +61,10 @@ int main(void)
 	char modLine[MAXLINE];
 
 	while (readline(line, MAXLINE) > 0)
-		expand(line, modLine);
-		printf("%s", modLine);
+		if (expand(line, modLine))
+			printf("%s", modLine);
+		else
+			printf("%s", line);
+
 	return 0;
 }
