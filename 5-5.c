@@ -29,13 +29,14 @@ char *strnCpy(char *s, char *t, int n)
 
 	if (s_len < n) 
 		while (t_len != n) {       /* pad t with '\0' */
-			*++t = '\0';
+			*t++ = '\0';
 			++t_len;
 		}
 
 	return t - n;
 
 }
+
 int main(void)
 {
 	char string1[32] = { "copy me" };
