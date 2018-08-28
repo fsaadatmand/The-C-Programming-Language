@@ -9,40 +9,85 @@
 #include <stdio.h>
 #include <string.h>
 
+#define MAXCHAR 32
+
 /* strnCpy: copy at most n characters of string t to s. Returns s. Pad with
  * '\0's if t has fewer than n characters */
 char *strnCpy(char *s, char *t, int n)
 {
-	int s_len, t_len;
+	int nChar;                     /* number of characters coppied */
+	int t_len;                     /* length of source string */
 
-	s_len = strlen(s);
-	t_len = 0;
+	t_len = strlen(t);
+	nChar = 0;
 
 	if (n <= 0)                    /* invalid inputs */
-		return s;
+		return t;
 
-	while (t_len < n) {            /* copy exactly n characters */
-		*t++ = *s++;
-		++t_len;
+	while (nChar < n) {            /* copy exactly n characters */
+		*s++ = *t++;
+		++nChar;
 	}
-	*t = '\0';                     /* terminate with null character */
+	*s = '\0';                     /* terminate with null character */
 
-	if (s_len < n) 
-		while (t_len != n) {       /* pad t with '\0' */
-			*t++ = '\0';
-			++t_len;
+	if (t_len < n) 
+		while (nChar != n) {       /* pad t with '\0' */
+			*s++ = '\0';
+			++nChar;
 		}
 
-	return t - n;
+	return s - n;
 
+}
+
+/* strnCat: concatenate at most n characters of string t to string s, terminate
+ * s with '\0'; return s*/
+char *strnCat(char *s, char *t, int n)
+{
+	int s_len;                      /* length of s */
+	int nChar = 0;
+
+	s_len = strlen(s);
+	s += s_len;                     /* find the end of s */
+
+	while (nChar < n) {
+		*s++ = *t++;
+		++nChar;
+	}
+
+	*s = '\0';
+
+	return s - s_len - nChar;
+}
+
+/* strnCmp: compare at most n characters of string s to string t; return < 0
+ * if s < t, 0 if s == t, or > 0 if s > t. */
+int strnCmp(char *s, char *t, int n)
+{
+	while (*s == *t) {
+		++s;
+		++t;
+		--n;
+		if (n == 0)
+			return 0;
+	}
+
+	return *s - *t;
 }
 
 int main(void)
 {
-	char string1[32] = { "copy me" };
-	char string2[32];
+	char dest1[MAXCHAR];
+	char dest2[MAXCHAR] = { "It's a " };
+	char source[MAXCHAR] = { "copy me" };
+	char string1[MAXCHAR] = { "compare me" };
+	char string2[MAXCHAR] = { "compare me with other strings" };
 
-	printf("%s\n", strnCpy(string1, string2, 4));
+	printf("%s\n", strnCpy(dest1, source, 4));
+
+	printf("%s\n", strnCat (dest2, source, 4));
+
+	printf("%i\n", strnCmp (string1, string2, 4));
 	
 	return 0;
 }
