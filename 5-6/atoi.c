@@ -5,16 +5,14 @@
  * include getLine (chapter1 and 4), atoi, itoa, and their variants (Chapters
  * 2, 3 and 4), reverse (Chapter 3), and strindex and gettop (Chapter 4)
  * By Faisal Saadatmand
- * */
+ */
 
 #include <stdio.h>
 #include <ctype.h>
 
 #define MAXCHAR 100
 
-/*
- * chapter 1
- */
+/* chapter 1 */
 
 /* atoi: convert s to integer - pointer version */
 int atoi_1(char s[])
@@ -28,9 +26,7 @@ int atoi_1(char s[])
 	return n;
 }
 
-/*
- * chater 3
- */
+/* chater 3 */
 
 /* atoi: convert s to integer; version 2 - pointer version */
 int atoi_2(char *s)

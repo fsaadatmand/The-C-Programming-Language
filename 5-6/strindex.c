@@ -4,7 +4,7 @@
  * include getLine (chapter1 and 4), atoi, itoa, and their variants (Chapters
  * 2, 3 and 4), reverse (Chapter 3), and strindex and gettop (Chapter 4)
  * By Faisal Saadatmand
- * */
+ */
 
 #include <stdio.h>
 
