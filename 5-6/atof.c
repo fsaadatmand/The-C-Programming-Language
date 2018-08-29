@@ -18,44 +18,36 @@ double atof(char *s)
 	int    sign, expSign;
 	double val, power, exponent;
 
-	while (isspace(*s))                  /* skip whitespace */
+	while (isspace(*s))                         /* skip whitespace */
 		++s;
 
 	sign = (*s == '-') ? -1 : 1;
 	if (*s == '+' || *s == '-')
 		++s;
 	
-	val = 0.0;
-	while (isdigit(*s)) {
+	for (val = 0.0; isdigit(*s); ++s)
 		val = 10.0 * val + (*s - '0');
-		++s;
-	}
 	
 	if (*s == '.')
 		++s;
 
-	power = 1.0;
-	while (isdigit(*s)) {
+	for (power = 1.0; isdigit(*s); ++s) {
 		val = 10.0 * val + (*s - '0');
 		power *= 10.0;
-		++s;
 	}
 
-	if (*s != '\0') {                    /* handle scientific notation */
+	if (*s != '\0') {                           /* handle scientific notation */
 		if (*s == 'e' || *s == 'E')
 			++s;
 		else
 			return -1;
 
-		expSign = (*s == '-') ? -1 : 1;  /* record the exponent sign */
+		expSign = (*s == '-') ? -1 : 1;         /* record the exponent sign */
 		if (*s == '+' || *s == '-')
 			++s;
 
-		exponent = 0.0;
-		while (isdigit(*s)) {            /* extract the exponent */
+		for (exponent = 0.0; isdigit(*s); ++s)  /* extract the exponent */
 			exponent = 10.0 * exponent + (*s - '0');
-			++s;
-		}
 
 		return (sign * val / power) * pow(10, expSign * exponent);
 
