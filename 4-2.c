@@ -10,7 +10,7 @@ double atof(char s[])
 	int    i, sign, expSign;
 	double val, power, exponent;
 
-	for (i = 0; isspace(s[i]); ++i)  /* skip whitespace */
+	for (i = 0; isspace(s[i]); ++i)               /* skip whitespace */
 		;
 
 	sign = (s[i] == '-') ? -1 : 1;
@@ -28,13 +28,13 @@ double atof(char s[])
 		power *= 10.0;
 	}
 
-	if (s[i] != '\0') {       /* handle scientific notation */
+	if (s[i] != '\0') {                           /* handle scientific notation */
 		if (s[i] == 'e' || s[i] == 'E')
 			++i;
 		else
 			return -1;
 
-		expSign = (s[i] == '-') ? -1 : 1;  /* record the exponent sign */
+		expSign = (s[i] == '-') ? -1 : 1;         /* record the exponent sign */
 		if (s[i] == '+' || s[i] == '-')
 			++i;
 
