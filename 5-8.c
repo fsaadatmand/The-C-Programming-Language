@@ -11,7 +11,7 @@ static char daytab[2][13] = {
 	{0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 };
 
-/* day_of_year: set day of year from month & day */
+/* day_of_year: set day of year from month & day; return -1 on invalid input */
 int day_of_year(int year, int month, int day)
 {
 	int i, leap;
@@ -27,7 +27,8 @@ int day_of_year(int year, int month, int day)
 	return day;
 }
 
-/* month_day: set month, day from day of year */
+/* month_day: set month, day from day of year; return 1 on success, -1 on
+ * invalid input */
 int month_day(int year, int yearday, int *pmonth, int *pday)
 {
 	int i, leap;
@@ -45,19 +46,19 @@ int month_day(int year, int yearday, int *pmonth, int *pday)
 	*pmonth = i;
 	*pday = yearday;
 
-	return 0;
+	return 1;
 }
 
 int main(void)
 {
 	int yearday, month, day;
 
-	if ((yearday = day_of_year(2018, 12, 31)) >= 0)
+	if ((yearday = day_of_year(1977, 07, 22)) >= 0)
 		printf("%i day of the year\n", yearday);
 	else
 		printf("invalid input\n");
 
-	if (month_day(2018, 365, &month, &day) >= 0)
+	if (month_day(2018, 365, &month, &day))
 		printf("month %i, day %i\n", month, day);
 	else
 		printf("invalid input\n");
