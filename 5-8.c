@@ -27,26 +27,18 @@ int day_of_year(int year, int month, int day)
 	return day;
 }
 
-/* month_day: set month, day from day of year; return 1 on success, -1 on
- * invalid input */
-int month_day(int year, int yearday, int *pmonth, int *pday)
+/* month_day: set month, day from day of year; zero value is an invalid input */
+void month_day(int year, int yearday, int *pmonth, int *pday)
 {
 	int i, leap;
 
-	if (yearday < 1 && yearday > 366)
-		return -1;
-
 	leap = (year % 4 == 0 && year % 100) || year % 400 == 0;
-
-	if (!leap && yearday > 365)
-		return -1;
 
 	for (i = 1; yearday > daytab[leap][i]; i++)
 		yearday -= daytab[leap][i];
-	*pmonth = i;
-	*pday = yearday;
 
-	return 1;
+	(i < 1 || i > 12) ? (*pmonth = daytab[0][0]) : (*pmonth = i);
+	(yearday < 1 || yearday > 366) ? (*pday = daytab[0][0]) : (*pday = yearday);
 }
 
 int main(void)
@@ -58,11 +50,12 @@ int main(void)
 	else
 		printf("invalid input\n");
 
-	if (month_day(2018, 365, &month, &day))
+	month_day(2020, 366, &month, &day);
+
+	if (month != 0 && day != 0)
 		printf("month %i, day %i\n", month, day);
 	else
 		printf("invalid input\n");
 
 	return 0;
 }
-
