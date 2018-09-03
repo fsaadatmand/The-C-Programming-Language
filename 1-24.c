@@ -95,7 +95,6 @@ int findComment(char line[], int notation)
 int delComment(char line[], char modLine[], int start, int end)
 {
 	int i, j;
-	int len;
 	int status;
 
 	i = j = 0;
@@ -174,7 +173,7 @@ void checkSyntax(char symbol[], int charsCount[], int len)
 			syntaxError = 1;
 		}
 	if (syntaxError != 1)
-		printf("Syntax check: no error found\n");
+		printf("Syntax check: no errors found\n");
 }
 int main(void)
 {
@@ -187,7 +186,6 @@ int main(void)
 	int  charsCount[6];
 	char symbol[6] = { '{', '}', '(', ')', '[', ']' };
 	
-	int i;
 	for (len = 0; len <= 6 ; ++len)        /* use len temporarily as an index */
 		charsCount[len] = 0;
 
