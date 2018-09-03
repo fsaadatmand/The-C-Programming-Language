@@ -95,7 +95,6 @@ int findComment(char line[], int notation)
 int delComment(char line[], char modLine[], int start, int end)
 {
 	int i, j;
-	int len;
 	int status;
 
 	i = j = 0;
