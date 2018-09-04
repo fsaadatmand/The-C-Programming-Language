@@ -15,7 +15,7 @@ static char daytab[2][13] = {
 	{0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 };
 
-	char (*pdaytab)[13] = daytab;     /* pointer to daytab[0][0] */
+	char (*pdaytab)[13] = daytab;     /* pointer to first element (1st array) */
 
 /* day_of_year: set day of year from month & day; return -1 on invalid input */
 int day_of_year(int year, int month, int day)
