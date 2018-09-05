@@ -17,7 +17,6 @@
 #define MATH        '1'          /* signal that an operation was found */
 #define END         0            /* singal EOF */
 #define MAXVAL      100          /* maximum depth of val stack */
-#define BUFSIZE     100
 #define MATCH       0
 #define MAXVAR      26           /* max number of variables */
 #define TOP         val[sp - 1]  /* top of the stack element */ 
@@ -38,8 +37,6 @@ void   clearMemory(double mem[], int size);
 /* external variables */
 int    sp = 0;               /* next free stack position */
 double val[MAXVAL];          /* value stack */
-char   buf[BUFSIZE];         /* buffer from ungetch */
-int    bufp = 0;             /* next free position in buf */
 char   variable;             /* current input variable */ 
 double lastPrint;            /* last printed value */
 
