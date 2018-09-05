@@ -1,17 +1,17 @@
 /*
- * detab function that replaces tabs in the input with the proper number of
- * blanks to space to the next tab stop. Assume a fixed set of tab stops,
- * say every n columns.
+ * Exercise 1-20. Write a program detab function that replaces tabs in the
+ * input with the proper number of blanks to space to the next tab stop. Assume
+ * a fixed set of tab stops, say every n columns. Should n be a variable or a
+ * symbolic parameter.
  * By Faisal Saadatmad
  */
 
 /*
- * Should n be a variable or a symbolic paramter?
- * It is wiser to use a symbolic parameter for the value n rather than a gloable
- * variable. The value of n should remain constant throughout the program, for a
- * change in n would break algorithm in functions that depend on a specific 
- * value of n. If need be it is better to change the value of n in a function
- * through a local variable instead.
+ * Answer: it is wiser to use a symbolic parameter for the value n rather than
+ * a gloabl variable. The value of n should remain constant throughout the
+ * program, for a change in n would break algorithm in functions that depend on
+ * a specific value of n. If need be, it is better to change the value of n in
+ * a function through a local variable instead.
  */
 
 #include <stdio.h>
@@ -19,16 +19,14 @@
 #define MAXLINE 1000
 #define N       4          /* tabstop for every n columns */
 
-int readline(char s[], int lim);
+int getLine(char s[], int lim);
 void detab(void);
 
 char line[MAXLINE];        /* currently read line */
 char modLine[MAXLINE];     /* modified line */
-int  len;                  /* length of the current line */
 
-
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -66,7 +64,7 @@ void detab(void)
 
 int main(void)
 {
-	while ((len = readline(line, MAXLINE)) > 0) {
+	while (getLine(line, MAXLINE) > 0) {
 		detab();
 		printf("%s", modLine);
 	}
