@@ -12,7 +12,6 @@
 #include <ctype.h>
 
 #define NUMBER '0'
-#define MAXOP  100
 #define MAXVAL 100
 
 /* function declarations */
