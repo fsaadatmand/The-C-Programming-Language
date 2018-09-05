@@ -1,29 +1,30 @@
 /* 
- * entab function that replaces stings of blanks by the minimum number of tabs
- * and blanks to achieve the same spacing.
+ * Exercise 1-21. Write a program entab that replaces strings of blanks by the
+ * minimum number of tabs and blanks to achieve the same spacing. When either a
+ * tab or a singl blank would suffice to reach a tab stop, which should be give
+ * preference?
  * By Faisal Saadatmad
  */
 
 /*
- * When either a tab or a singl blank would suffice to reach a tab stop, which
- * should be give preference?
- * In such a case, a singal space is given preference, because otherwise a change 
+ * Answer: in such a case, a singal space is given preference, because otherwise a change 
  * to the value of the tab stop (n) would distored the single space.
  */
 
 #include <stdio.h>
 
 #define MAXLINE 1000
-#define N       4             /* tabstop for every n columns */
+#define N       4             /* default tabstop for every n columns */
 #define YES     1
 #define NO      0
 
-int  readline(char s[], int lim);
+/* functions declarations */
+int  getLine(char s[], int lim);
 int  count(char s[], char c, int p);
 void entab(char line[], char modLine[]);
 
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -84,9 +85,8 @@ int main(void)
 {
 	char line[MAXLINE];       /* currently read line */
 	char modLine[MAXLINE];    /* modified line */
-	int  len;                 /* length of the current line */
 
-	while ((len = readline(line, MAXLINE)) > 0) {
+	while (getLine(line, MAXLINE) > 0) {
 		entab(line, modLine);
 		printf("%s", modLine);
 	}
