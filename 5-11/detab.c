@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 
 		*pTablist = atoi(*argv);    /* store tabstops list */
 
-		if (*pTablist <= 0) {     /* error check; reject 0 and negative numbers */
+		if (*pTablist <= 0) {       /* error check; 0 & negative numbers */
 			printf("error: zero is an invalid tabstop value\n");
 			return -1;
 		}
