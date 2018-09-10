@@ -44,22 +44,30 @@ void detab(char *line, char *modLine, int *n)
 {
 	int toNextTabStop;              /* number of spaces to the next tabstop */
 	int column;                     /* current column number/location */
-	int nTabStops;                  /* counter to cycle throught tabList[] */
+	int tabStopSetting;             /* counter to cycle throught tabList[] */
 
-	nTabStops = argNum;
+	tabStopSetting = argNum;
 	column = 0;
 	while (*line != '\0') {
 		if (*line == '\t') {
 			toNextTabStop = *n - (column % *n);
 			while (toNextTabStop-- > 0) {
 				*modLine++ = ' ';
-				++column;
+			//	++column;
+				if (column++ == *n && tabStopSetting > 0) {
+					++n;
+					--tabStopSetting;
+				}
 			}
-			if (--nTabStops > 0)    /* keep last setting, if no more element */
-				++n;                /* switch to next tabstop in the list */
+//			if (--tabStopSetting > 0)    /* keep last setting, if no more element */
+//				++n;                /* switch to next tabstop in the list */
 		} else {
 			*modLine++ = *line;
-			++column;
+	//		++column;
+			if (column++ == *n && tabStopSetting > 0) {
+				++n;
+				--tabStopSetting;
+			}
 		}
 		++line;
 	}
