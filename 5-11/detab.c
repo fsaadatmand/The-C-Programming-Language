@@ -10,15 +10,12 @@
 #include <ctype.h>
 
 #define MAXLINE 1000
-#define MAXARG  20                  /* max number of tabstop arguments */
+#define MAXARG  1000                  /* max number of tabstop arguments */
+#define N       4                   /* default tabstop for every n columns */
 
 /* functions declarations */
 int getLine(char *s, int lim);
-void detab(char *line, char *modLine, int *n);
-
-/* Global variables */
-int n = 4;                          /* default tabstop for every n columns */
-int argNum = 0;                     /* number of command-line arguments */ 
+void detabList(char *line, char *modLine, int *list, int listSzie);
 
 /* getLine: get line into s, return length of s -- pointer version */
 int getLine(char *s, int lim)
@@ -38,80 +35,93 @@ int getLine(char *s, int lim)
 	return len;
 }
 
-/* detab function: replaces tabs with the proper number of blanks; reads from
- * line, writes to modLine. Tabstop every n column. */
-void detab(char *line, char *modLine, int *n)
+/* detabList function: replaces tabs with the proper number of blanks; reads from
+ * line, writes to modLine. Uses default tabstop (every N column) if no list.
+ * is supplied */
+void detabList(char *line, char *modLine, int *list, int listSzie)
 {
 	int toNextTabStop;              /* number of spaces to the next tabstop */
 	int column;                     /* current column number/location */
-	int tabStopSetting;             /* counter to cycle throught tabList[] */
 
-	tabStopSetting = argNum;
 	column = 0;
-	while (*line != '\0') {
+	while (*line) {
 		if (*line == '\t') {
-			toNextTabStop = *n - (column % *n);
+			if (listSzie > 0) {
+				while (column >= *list && listSzie > 0) {
+					++list;
+					--listSzie;
+				}
+				toNextTabStop = *list - column;
+			} else
+				toNextTabStop = N - (column % N); /* default tabstop setting */
 			while (toNextTabStop-- > 0) {
 				*modLine++ = ' ';
-			//	++column;
-				if (column++ == *n && tabStopSetting > 0) {
-					++n;
-					--tabStopSetting;
-				}
+				++column;
 			}
-//			if (--tabStopSetting > 0)    /* keep last setting, if no more element */
-//				++n;                /* switch to next tabstop in the list */
 		} else {
 			*modLine++ = *line;
-	//		++column;
-			if (column++ == *n && tabStopSetting > 0) {
-				++n;
-				--tabStopSetting;
-			}
+			++column;
 		}
 		++line;
 	}
 	*modLine = '\0';
 }
 
+/* isDigitStr: check if string is made of positive integers characters. Return
+ * 1 if true; 0 if false */
+int isDigitStr(char *s[])
+{
+	int i;
+
+		for (i = 0; (*s)[i]; ++i)   /* ommitted '\0', since s is a pointer */
+			if (!isdigit((*s)[i]))
+				return 0;
+	return 1;
+}
+
 int main(int argc, char *argv[])
 {
 	char line[MAXLINE];             /* currently read line */
 	char modLine[MAXLINE];          /* modified line */
-	static int tabList[MAXARG];     /* list of tabstops */
-	int i;                          /* *argv[] elements index */
-	int *pTablist, *pN;             /* convenient pointers */
+	static int tabStopList[MAXARG]; /* list of tab stops (column numbers) */
+	int argNum = 0;                 /* number of command-line arguments */ 
+	int c;                          /* current read character */
+	int list;                       /* flag variable to signal "-l" option */
+	int *pTablist;                  /* pointer to tabStopList */
 
-	pTablist = tabList;
-
-	argNum = argc - 1;              /* record number of cli arguments */
-
-	if (argNum > MAXARG) {          /* tabStops[] #arguments limit check */
-		printf("error: %d max number of tab stops\n", MAXARG);
-		return -1;
-	}
-
-	while (--argc > 0) {            /* check for cli arguments */
-		++argv;
-		for (i = 0; (*argv)[i] != '\0'; ++i) /* error check; non-digits input */
-			if (!isdigit((*argv)[i])) {
-				printf("error: invalid argument\n");
-				return -1;
+	argNum = argc - 1;              /* record number of cli arguments;
+									   exclude program name (*argv)  */
+	while (--argc > 0 && (*++argv)[0] == '-') {   /* parse options */
+		while ((c = *++argv[0]))    /* cycle through columns */
+			switch (c) {
+			case 'l':
+				list = 1;
+				break;
+			default:
+				printf("detab: illegal option %c\n", c);
+				argc = -1;
+				break;
 			}
-
-		*pTablist = atoi(*argv);    /* store tabstops list */
-
-		if (*pTablist <= 0) {       /* error check; 0 & negative numbers */
-			printf("error: zero is an invalid tabstop value\n");
-			return -1;
-		}
-		++pTablist;
 	}
 
-	pN = (!argNum) ? &n : tabList;  /* if no cli arguments, 
-									   use default tabstop setting */
+	if (list) {
+		pTablist = tabStopList;
+		--argNum;                               /* exclude "-l" */
+		while (argc > 0) 
+			if (isDigitStr(argv)) {             /* error check */
+				*pTablist++ = atoi(*argv++);    /* store tabstops list */
+				--argc;
+			} else {
+				printf("error: invalid tab Stop %s\n", *argv);
+				argc = -1;
+			}
+	}
+
+	if (argc < 0)
+		return -1;
+
 	while (getLine(line, MAXLINE) > 0) {
-		detab(line, modLine, pN);
+		detabList(line, modLine, tabStopList, argNum);
 		printf("%s", modLine);
 	}
 	return 0;
