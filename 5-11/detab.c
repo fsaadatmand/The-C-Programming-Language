@@ -14,8 +14,10 @@
 #define N       4                   /* default tabstop for every n columns */
 
 /* functions declarations */
-int getLine(char *s, int lim);
+int  getLine(char *s, int lim);
 void detabList(char *line, char *modLine, int *list, int listSzie);
+int  isDigitStr(char *s[]);
+int  getOption(char *argument[]);
 
 /* getLine: get line into s, return length of s -- pointer version */
 int getLine(char *s, int lim)
@@ -80,21 +82,22 @@ int isDigitStr(char *s[])
 }
 
 /* getOtion: return option type from user inputed command-line argument */
-int getOption(char *argument[], int counter)
+int getOption(char *argument[])
 {
 	int c;                          /* current read character */
 	int list;                       /* flag variable to signal "-l" option */
 	int option;                     /* inputed cli option */
 
 	list = 0;
-	if (counter > 0 && (*argument)[0] == '-') {   /* parse options */
+	if (*argument[0] == '-') {   /* parse options */
 		while ((c = *++argument[0]) && !list)     /* cycle through columns */
 			if (c == 'l') {
 				list = 1;
 				option = c;
 			} else
 				return c;
-	}
+	} else
+		option = *argument[0];      /* illegal switch caharacter */
 	return option;
 }
 
@@ -109,7 +112,8 @@ int main(int argc, char *argv[])
 
 	argNum = argc - 1;              /* record number of cli arguments;
 									   exclude program name (*argv)  */
-	while ((type = getOption(++argv, --argc)))
+	while (--argc > 0) {
+		(type = getOption(++argv));
 		switch (type) {
 		case ('l'):
 			pTablist = tabStopList;
@@ -128,6 +132,7 @@ int main(int argc, char *argv[])
 			return -1;
 			break;                  /* superfluous */
 		}
+	}
 
 	while (getLine(line, MAXLINE) > 0) {
 		detabList(line, modLine, tabStopList, argNum);
