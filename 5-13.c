@@ -19,12 +19,11 @@
 
 #define MAXLINES   5000      /* max #lines to be stored */
 #define MAXLEN     1000      /* max length of any input line */
-#define MEMORYSIZE 100000    /* storage for memory[] */
+#define MEMORYSIZE 10000     /* storage for memory[] */
 #define N          10        /* default value of last lines to print */
 
 /* function declerations */
 int  readlines(char *lineptr[], int nlines, char *p);
-void writelines(char *lineptr[], int nlines);
 int  getLine(char *, int);
 int  isDigitStr(char *s[]);
 
@@ -70,13 +69,6 @@ int getLine(char *s, int lim)
 	return len;
 }
 
-/* writelines: write output lines */
-void writelines(char *lineptr[], int nlines)
-{
-	while (nlines-- > 0)
-		printf("%s\n", *lineptr++);
-}
-
 /* isDigitStr: check if string is made of positive integers characters. Return
  * 1 if true; 0 if false */
 int isDigitStr(char *s[])
@@ -97,28 +89,30 @@ int main(int argc, char *argv[])
 	int i;                        /* index variable */
 	int n;                        /* cli argument value of n */
 
-	n = 0;
 	while (--argc > 0) {
 		type = *(++argv)[0];
 		switch (type) {
 		case ('-'):
 			n = *++argv[0];
-			if (isDigitStr(argv))
+			if (isDigitStr(argv)) {
 				n = atoi(*argv);
-			else 
-				n = 0;
+				argc = 0;         /* signal to exit loop */
+			}
+			else {
+				n = 0;            /* signal invalid value */
+				argc =0;
+			}
 			break;
 		default:
-			printf("tail: illegal argument\n");
-			return -1;
+			n = 0;                /* signal invalid input */
+			argc = 0;
 			break;
 		}
 	}
 
 	if ((nlines = readlines(lineptr, MAXLINES, memory)) >= 0) {
-		
-		if (n <= 0 || n > nlines)
-			n = N;                /* default to N, if input is unreasonable */
+		if (n <= 0 || n > nlines) /* check input or value of argument */
+			n = N;                /* default to N, if unreasonable */
 		for (i = 0; i < n; ++i)
 			printf("%s\n", lineptr[(nlines - n) + i]);
 		return 0;
