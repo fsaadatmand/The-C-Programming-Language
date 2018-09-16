@@ -1,6 +1,8 @@
-/* 
- * Program that replaces each tab with \t, each backspace with \b
- * and each backslash with \\
+/*
+ * Exercise 1-10. Write a program to copy its input to its output, replacing
+ * each tab by \t, each backspace by \b, and each backslash by \\. This makes
+ * tabs and backspaces visible in an
+ * By Faisal Saadatmand
  */
 
 #include <stdio.h>
@@ -14,25 +16,20 @@ int main(void)
 
 	while ((c = getchar()) != EOF) {
 		charReplaced = NO;
-
 		if (c == '\t') {
 			printf("\\t");
 			charReplaced = YES;
 		}
-
 		if (c == '\b') {
 			printf("\\b");
 			charReplaced = YES;
 		}
-
 		if (c == '\\') {
 			printf("\\\\");
 			charReplaced = YES;
 		}
-
 		if (charReplaced == NO)
 			putchar(c);
 	}
-
 	return 0;
 }

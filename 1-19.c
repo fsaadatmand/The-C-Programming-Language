@@ -1,6 +1,7 @@
 /*
- * A program that removes trailing blanks and tabs from each line of input,
- * and deletes entirely blank lines.
+ * Exercise 1-19. Write a function reverse(s) that reverses the character
+ * string s. Use it to write a program that reverses its input a line at a
+ * time.
  * By Faisal Saadatmand
  */
 
@@ -10,12 +11,12 @@
 #define YES           1
 #define NO            0
 
-int  readline(char s[], int lim);
+int  getLine(char s[], int lim);
 int  delTrailingWS(char s[], int len);
 void reverse(char s1[], char s2[], int len);
 
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -85,7 +86,7 @@ int main(void)
 	char line[MAXLINE];         /* current input line */
 	char reversedLine[MAXLINE]; 
 
-	while ((len = readline(line, MAXLINE)) > 0) {
+	while ((len = getLine(line, MAXLINE)) > 0) {
 		len = delTrailingWS(line, len);   /* new length after removing ws */
 		reverse(line, reversedLine, len);
 		printf("%s", reversedLine);

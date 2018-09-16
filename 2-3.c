@@ -1,8 +1,15 @@
-#include <stdio.h>
-#include <ctype.h>       /* htoi() depends on ctype.h */
-#include <math.h>        /* htoi() depends on math.h */
-#include <string.h>     
+/*
+ * Exercise 2-3. Write a function htoi(s), which converts a string of
+ * hexadecimal digits (including an optional 0x or 0X) into its equivalent
+ * integer value. The allowable digits are 0 through 9, a through f, and A
+ * through F.
+ * By Faisal Saadatmand
+ */
 
+#include <stdio.h>
+#include <ctype.h>       /* for htoi() */ 
+#include <math.h>        /* for powe() */
+#include <string.h>     
 
 #define MAXLINE 1000
 
@@ -58,7 +65,7 @@ int main(void)
 	char xString[MAXLINE];
 
 	printf("Enter a hexadecimal string: ");
-	scanf("%s", &xString);
+	scanf("%s", xString);
 
 	len = strlen(xString);
 
@@ -66,6 +73,5 @@ int main(void)
 		printf("%i\n", intValue);
 	else
 		printf("Invalid hexadecimal number\n");
-	
 	return 0;
 }

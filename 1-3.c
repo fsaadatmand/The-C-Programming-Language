@@ -1,7 +1,7 @@
 /* 
- * program that prints Fahrenheit-Celsius convertion table
- * for fahr = 0, 20, ..., 300; floating-point version
- * Modification: print table header.
+ * Exercise 1-3. Modify the temperature conversion program to print a heading
+ * above the table.
+ * By Fasial Saadatmand
  */
 
 #include <stdio.h>
@@ -11,7 +11,7 @@ int main(void)
 	float fahr, celsius;
 	float lower, upper, step;
 
-	lower = 0;        /* lower limit of temperatuire scale */
+	lower = 0;        /* lower limit of temperature scale */
 	upper = 300;      /* upper limit */
 	step  = 20;       /* step size */
 
@@ -24,6 +24,5 @@ int main(void)
 		printf("%10.0f\t%7.1f\n", fahr, celsius);
 		fahr = fahr + step;
 	}
-
 	return 0;
 }

@@ -108,5 +108,6 @@ int main(void)
 	printf("\n\t**** Library function Ranges *****\n");
 	stdLibraryRanges();
 
+	printf("Size of in %d bytes\n", sizeof(int));
 	return 0;
 }

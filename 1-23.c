@@ -1,5 +1,7 @@
 /* 
- * A program that removes all comments from a C program
+ * Exercise 1-23. Write a program to remove all comments from a C program.
+ * Don't forget to handle quoted strings and character constants properly. C
+ * comments don't nest.
  * Known issue: when more than full comment is present in a single line, only
  * the last one is removed.
  * By Faisal Saadatmand
@@ -13,13 +15,13 @@
 #define SLASH_ASTERISK          1
 #define ASTERISK_SLASH          0
 
-int  readline(char s[], int lim);
+int  getLine(char s[], int lim);
 int  findComment(char line[], int notation);
 int  delComment(char line[], char modLine[], int start, int end);
 int  delBlankLine(char s[]);
 
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -173,7 +175,7 @@ int main(void)
 
 	status = 0;
 
-	while ((len = readline(line, MAXLINE)) > 0) {
+	while ((len = getLine(line, MAXLINE)) > 0) {
 
 		start = findComment(line, SLASH_ASTERISK);
 		end   = findComment(line, ASTERISK_SLASH);

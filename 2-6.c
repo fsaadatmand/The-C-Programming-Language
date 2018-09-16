@@ -1,6 +1,7 @@
 /* 
- * function that returns x with th n bits that begin at position p set to the
- * rightmost n bits in y, leaving the other bits unchanged
+ * Exercise 2-6. Write a function setbits(x,p,n,y) that returns x with the n
+ * bits that begin at position p set to the rightmost n bits of y, leaving the
+ * other bits unchanged.
  * by Faisal Saadatmand
  * */
 
@@ -14,7 +15,6 @@ unsigned int setbits(unsigned int x, int p, int n, unsigned y)
 	unsigned xORy;
 
 	xORy = x | (y & mask) << p;   /* move bits to p, OR with x to set them */
-
 	return xORy;
 }
 

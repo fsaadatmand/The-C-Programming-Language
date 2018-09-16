@@ -1,9 +1,8 @@
-/* count line, words, and character in input */
-
-/* 
- * How would you test the word count program? what kind of input is most likely
- * to uncover bugs if there are any?
- */
+/*
+* Exercise 1-11. How would you test the word count program? What kinds of input
+* are most likely to uncover bugs if there are any?
+* By Faisal Saadatmand
+*/
 
 #include <stdio.h>
 
@@ -28,6 +27,6 @@ int main(void)
 			++nw;
 		}
 	}
-
 	printf("%d %d %d\n", nl, nw, nc);
+	return 0;
 }

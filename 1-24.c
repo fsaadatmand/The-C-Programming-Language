@@ -1,6 +1,8 @@
 /* 
- * A program that that checks for rudimentary syntax error, such as unbalanced
- * braces, parenteses and brackets. 
+ * Exercise 1-24. Write a program to check a C program for rudimentary syntax
+ * errors like unmatched parentheses, brackets and braces. Don't forget about
+ * quotes, both single and double, escape sequences, and comments. (This
+ * program is hard if you do it in full generality.)
  * By Faisal Saadatmand
  */
 
@@ -14,12 +16,12 @@
 #define IN                      1
 #define OUT                     0  
 
-int  readline(char s[], int lim);
+int  getLine(char s[], int lim);
 int  findComment(char line[], int notation);
 int  delComment(char line[], char modLine[], int start, int end);
 
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -190,8 +192,7 @@ int main(void)
 		charsCount[len] = 0;
 
 	status = 0;
-
-	while ((len = readline(line, MAXLINE)) > 0) {
+	while ((len = getLine(line, MAXLINE)) > 0) {
 
 		start = findComment(line, SLASH_ASTERISK);
 		end   = findComment(line, ASTERISK_SLASH);
@@ -203,8 +204,6 @@ int main(void)
 			findCharacter(modLine, symbol, charsCount, 5);
 		}
 	}
-
 	checkSyntax(symbol, charsCount, 5);
-
 	return 0;
 }

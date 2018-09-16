@@ -1,6 +1,6 @@
 /* 
- * Rewrite the function lower, which converts upper case letters to lower case,
- * with a conditional expression instead of if-else.
+ * Exercise 2-10. Rewrite the function lower, which converts upper case letters
+ * to lower case, with a conditional expression instead of if-else.
  * By Faisal Saadatmand
  */
 
@@ -8,11 +8,11 @@
 
 #define MAXLINE       1000         /* maximum input line length */
 
-int  readline(char s[], int lim);
+int  getLine(char s[], int lim);
 void toLowercase(char line[]);
 
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -43,7 +43,7 @@ int main(void)
 	char len;
 	char line[MAXLINE];
 
-	while ((len = readline(line, MAXLINE)) > 0) {
+	while ((len = getLine(line, MAXLINE)) > 0) {
 		toLowercase(line);
 		printf("%s", line);
 	}

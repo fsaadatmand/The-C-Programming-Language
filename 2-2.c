@@ -1,11 +1,17 @@
+/*
+ * Exercise 2-2. Write a loop equivalent to the for loop above without using &&
+ * or ||. 
+ * By Faisal Saadatmand
+ */
+
 #include <stdio.h>
 
 #define MAXLINE       1000         /* maximum input line length */
 
-int readline(char s[], int lim);
+int getLine(char s[], int lim);
 
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i, halt = 0;
 
@@ -42,8 +48,7 @@ int main(void)
 	int  len;                 /* current line length */
 	char line[MAXLINE];       /* current input line */
 
-	while ((len = readline(line, MAXLINE)) > 0) {
-			printf("%s", line);
-	}
+	while ((len = getLine(line, MAXLINE)) > 0)
+		printf("%s", line);
 	return 0;
 }

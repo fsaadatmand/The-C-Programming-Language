@@ -1,6 +1,6 @@
 /*
- * Program that prints a histogram of the frequencies of different characters
- * in its input
+ * Exercise 1-14. Write a program to print a histogram of the frequencies of
+ * different characters in its input.
  * By Faisal Saadatmand
  */
 
@@ -53,7 +53,6 @@ int main(void)
 		--longestBar;
 		printf("\n");
 	}
-
 	for (i = 0; i <= MAXCHAR; ++i)          /* print histogram labels */
 		if (characters[i] != EMPTY)
 			printf ("%c ", i + '0');

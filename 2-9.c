@@ -1,7 +1,7 @@
 /*
- * In two's complent number system, x &= (x - 1) deletes the right most 1-bit
- * in x. Explaing why. Use this observation to write a faster version of
- * bitcount.
+ * Exercise 2-9. In a two's complement number system, x &= (x-1) deletes the
+ * rightmost 1-bit in x. Explaing why. Use this observation to write a faster
+ * version of bitcount.
  *
  * Answer: It has to do with they way binary substraction works. Substracting 1
  * from x results in inverting the rightmost bit when it is 1, leaving the

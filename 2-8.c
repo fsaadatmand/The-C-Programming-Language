@@ -1,6 +1,6 @@
 /*
- * Write a function rightrot(x, n) that returns the value of the ineger x
- * rotated to the right by n positions.
+ * Exercise 2-8. Write a function rightrot(x,n) that returns the value of the
+ * integer x rotated to right by n positions.
  * By Faisal Saadatmand
  */
 
@@ -17,7 +17,6 @@ unsigned int rightrot(unsigned int x, int n)
 	size = (sizeof(unsigned int)) * 8;    /* never assume size of int */
 
 	bits = x & ~(~0 << n);                /* extract n bits to be rotated */
-	
 	rotatedX = (x >> n) | bits << (size - n);
 
 	return rotatedX;
@@ -26,7 +25,7 @@ unsigned int rightrot(unsigned int x, int n)
 int main(void)
 {
 	unsigned int x = 0XAF14E5CB;
-	int n      = 16;
+	int          n = 16;
 
 	printf("%x\n", rightrot(x, n));
 

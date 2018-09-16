@@ -1,7 +1,7 @@
-/*
- * print Fahrenheit-Celsius table
- * for fahr = 0, 20, ..., 300; floating-point version
- * Modification: Rewrite using functions
+/* 
+ * Exercise 1.15. Rewrite the temperature conversion program of Section 1.2 to
+ * use a function for conversion.
+ * By Faisal Saadatmand
  */
 
 #include <stdio.h>
@@ -22,7 +22,7 @@ int main(void)
 	float fahr, celsius;
 	float lower, upper, step;
 
-	lower = 0;        /* lower limit of temperatuire scale */
+	lower = 0;        /* lower limit of temperature scale */
 	upper = 300;      /* upper limit */
 	step  = 20;       /* step size */
 
@@ -35,6 +35,5 @@ int main(void)
 		printf("%10.0f\t%7.1f\n", fahr, celsius);
 		fahr = fahr + step;
 	}
-
 	return 0;
 }

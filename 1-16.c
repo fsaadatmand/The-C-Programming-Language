@@ -1,19 +1,20 @@
 /*
- * Program to print the longest line
- * Note: changed function name from getline to readline 
- * Modified main routine to print the length of arbitrary long
- * input line, and as much as possible of the text.
+ * Exercise 1-16. Revise the main routine of the longest-line program so it
+ * will correctly print the length of arbitrary long input lines, and as much
+ * as possible of the text.
+ * Note: changed getline() name to getLine().
+ * By Faisal Saadatmand
  */
 
 #include <stdio.h>
 
 #define MAXLINE 1000          /* maximum input line length */
 
-int  readline(char s[], int lim);
+int  getLine(char s[], int lim);
 void copy(char to[], char from[]);
 
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -48,15 +49,14 @@ int main(void)
 	char longest[MAXLINE];    /* longest line saved here */
 
 	max = 0;
-
-	while ((len = readline(line, MAXLINE)) > 0)
+	while ((len = getLine(line, MAXLINE)) > 0)
 		if (len == MAXLINE - 1 &&   /* test for length and previous input */
 				line[MAXLINE - 1] != '\n') {
 			copy(longest, line);            /* save the string */
 			longest[MAXLINE - 2] = '\n';    /* insert a newline charcter before
 											   the null character */
 			max = len;
-			max += readline(line, MAXLINE); /* save the value of max */
+			max += getLine(line, MAXLINE); /* save the value of max */
 		} else if (len > max) {
 			max = len;
 			copy(longest, line);

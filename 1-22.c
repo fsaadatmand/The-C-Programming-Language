@@ -1,6 +1,8 @@
 /*
- * Program that "folds" lond input lines into two or more shorter lines after
- * th last non-blank character that occurs before the n-th column of input.
+ * Exercise 1-22. Write a program to "fold" long input lines into two or more
+ * shorter lines after the last non-blank character that occurs before the n-th
+ * column of input. Make sure your program does something intelligent with very
+ * long lines, and if there are no blanks or tabs before the specified column.
  * By Faisal Saadatmand
  */
 
@@ -9,11 +11,11 @@
 #define MAXLINE        1000        /* maximum input line length */
 #define LINE_LENGTH    81          /* maximum output line length */
 
-int    readline(char s[], int lim);
+int    getLine(char s[], int lim);
 void   foldLine(char line[], char fldLine[], int lineLen);
 
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -67,15 +69,14 @@ int main(void)
 	char line[MAXLINE];       /* current input line */
 	char fldLine[MAXLINE];    /* folded input line */
 
-// 	while ((len = readline(line, MAXLINE)) > 0)
-	len = readline(line, MAXLINE);
+	len = getLine(line, MAXLINE);
 	while (len > 0) {
 		if (len >= LINE_LENGTH) {
 			foldLine(line, fldLine, LINE_LENGTH);
 			printf("%s", fldLine);     /* print folded lines */
 		} else	
 			printf("%s", line);        /* print unfolded lines */
-		len = readline(line,MAXLINE);
+		len = getLine(line,MAXLINE);
 	}
 	return 0;
 }

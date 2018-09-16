@@ -1,6 +1,6 @@
-/* 
- * A program that removes trailing blanks and tabs from each line of input,
- * and deletes entirely blank lines.
+/*
+ * Exercise 1-18. Write a program to remove trailing blanks and tabs from each
+ * line of input, and to delete entirely blank lines.
  * By Faisal Saadatmand
  */
 
@@ -10,12 +10,12 @@
 #define YES           1
 #define NO            0
 
-int  readline(char s[], int lim);
+int  getLine(char s[], int lim);
 int  delTrailingWS(char s[], int len);
 void delBlankLns(char s[], int len);
 
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -81,7 +81,7 @@ int main(void)
 	int  newLen;              /* modified line length */
 	char line[MAXLINE];       /* current input line */
 
-	while ((len = readline(line, MAXLINE)) > 0) {
+	while ((len = getLine(line, MAXLINE)) > 0) {
 		newLen = delTrailingWS(line, len);
 		delBlankLns(line, newLen);
 		printf("%s", line);
