@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 	int *pTablist;                  /* pointer to tabStopList */
 	int type;                       /* type of argument operator */
 	int mShorthand,nShorthand;      /* flag variables */            
-	int c;                          /* temp variable  to increment pointer */
+	int c;                          /* temp variable to increment pointer */
 
 	pTablist = tabStopList;
 
