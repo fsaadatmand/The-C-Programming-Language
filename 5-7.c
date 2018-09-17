@@ -2,9 +2,9 @@
  * Exercise 5-7. Rewrite readlines to store lines in an array supplied by main,
  * rather than calling alloc to maintain storage. How much faster is the
  * program? 
- * With the current implementation both clock_t and unix time command report
- * similar runtimes.  perhaps a much bigger data would show a discrepancy in
- * runtimes.
+ * Answer: With the current implementation both clock_t and unix time command
+ * report similar runtimes.  perhaps a much bigger data would show a
+ * discrepancy in runtimes.
  * By Faisal Saadatmand
  */
 
