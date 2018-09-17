@@ -1,3 +1,12 @@
+/*
+ * Exercise 3-3. Write a function expand(s1,s2) that expands shorthand
+ * notations like a-z in the string s1 into the equivalent complete list
+ * abc...xyz in s2. Allow for letters of either case and digits, and be
+ * prepared to handle cases like a-b-c and a-z0-9 and -a-z. Arrange that a
+ * leading or trailing  - is taking literally.
+ * By Faisal Saadatmand
+ */
+
 #include <stdio.h>
 #include <ctype.h>
 
@@ -7,8 +16,8 @@
 #define YES 1
 #define NO  0
 
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -60,7 +69,7 @@ int main(void)
 	char line[MAXLINE];
 	char modLine[MAXLINE];
 
-	while (readline(line, MAXLINE) > 0)
+	while (getLine(line, MAXLINE) > 0)
 		if (expand(line, modLine))
 			printf("%s", modLine);
 		else

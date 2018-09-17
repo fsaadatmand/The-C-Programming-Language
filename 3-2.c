@@ -1,20 +1,21 @@
 /*
- * Exercise 3-1: Our binary search makes two tests inside the loop, when one
- * would suffice (at the price of more tests outside). Write a version with
- * only one test inside the loop and measure the difference in run-time.  By
- * Faisal Saadatmand
+ *Exercise 3-2. Write a function escape(s,t) that converts characters like
+ newline and tab into visible escape sequences like \n and \t as it copies the
+ string t to s. Use a switch. Write a function for the other direction as well,
+ converting escape sequences into the real characters. 
+ * By Faisal Saadatmand
  */
 
 #include <stdio.h>
 
 #define MAXLINE       10000         /* maximum input line length */
 
-int  readline(char s[], int lim);
+int  getLine(char s[], int lim);
 void escape(char line[], char modLine[]);
 void escapeRev(char line[], char modLine[]);
 
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -92,7 +93,7 @@ int main(void)
 	char line[MAXLINE];
 	char modLine[MAXLINE];
 
-	while ((len = readline(line, MAXLINE)) > 0) {
+	while ((len = getLine(line, MAXLINE)) > 0) {
 	//	escape(line, modLine);
 	//	printf("%s", modLine);
 		escapeRev(line, modLine);

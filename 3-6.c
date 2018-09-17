@@ -1,3 +1,10 @@
+/*
+ * Exercise 3-6. Write a version of itoa that accepts three arguments instead
+ * of two. The third argument is a minimum field width; the converted number
+ * must be padded with blanks on the left is necessary to make it wide enough.
+ * By Faisal Saadatmand
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>

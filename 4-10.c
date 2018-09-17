@@ -1,5 +1,5 @@
 /*
- * Exercise 4-10: An alernate organization uses getline to read an entire input
+ * Exercise 4-10. An alernate organization uses getline to read an entire input
  * line; this makes getch and ungetch unnecessary. Revise the calculator to us
  * this approach.
  * Faisal Saadatmand
@@ -23,7 +23,7 @@
 
 /* function decleration */
 int    getop(char []);
-int    readline(char s[], int lim);
+int    getLine(char s[], int lim);
 void   push(double);
 double pop(void);
 void   printTop(void);
@@ -68,7 +68,7 @@ int getop(char s[])
 	int           j; 
 
 	if (i == len) {         /* check if the previous line was read completely */
-		len = readline(line, MAXLINE);	    /* read the next line */
+		len = getLine(line, MAXLINE);	    /* read the next line */
 		i = 0;                              /* reset index */
 		if (len < 0)                        /* line to read */
 			return END;
@@ -101,8 +101,8 @@ int getop(char s[])
 	return NUMBER;
 }
 
-/* readline: get line into s, return length of s */
-int readline(char s[], int lim)
+/* getLine: get line into s, return length of s */
+int getLine(char s[], int lim)
 {
 	int c, i;
 

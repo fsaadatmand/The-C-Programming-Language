@@ -1,17 +1,21 @@
-/* changed the index of the outer for loop in strindex only */
+/*
+ * Exercise 4-1. Write the function strindex(s,t) which returns the position of
+ * the rightmost occurrence of s in t, or -1 if there is none.
+ * By Faisal Saadatmand
+ */
 
 #include <stdio.h>
 #include <string.h>
 
 #define MAXLINE 1000          /* maximum input line length */
 
-int readline(char line[], int lim);
+int getLine(char line[], int lim);
 int strindex(char source[], char searchfor[]);
 
 char pattern[] = "ould";      /* pattern to search for */
 
-/* readline: get line into s, return */
-int readline(char s[], int lim)
+/* getLine: get line into s, return */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -49,7 +53,7 @@ int main(void)
 	int found = 0;
 	int position; 
 
-	while (readline(line, MAXLINE) > 0)
+	while (getLine(line, MAXLINE) > 0)
 		if ((position = strindex(line, pattern)) >= 0) {
 			printf("%s", line);
 			printf("%i\n", position);
