@@ -9,11 +9,11 @@
 /* concatenate t to end of s; s must be big enough */
 void strCat(char *s, char *t)
 {
-	while (*s)             /* find end of s */
-		++s;
+  while (*s)             /* find end of s */
+    ++s;
 
-  	while ((*s++ = *t++))  /* copy t */
-			;
+  while ((*s++ = *t++))  /* copy t */
+    ;
 }
 
 int main(void)
@@ -21,9 +21,9 @@ int main(void)
   char string1[64] = { "test this " };
   char string2[] = { "function" };
 
-	  strCat(string1, string2);
+  strCat(string1, string2);
 
-  printf("%s\n", string1); 
-		 
-	return 0;
+  printf("%s\n", string1);
+  
+  return 0;
 }
