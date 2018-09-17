@@ -9,29 +9,24 @@
 /* strend: returns 1 if t occurs at the end of s, and zero otherwise */
 int strend (char *s, char *t)
 {
-	int t_len;
+  int t_len;
 
-	while (*s)            /* find end of s */
-		++s;
+  while (*++s)          /* find end of s */
+    ;
 
-	t_len = 0;
-	while (*t) {          /* find end of t */
-		++t_len;          /* find length of t */
-		++t;
-	}
+  t_len = 0;
+  while (*t++)          /* find end of t */
+    ++t_len;            /* find length of t */
 
-	++t_len;              /* account for '\0' */
+  ++t_len;              /* account for '\0' */
 
-	while (*s == *t) {
-		--s;
-		--t;
-		--t_len;
-	}
+  while (*s-- == *t--)
+    --t_len;
 
-	if (t_len == 0) 
-		return 1;
-	else
-		return 0;
+  if (t_len == 0)
+    return 1;
+  else
+    return 0;
 }
 
 int main(void)
@@ -40,6 +35,6 @@ int main(void)
   char string2[] = { "string" };
 
   printf("%i\n", strend(string1, string2));
-
-	return 0;
+  
+  return 0;
 }
