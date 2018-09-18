@@ -1,7 +1,7 @@
 /* 
  * Program to print the longest line
- * Note: change function name from getline to readline 
- * Modified the readline function and the main routine. 
+ * Note: change function name from getline to getLine 
+ * Modified the getLine function and the main routine. 
  * While this approach works, it is not the correct answer for 
  * question 1-16.
  */
@@ -10,11 +10,11 @@
 
 #define MAXLINE 1000          /* maximum input line length */
 
-int readline(char s[], int lim);
+int getLine(char s[], int lim);
 void copy(char to[], char from[]);
 
-/* readline function: read a line into s, return length */
-int readline(char s[], int lim)
+/* getLine function: read a line into s, return length */
+int getLine(char s[], int lim)
 {
 	int c, i;
 
@@ -59,7 +59,7 @@ int main(void)
 
 	max = 0;
 
-	while ((len = readline(line, MAXLINE)) > 0)
+	while ((len = getLine(line, MAXLINE)) > 0)
 		if (len > max) {
 			max = len;
 			copy(longest, line);
