@@ -12,12 +12,13 @@
 
 #define MAXLINES   5000      /* max #lines to be sorted */
 #define MAXLEN     1000      /* max length of any input line */
-#define MEMORYSIZE 10000     /* storage for memory[] */
+#define ALLOCSIZE 100000     /* storage for alloc */
 
 /* functions */
 int  getLine(char *s, int lim);
-int  readlines(char *lineptr[], int nlines, char *p);
+int  readlines(char *lineptr[], int nlines);
 void witelines(char *lineptr[], int nlines);
+char *alloc(int);
 void qSort(void *lineptr[], int left, int right,
 		int (*comp)(void *, void *));
 int  numcmp(char *, char *);
@@ -28,7 +29,9 @@ int  fstrCmp(char *s, char *t);
 int  frstrCmp(char *s, char *t);
 
 /* Globals */
-char *lineptr[MAXLINES];     /* pointers to text lines */
+char        *lineptr[MAXLINES];   /* pointers to text lines */
+static char allocbuf[ALLOCSIZE];  /* storage for alloc */
+static char *allocp = allocbuf;   /* next fre position */
 
 /* getLine: get line into s, return length of s -- pointer version */
 int getLine(char *s, int lim)
@@ -49,22 +52,19 @@ int getLine(char *s, int lim)
 }
 
 /* readlines: read input lines */
-int readlines(char *lineptr[], int maxlines, char *p)
+int readlines(char *lineptr[], int maxlines)
 {
-	int len, nlines, usedMemory;
-	char line[MAXLEN];
+	int len, nlines;
+	char *p, line[MAXLEN];
 
-	usedMemory = 0;
 	nlines = 0;
 	while ((len = getLine(line, MAXLEN)) > 0)
-		if (nlines >= maxlines || MEMORYSIZE - usedMemory < len)
+		if (nlines >= maxlines || (p = alloc(len)) == NULL)
 			return -1;
 		else {
 			line[len - 1] = '\0';   /* delete newline character */
 			strcpy(p, line);
 			lineptr[nlines++] = p;
-			p += len;               /* increment pointer */
-			usedMemory += len;      /* track memory usage */
 		}
 	return nlines;
 }
@@ -74,6 +74,16 @@ void writelines(char *lineptr[], int nlines)
 {
 	while (nlines-- > 0)
 		printf("%s\n", *lineptr++);
+}
+
+/* alloc: allocate memory */
+char *alloc(int n)               /* return pointer to n characters */
+{
+	if (allocbuf + ALLOCSIZE - allocp >=n) {     /* it fits */
+		allocp += n;
+		return allocp - n;                       /* old p */
+	} else                                       /* not enough room */
+		return 0;
 }
 
 /* qsort: sort v[left]...V[right] into increasing order */
@@ -181,7 +191,6 @@ int main(int argc, char *argv[])
 	int numeric = 0;               /* 1 if numeric sort */
 	int decreasing = 0;            /* 1 if reverse order sort */
 	int fold = 0;                  /* 1 id case insensitive sort */
-	char memory[MEMORYSIZE];       /* stored lines */
 
 	++argv;
 	while (--argc > 0) {
@@ -194,7 +203,7 @@ int main(int argc, char *argv[])
 		++argv;
 	}
 
-	if ((nlines = readlines(lineptr, MAXLINES, memory)) >= 0) {
+	if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
 		if (decreasing)
 			qSort((void**) lineptr, 0, nlines - 1,
 					(int (*)(void*, void*))(numeric ? rnumcmp :

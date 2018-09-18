@@ -29,7 +29,7 @@ int  fstrCmp(char *s, char *t);
 int  frstrCmp(char *s, char *t);
 
 /* Globals */
-char *lineptr[MAXLINES];     /* pointers to text lines */
+char        *lineptr[MAXLINES];   /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
 static char *allocp = allocbuf;   /* next fre position */
 
@@ -79,10 +79,10 @@ void writelines(char *lineptr[], int nlines)
 /* alloc: allocate memory */
 char *alloc(int n)               /* return pointer to n characters */
 {
-	if (allocbuf + ALLOCSIZE - allocp >=n) {        /* it fits */
+	if (allocbuf + ALLOCSIZE - allocp >=n) {     /* it fits */
 		allocp += n;
 		return allocp - n;                       /* old p */
-	} else                            /* not enough room */
+	} else                                       /* not enough room */
 		return 0;
 }
 

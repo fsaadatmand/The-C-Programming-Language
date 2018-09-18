@@ -19,34 +19,34 @@
 
 #define MAXLINES   5000      /* max #lines to be stored */
 #define MAXLEN     1000      /* max length of any input line */
-#define MEMORYSIZE 10000     /* storage for memory[] */
+#define ALLOCSIZE 100000     /* storage for alloc */
 #define N          10        /* default value of last lines to print */
 
 /* function declerations */
-int  readlines(char *lineptr[], int nlines, char *p);
+int  readlines(char *lineptr[], int nlines);
 int  getLine(char *, int);
+char *alloc(int);
 int  isDigitStr(char *s[]);
 
 /* global variables */
-char *lineptr[MAXLINES];    /* pointers to text lines */
+char        *lineptr[MAXLINES];   /* pointers to text lines */
+static char allocbuf[ALLOCSIZE];  /* storage for alloc */
+static char *allocp = allocbuf;   /* next fre position */
 
 /* readlines: read input lines */
-int readlines(char *lineptr[], int maxlines, char *p)
+int readlines(char *lineptr[], int maxlines)
 {
-	int len, nlines, usedMemory;
-	char line[MAXLEN];
+	int len, nlines;
+	char *p, line[MAXLEN];
 
-	usedMemory = 0;
 	nlines = 0;
 	while ((len = getLine(line, MAXLEN)) > 0)
-		if (nlines >= maxlines || MEMORYSIZE - usedMemory < len)
+		if (nlines >= maxlines || (p = alloc(len)) == NULL)
 			return -1;
 		else {
 			line[len - 1] = '\0';   /* delete newline character */
 			strcpy(p, line);
 			lineptr[nlines++] = p;
-			p += len;               /* increment pointer */
-			usedMemory += len;      /* track memory usage */
 		}
 	return nlines;
 }
@@ -69,6 +69,16 @@ int getLine(char *s, int lim)
 	return len;
 }
 
+/* alloc: allocate memory */
+char *alloc(int n)               /* return pointer to n characters */
+{
+	if (allocbuf + ALLOCSIZE - allocp >=n) {     /* it fits */
+		allocp += n;
+		return allocp - n;                       /* old p */
+	} else                                       /* not enough room */
+		return 0;
+}
+
 /* isDigitStr: check if string is made of positive integers characters. Return
  * 1 if true; 0 if false */
 int isDigitStr(char *s[])
@@ -84,7 +94,6 @@ int isDigitStr(char *s[])
 int main(int argc, char *argv[])
 {
 	int nlines;                   /* number of input lines read */
-	char memory[MEMORYSIZE];      /* stored lines */
 	int type;                     /* type of argument operator */
 	int i;                        /* index variable */
 	int n;                        /* cli argument value of n */
@@ -110,7 +119,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if ((nlines = readlines(lineptr, MAXLINES, memory)) >= 0) {
+	if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
 		if (n <= 0 || n > nlines) /* check input or value of argument */
 			n = N;                /* default to N, if unreasonable */
 		for (i = 0; i < n; ++i)
