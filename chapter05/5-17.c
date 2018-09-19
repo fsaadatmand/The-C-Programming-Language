@@ -28,6 +28,10 @@ int  rnumcmp(char *, char *);
 int  rstrCmp(char *s, char *t);
 int  fstrCmp(char *s, char *t);
 int  frstrCmp(char *s, char *t);
+int  dstrCmp(char *s, char *t);
+int  drstrCmp(char *s, char *t);
+int  dfstrCmp(char *s, char *t);
+int  dfrstrCmp(char *s, char *t);
 
 /* Globals */
 char        *lineptr[MAXLINES];   /* pointers to text lines */
