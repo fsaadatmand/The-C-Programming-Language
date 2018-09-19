@@ -1,5 +1,4 @@
-# Answers to The C Programming Language (Second Edition) by Brian W. Kernighan
-& Dennis M. Ritchie.
+# Answers to The C Programming Language (Second Edition) by Brian W. Kernighan & Dennis M. Ritchie.
 
 These are the answers to the exercises in K&R's The C Programming Language
 (second Edition).
