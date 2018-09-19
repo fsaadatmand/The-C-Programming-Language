@@ -74,21 +74,72 @@ void computeRanges(void)
 
 	/* floating points */
 	/* see IEEE 754 standards */
-	float fltMin;
-	float fltMax;
-	fltMin = (2 - pow(2, -23)) / pow(2, 127);
-	fltMax = (2 - pow(2, -23)) * pow(2, 127);
+	float fltMin, fltMax;
+	double dblMin, dblMax, mantissa, exponent;
+	
+	mantissa = 1.0;
+	exponent = 1.0;
+	int i;
+	for (i = 0; i < 23; ++i)
+		 mantissa /= 2;
+	for (i = 0; i < 127; ++i)
+		exponent *= 2;
+	fltMin = (2 - mantissa) / exponent;
+	fltMax = (2 - mantissa) * exponent;
 	printf("float\t\t\t%g\t\t%g\n", fltMin, fltMax);
 
-	double dblMin;
-	double dblMax;
-	dblMin = (2 - pow(2, -52)) / pow(2, 1023);
-	dblMax = (2 - pow(2, -52)) * pow(2, 1023);
-	printf("double\t\t\t%lg\t\t%lg\n", dblMin, dblMax);
-
+	mantissa = 1.0;
+	for (i = 0; i < 52; ++i)
+		mantissa /= 2;
+	exponent = pow(2, 1023);    /* too big to fit into a variable */
+	dblMin = (2 - mantissa) / exponent;
+	dblMax = (2 - mantissa) * exponent;
+	printf("double\t\t\t%g\t\t%g\n", dblMin, dblMax);
 }
 
-void stdLibraryRanges(void)
+void stdLibraryRanges()
+{
+	/* Characters and Integers */
+	printf("signed char\t\t%.0f\t\t\t%.0f\n",
+			pow(2, (sizeof(char) * 8 - 1)) * -1,
+			pow(2, (sizeof(char) * 8) - 1) - 1);
+	printf("unsigned char\t\t%2i\t\t\t%.0f\n", 0,
+			pow(2, sizeof(unsigned char) * 8) - 1);
+
+	printf("signed short\t\t%.0f\t\t\t%.0f\n",
+			pow(2, (sizeof(short) * 8 - 1)) * -1,
+			pow(2, (sizeof(short) * 8) - 1) - 1);
+	printf("unsigned short\t\t%2i\t\t\t%0.f\n", 0,
+			pow(2, sizeof(unsigned short) * 8) - 1);
+
+	printf("signed int\t\t%.0f\t\t%.0f\n",
+			pow(2, (sizeof(int) * 8 - 1)) * -1,
+			pow(2, (sizeof(int) * 8) - 1) - 1);
+	printf("unsigned int\t\t%2i\t\t\t%0.f\n", 0,
+			pow(2, sizeof(unsigned int) * 8) - 1);
+
+	printf("signed long\t\t%.0f\t%.0Lf\n",
+			pow(2, (sizeof(long) * 8 - 1)) * -1,
+			(long double) pow(2, (sizeof(long) * 8) - 1) - 1);
+	printf("unsigned long\t\t%2i\t\t\t%0.Lf\n", 0,
+			(long double)  pow(2, sizeof(unsigned long) * 8) - 1);
+
+	printf("signed long\t\t%.0f\t%.0Lf\n",
+			pow(2, (sizeof(long long) * 8 - 1)) * -1,
+			(long double) pow(2, (sizeof(long long) * 8) - 1) - 1);
+	printf("unsigned long\t\t%2i\t\t\t%0.Lf\n", 0,
+			(long double) pow(2, sizeof(unsigned long long) * 8) - 1);
+
+	printf("\n");
+
+	/* floating points */
+	/* see IEEE 754 standards */
+	printf("float\t\t\t%g\t\t%g\n",
+			(2 - pow(2, -23)) / pow(2, 127),(2 - pow(2, -23)) * pow(2, 127));
+	printf("double\t\t\t%lg\t\t%lg\n",
+			(2 - pow(2, -52)) / pow(2, 1023), (2 - pow(2, -52)) * pow(2, 1023));
+}
+void stdLibraryMacros(void)
 {
 	/* characters */
 	printf("signed char\t\t%i\t\t\t%i\n", CHAR_MIN, CHAR_MAX);
@@ -118,6 +169,9 @@ int main(void)
 
 	printf("\n\t**** Library function Ranges *****\n");
 	stdLibraryRanges();
+
+	printf("\n\t**** Library Macros Ranges *****\n");
+	stdLibraryMacros();
 
 	return 0;
 }
