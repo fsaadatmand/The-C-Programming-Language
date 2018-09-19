@@ -70,7 +70,22 @@ void computeRanges(void)
 		;
 	printf("unsigned long long\t%2i\t\t\t%llu\n", 0, ullInt);
 
+	printf("\n");
+
 	/* floating points */
+	/* see IEEE 754 standards */
+	float fltMin;
+	float fltMax;
+	fltMin = (2 - pow(2, -23)) / pow(2, 127);
+	fltMax = (2 - pow(2, -23)) * pow(2, 127);
+	printf("float\t\t\t%g\t\t%g\n", fltMin, fltMax);
+
+	double dblMin;
+	double dblMax;
+	dblMin = (2 - pow(2, -52)) / pow(2, 1023);
+	dblMax = (2 - pow(2, -52)) * pow(2, 1023);
+	printf("double\t\t\t%lg\t\t%lg\n", dblMin, dblMax);
+
 }
 
 void stdLibraryRanges(void)
@@ -91,9 +106,9 @@ void stdLibraryRanges(void)
 	printf("\n");
 
 	/* floating points */
-	printf("float\t\t\t%f\t\t%g\n", FLT_MIN, FLT_MAX);
-	printf("double\t\t\t%lf\t\t%lg\n", DBL_MIN, DBL_MAX);
-	printf("long double\t\t%llf\t\t%llg\n", LDBL_MIN, LDBL_MAX);
+	printf("float\t\t\t%g\t\t%g\n", FLT_MIN, FLT_MAX);
+	printf("double\t\t\t%lg\t\t%lg\n", DBL_MIN, DBL_MAX);
+	printf("long double\t\t%Lg\t\t%Lg\n", LDBL_MIN, LDBL_MAX);
 }
 
 int main(void)
