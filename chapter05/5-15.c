@@ -23,13 +23,16 @@ void qSort(void *lineptr[], int left, int right,
 		int (*comp)(void *, void *));
 int  numcmp(char *, char *);
 int  strCmp(char *s, char *t);
+int  reverse(char *s, char *t);
 int  fstrCmp(char *s, char *t);
 
 /* Globals */
 char        *lineptr[MAXLINES];   /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
 static char *allocp = allocbuf;   /* next fre position */
-int         reverse = 0;          /* 1 if reverse order sort */
+int         numeric = 0;          /* 1 if numeric sort */
+int         decreasing = 0;       /* 1 if reverse order sort */
+int         fold = 0;             /* 1 id case insensitive sort */
 
 /* getLine: get line into s, return length of s -- pointer version */
 int getLine(char *s, int lim)
@@ -114,9 +117,9 @@ int numcmp(char *s1, char *s2)
 	v2 = atof(s2);
 
 	if (v1 < v2)
-		return (reverse) ? 1 : -1;
+		return -1;
 	else if (v1 > v2)
-		return (reverse) ? -1 : 1;
+		return 1;
 	else
 		return 0;
 }
@@ -127,7 +130,7 @@ int strCmp(char *s, char *t)
 	for ( ; *s == *t; s++, t++)
 		if (*s == '\0')
 			return 0;
-	return (reverse) ? *t - *s : *s - *t;
+	return *s - *t;
 }
 
 void swap(void *v[], int i, int j)
@@ -139,28 +142,45 @@ void swap(void *v[], int i, int j)
 	v[j] = temp;
 }
 
+/* reverse: reverse the return value of a function */
+int reverse(char *s, char *t)
+{
+	int (*comp) (char *, char *);
+
+	if (numeric)
+		comp = numcmp;
+	else if (fold)
+		comp = fstrCmp;
+	else
+		comp = strCmp;
+		
+		if ((*comp)(s, t) < 0)
+			return  1;
+		else if ((*comp)(s, t) > 0)
+			return -1;
+		return 0;
+}
+
 /* fstrCmp: same as strCmp but case insensitive */
 int fstrCmp(char *s, char *t)
 {
 	for ( ; tolower(*s) == tolower(*t); s++, t++)
 		if (*s == '\0')
 			return 0;
-	return (reverse) ? tolower(*t) - tolower(*s) : tolower(*s) - tolower(*t);
+	return tolower(*s) - tolower(*t);
 }
 
 /* sort input lines */
 int main(int argc, char *argv[])
 {
 	int nlines;                    /* number of input lines read */     
-	int numeric = 0;               /* 1 if numeric sort */
-	int fold = 0;                  /* 1 id case insensitive sort */
 
 	++argv;
 	while (--argc > 0) {
 		if (strCmp(argv[0], "-n") == 0)
 			numeric = 1;
 		if (strCmp(argv[0], "-r") == 0)
-			reverse = 1;
+			decreasing = 1;
 		if (strCmp(argv[0], "-f") == 0)
 			fold = 1;
 		++argv;
@@ -168,8 +188,9 @@ int main(int argc, char *argv[])
 
 	if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
 			qSort((void**) lineptr, 0, nlines - 1,
-					(int (*)(void*, void*))(numeric ? numcmp :
-						(fold) ? fstrCmp : strCmp));
+					(int (*)(void *, void *))(numeric ? (decreasing) ?
+						reverse : numcmp : (decreasing) ? reverse : (fold) ?
+						fstrCmp : strCmp));
 		writelines(lineptr, nlines);
 		return 0;
 	} else {

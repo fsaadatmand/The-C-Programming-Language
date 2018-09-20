@@ -24,19 +24,19 @@ void qSort(void *lineptr[], int left, int right,
 		int (*comp)(void *, void *));
 int  numcmp(char *, char *);
 int  strCmp(char *s, char *t);
-int  rnumcmp(char *, char *);
-int  rstrCmp(char *s, char *t);
+int  reverse(char *s, char *t);
 int  fstrCmp(char *s, char *t);
-int  frstrCmp(char *s, char *t);
 int  dstrCmp(char *s, char *t);
-int  drstrCmp(char *s, char *t);
-int  dfstrCmp(char *s, char *t);
-int  dfrstrCmp(char *s, char *t);
 
 /* Globals */
 char        *lineptr[MAXLINES];   /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
 static char *allocp = allocbuf;   /* next fre position */
+int         numeric = 0;          /* 1 if numeric sort */
+int         decreasing = 0;       /* 1 if reverse order sort */
+int         fold = 0;             /* 1 id case insensitive sort */
+int         dirOr = 0;            /* 1 if directory order sort */
+int         field = 0;            /* value of field to sort */
 
 /* getLine: get line into s, return length of s -- pointer version */
 int getLine(char *s, int lim)
@@ -137,31 +137,6 @@ int strCmp(char *s, char *t)
 	return *s - *t;
 }
 
-/* rnumcmp: compare s1 and s2 numerically */
-int rnumcmp(char *s1, char *s2)
-{
-	double v1, v2;
-
-	v1 = atof(s1);
-	v2 = atof(s2);
-
-	if (v1 > v2)
-		return -1;
-	else if (v1 < v2)
-		return 1;
-	else
-		return 0;
-}
-
-/* rstrCmp: same as strCmp but in reverse order */
-int rstrCmp(char *s, char *t)
-{
-	for ( ; *s == *t; s++, t++)
-		if (*s == '\0')
-			return 0;
-	return *t - *s;
-}
-
 void swap(void *v[], int i, int j)
 {
 	void *temp;
@@ -169,6 +144,27 @@ void swap(void *v[], int i, int j)
 	temp = v[i];
 	v[i] = v[j];
 	v[j] = temp;
+}
+
+/* reverse: reverse the return value of a function */
+int reverse(char *s, char *t)
+{
+	int (*comp) (char *, char *);
+
+	if (numeric)
+		comp = numcmp;
+	else if (fold && !dirOr)      /* important */
+		comp = fstrCmp;
+	else if (dirOr)
+		comp = dstrCmp;
+	else
+		comp = strCmp;
+		
+		if ((*comp)(s, t) < 0)
+			return  1;
+		else if ((*comp)(s, t) > 0)
+			return -1;
+		return 0;
 }
 
 /* fstrCmp: same as strCmp but case insensitive */
@@ -180,95 +176,61 @@ int fstrCmp(char *s, char *t)
 	return tolower(*s) - tolower(*t);
 }
 
-/* frstrCmp: same as rstrCmp but case insensitive */
-int frstrCmp(char *s, char *t)
-{
-	for ( ; tolower(*s) == tolower(*t); s++, t++)
-		if (*s == '\0')
-			return 0;
-	return tolower(*t) - tolower(*s);
-}
-
 /* dstrCmp: directory order; compares only letters, numbers and blanks. */
 int dstrCmp(char *s, char *t)
 {
-	for ( ; ; ++s, ++t) {
-		while (*s != '\0' && (!isalnum(*s) && !isblank(*s)))
-			++s;
-		while (*t != '\0' && (!isalnum(*t) && !isblank(*t)))
-			++t;
+	int (*comp) (char *, char *);
+	char v1[MAXLEN], v2[MAXLEN];
+	int i;
 
-		if (*s == *t) {
-			if (*s == '\0')
-				return 0;
-		} else
-			break;
-	}
+	if (fold)
+		comp = fstrCmp;
+	else
+		comp = strCmp;
+
+	for (i = 0; *s != '\0'; ++s)
+		if (isalnum(*s) || isblank(*s))
+			v1[i++] = *s;
+	v1[i] = '\0';
+
+	for (i = 0; *t != '\0'; ++t)
+		if (isalnum(*t) || isblank(*t))
+			v2[i++] = *t;
+	v2[i] = '\0';
+
+	return (*comp) (v1, v2);
+}
+
+/* isDigitStr: check if string is made of positive integers characters. Return
+ * 1 if true; 0 if false */
+int isDigitStr(char *s[])
+{
+	int i;
+
+	for (i = 0; (*s)[i] != '\0'; ++i)
+		if (!isdigit((*s)[i]))
+			return 0;
+	return 1;
+}
+
+/* fieldSearch */
+int fieldSearch(char *s, char *t)
+{
+	while (*s != '\0' && field > 0)
+		if (isblank(*s++))
+			--field;
+
+	for ( ; *s == *t; s++, t++)
+		if (*s == '\0')
+			return 0;
+
 	return *s - *t;
-}
-
-/* drstrCmp: same as strCmp but in reverse order - directory order version */
-int drstrCmp(char *s, char *t)
-{
-	for ( ; ; ++s, ++t) {
-		while (*s != '\0' && (!isalnum(*s) && !isblank(*s)))
-			++s;
-		while (*t != '\0' && (!isalnum(*t) && !isblank(*t)))
-			++t;
-
-		if (*s == *t) {
-			if (*s == '\0')
-				return 0;
-		} else
-			break;
-	}
-	return *t - *s;
-}
-
-/* dfstrCmp: same as strCmp but case insensitive - directory order version */
-int dfstrCmp(char *s, char *t)
-{
-	for ( ; ; ++s, ++t) {
-		while (*s != '\0' && (!isalnum(*s) && !isblank(*s)))
-			++s;
-		while (*t != '\0' && (!isalnum(*t) && !isblank(*t)))
-			++t;
-
-		if (tolower(*s) == tolower(*t)) {
-			if (*s == '\0')
-				return 0;
-		} else
-			break;
-	}
-	return tolower(*s) - tolower(*t);
-}
-
-/* dfrstrCmp: same as rstrCmp but case insensitive - directory order version */
-int dfrstrCmp(char *s, char *t)
-{
-	for ( ; ; ++s, ++t) {
-		while (*s != '\0' && (!isalnum(*s) && !isblank(*s)))
-			++s;
-		while (*t != '\0' && (!isalnum(*t) && !isblank(*t)))
-			++t;
-
-		if (tolower(*s) == tolower(*t)) {
-			if (*s == '\0')
-				return 0;
-		} else
-			break;
-	}
-	return tolower(*t) - tolower(*s);
 }
 
 /* sort input lines */
 int main(int argc, char *argv[])
 {
 	int nlines;                    /* number of input lines read */     
-	int numeric = 0;               /* 1 if numeric sort */
-	int decreasing = 0;            /* 1 if reverse order sort */
-	int fold = 0;                  /* 1 if case insensitive sort */
-	int dirOr = 0;                 /* 1 if directory order sort */
 
 	/* note: no input error checking */
 	++argv;
@@ -281,21 +243,22 @@ int main(int argc, char *argv[])
 			fold = 1;
 		if (strCmp(argv[0], "-d") == 0)
 			dirOr = 1;
+		if (strCmp(argv[0], "-t") == 0) {
+			if (--argc > 0 && isDigitStr(++argv))
+				field = atoi(*argv);
+			else {
+				printf("qsort: option -t takes a numeric agument.\n");
+				return -1;
+			}
+		}
 		++argv;
 	}
 
 	if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
-		if (numeric)
-			qSort((void**) lineptr, 0, nlines - 1,
-					(int (*)(void*, void*))(decreasing ? rnumcmp : numcmp));
-		else if (dirOr) 
-			qSort((void**) lineptr, 0, nlines - 1,
-					(int (*)(void*, void*))(decreasing ? (fold) ? dfrstrCmp :
-						drstrCmp : (fold) ? dfstrCmp : dstrCmp));
-		else
-			qSort((void**) lineptr, 0, nlines - 1,
-					(int (*)(void*, void*))(decreasing ? (fold) ? frstrCmp :
-						rstrCmp : (fold) ? fstrCmp : strCmp));
+		qSort((void**) lineptr, 0, nlines - 1,
+				(int (*)(void *, void *))(numeric ? (decreasing) ?
+					reverse : numcmp : (decreasing) ? reverse : (fold) ?
+					(dirOr) ? dstrCmp : fstrCmp : (dirOr) ? dstrCmp : strCmp));
 		writelines(lineptr, nlines);
 		return 0;
 	} else {
