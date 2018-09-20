@@ -28,6 +28,7 @@ int  rstrCmp(char *s, char *t);
 char        *lineptr[MAXLINES];   /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
 static char *allocp = allocbuf;   /* next fre position */
+int reverse = 0;               /* 1 if reverse order sort */
 
 /* getLine: get line into s, return length of s -- pointer version */
 int getLine(char *s, int lim)
@@ -111,11 +112,15 @@ int numcmp(char *s1, char *s2)
 	v1 = atof(s1);
 	v2 = atof(s2);
 
-	if (v1 < v2)
+	if (v1 < v2) {
+		if (reverse)
+			return 1;
 		return -1;
-	else if (v1 > v2)
+	} else if (v1 > v2) {
+		if (reverse)
+			return -1;
 		return 1;
-	else
+	} else
 		return 0;
 }
 
@@ -125,32 +130,11 @@ int strCmp(char *s, char *t)
 	for ( ; *s == *t; s++, t++)
 		if (*s == '\0')
 			return 0;
+
+	if (reverse)
+		return *t - *s;
+
 	return *s - *t;
-}
-
-/* rnumcmp: compare s1 and s2 numerically - reversed order */
-int rnumcmp(char *s1, char *s2)
-{
-	double v1, v2;
-
-	v1 = atof(s1);
-	v2 = atof(s2);
-
-	if (v1 > v2)
-		return -1;
-	else if (v1 < v2)
-		return 1;
-	else
-		return 0;
-}
-
-/* rstrCmp: same as strCmp but in reverse order */
-int rstrCmp(char *s, char *t)
-{
-	for ( ; *s == *t; s++, t++)
-		if (*s == '\0')
-			return 0;
-	return *t - *s;
 }
 
 void swap(void *v[], int i, int j)
@@ -167,22 +151,17 @@ int main(int argc, char *argv[])
 {
 	int nlines;                    /* number of input lines read */     
 	int numeric = 0;               /* 1 if numeric sort */
-	int decreasing = 0;               /* 1 if reverse order sort */
 
 	++argv;
 	while (--argc > 0) {
 		if (strCmp(argv[0], "-n") == 0)
 			numeric = 1;
 		if (strCmp(argv[0], "-r") == 0)
-			decreasing = 1;
+			reverse = 1;
 		++argv;
 	}
 
 	if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
-		if (decreasing)
-			qSort((void**) lineptr, 0, nlines - 1,
-					(int (*)(void*, void*))(numeric ? rnumcmp : rstrCmp));
-		else
 			qSort((void**) lineptr, 0, nlines - 1,
 					(int (*)(void*, void*))(numeric ? numcmp : strCmp));
 		writelines(lineptr, nlines);
