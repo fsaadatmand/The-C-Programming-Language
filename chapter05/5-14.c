@@ -21,14 +21,12 @@ void qSort(void *lineptr[], int left, int right,
 		int (*comp)(void *, void *));
 int  numcmp(char *, char *);
 int  strCmp(char *s, char *t);
-int  rnumcmp(char *, char *);
-int  rstrCmp(char *s, char *t);
 
 /* Globals */
 char        *lineptr[MAXLINES];   /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
 static char *allocp = allocbuf;   /* next fre position */
-int reverse = 0;               /* 1 if reverse order sort */
+int         reverse = 0;          /* 1 if reverse order sort */
 
 /* getLine: get line into s, return length of s -- pointer version */
 int getLine(char *s, int lim)
