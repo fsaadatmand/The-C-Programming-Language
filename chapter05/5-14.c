@@ -110,15 +110,11 @@ int numcmp(char *s1, char *s2)
 	v1 = atof(s1);
 	v2 = atof(s2);
 
-	if (v1 < v2) {
-		if (reverse)
-			return 1;
-		return -1;
-	} else if (v1 > v2) {
-		if (reverse)
-			return -1;
-		return 1;
-	} else
+	if (v1 < v2)
+		return (reverse) ? 1 : -1;
+	 else if (v1 > v2)
+		return (reverse) ? -1 : 1;
+	 else
 		return 0;
 }
 
@@ -128,11 +124,7 @@ int strCmp(char *s, char *t)
 	for ( ; *s == *t; s++, t++)
 		if (*s == '\0')
 			return 0;
-
-	if (reverse)
-		return *t - *s;
-
-	return *s - *t;
+	return (reverse) ? *t - *s : *s - *t;
 }
 
 void swap(void *v[], int i, int j)
