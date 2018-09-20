@@ -2,7 +2,7 @@
  * Exercise 5-17. Add a field-searching capability, so sorting may bee done on
  * fields within lines, each field sorted according to an independent set of
  * options. (The index for this book was sorted with -df for the index category
- * and -n for the page numbers.) 5.12 Complicated Declarations
+ * and -n for the page numbers.)
  * By Faisal Saadatmand
  */
 
@@ -27,6 +27,7 @@ int  strCmp(char *s, char *t);
 int  reverse(char *s, char *t);
 int  fstrCmp(char *s, char *t);
 int  dstrCmp(char *s, char *t);
+int  fieldCmp(char *s, char *t);
 
 /* Globals */
 char        *lineptr[MAXLINES];   /* pointers to text lines */
@@ -149,22 +150,24 @@ void swap(void *v[], int i, int j)
 /* reverse: reverse the return value of a function */
 int reverse(char *s, char *t)
 {
-	int (*comp) (char *, char *);
+	int (*rev_compf) (char *, char *);  /* pointer to compare function */
 
 	if (numeric)
-		comp = numcmp;
-	else if (fold && !dirOr)      /* important */
-		comp = fstrCmp;
-	else if (dirOr)
-		comp = dstrCmp;
+		rev_compf = numcmp;
+	else if (fold && !dirOr && field <= 0)
+		rev_compf = fstrCmp;
+	else if (dirOr && field <=0)
+		rev_compf = dstrCmp;
+	else if (field > 0)
+		rev_compf = fieldCmp;
 	else
-		comp = strCmp;
-		
-		if ((*comp)(s, t) < 0)
-			return  1;
-		else if ((*comp)(s, t) > 0)
-			return -1;
-		return 0;
+		rev_compf = strCmp;
+
+	if ((*rev_compf)(s, t) < 0)
+		return  1;
+	else if ((*rev_compf)(s, t) > 0)
+		return -1;
+	return 0;
 }
 
 /* fstrCmp: same as strCmp but case insensitive */
@@ -179,14 +182,14 @@ int fstrCmp(char *s, char *t)
 /* dstrCmp: directory order; compares only letters, numbers and blanks. */
 int dstrCmp(char *s, char *t)
 {
-	int (*comp) (char *, char *);
-	char v1[MAXLEN], v2[MAXLEN];
 	int i;
+	char v1[MAXLEN], v2[MAXLEN];
+	int (*d_compf) (char *, char *);  /* pointer to compare function */
 
 	if (fold)
-		comp = fstrCmp;
+		d_compf = fstrCmp;
 	else
-		comp = strCmp;
+		d_compf = strCmp;
 
 	for (i = 0; *s != '\0'; ++s)
 		if (isalnum(*s) || isblank(*s))
@@ -198,7 +201,7 @@ int dstrCmp(char *s, char *t)
 			v2[i++] = *t;
 	v2[i] = '\0';
 
-	return (*comp) (v1, v2);
+	return (*d_compf) (v1, v2);
 }
 
 /* isDigitStr: check if string is made of positive integers characters. Return
@@ -213,18 +216,37 @@ int isDigitStr(char *s[])
 	return 1;
 }
 
-/* fieldSearch */
-int fieldSearch(char *s, char *t)
+/* fieldCmp: compare fields according field number inputed by user */
+int fieldCmp(char *s, char *t)
 {
-	while (*s != '\0' && field > 0)
-		if (isblank(*s++))
-			--field;
+	int i;
+	int (*fs_compf) (char *, char *);
 
-	for ( ; *s == *t; s++, t++)
-		if (*s == '\0')
-			return 0;
+	if (numeric)
+		fs_compf = numcmp;
+	else if (fold && !dirOr)
+		fs_compf = fstrCmp;
+	else if (dirOr)
+		fs_compf = dstrCmp;
+	else
+		fs_compf = strCmp;
 
-	return *s - *t;
+	for (i = field - 1; *s != '\0' && i > 0; ++s)
+		if (isblank(*s)) {
+			while (*s != '\0' && isblank(*s)) /* skip strings of blanks */
+				++s;
+			--i;
+			--s;   /* unread 1 character */
+		}
+
+	for (i = field - 1; *t != '\0' && i > 0; ++t)
+		if (isblank(*t)) {
+			while (*t !='\0' && isblank(*t)) /* skip strings of blanks */
+					++t;
+			--i;
+			--t;   /* unread 1 character */
+		}
+	return (*fs_compf) (s, t);
 }
 
 /* sort input lines */
@@ -247,18 +269,17 @@ int main(int argc, char *argv[])
 			if (--argc > 0 && isDigitStr(++argv))
 				field = atoi(*argv);
 			else {
-				printf("qsort: option -t takes a numeric agument.\n");
+				printf("sort: option requires an agument -- '%c'\n", *++argv[0]);
 				return -1;
 			}
 		}
 		++argv;
 	}
-
 	if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
-		qSort((void**) lineptr, 0, nlines - 1,
-				(int (*)(void *, void *))(numeric ? (decreasing) ?
-					reverse : numcmp : (decreasing) ? reverse : (fold) ?
-					(dirOr) ? dstrCmp : fstrCmp : (dirOr) ? dstrCmp : strCmp));
+		qSort((void**) lineptr, 0, nlines - 1, 
+				(int (*)(void *, void *))(decreasing ? reverse :
+					(field > 0) ? fieldCmp : numeric ? numcmp :
+					dirOr ? dstrCmp : fold ? fstrCmp : strCmp));
 		writelines(lineptr, nlines);
 		return 0;
 	} else {
