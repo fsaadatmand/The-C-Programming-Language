@@ -59,7 +59,6 @@ void detabList(char *line, char *modLine, int *list, int listSize)
 				toNextTabStop = *list - column;
 			else
 				toNextTabStop = n - (column % n); /* default tab stop setting */
-
 			while (toNextTabStop-- > 0) {
 				*modLine++ = ' ';
 				++column;
