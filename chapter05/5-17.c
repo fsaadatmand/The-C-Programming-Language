@@ -152,7 +152,7 @@ int reverse(char *s, char *t)
 {
 	int (*rev_compf) (char *, char *);  /* pointer to compare function */
 
-	if (numeric)
+	if (numeric && field <= 0)
 		rev_compf = numcmp;
 	else if (fold && !dirOr && field <= 0)
 		rev_compf = fstrCmp;
