@@ -27,6 +27,7 @@ int  strCmp(char *s, char *t);
 int  reverse(char *s, char *t);
 int  fstrCmp(char *s, char *t);
 int  dstrCmp(char *s, char *t);
+int  isDigitStr(char *s[]);
 int  fieldCmp(char *s, char *t);
 
 /* Globals */
@@ -38,7 +39,6 @@ int         decreasing = 0;       /* 1 if reverse order sort */
 int         fold = 0;             /* 1 id case insensitive sort */
 int         dirOr = 0;            /* 1 if directory order sort */
 int         field = 0;            /* value of field to sort */
-int (*compfun) (char *, char *);
 
 /* getLine: get line into s, return length of s -- pointer version */
 int getLine(char *s, int lim)
@@ -151,22 +151,14 @@ void swap(void *v[], int i, int j)
 /* reverse: reverse the return value of a function */
 int reverse(char *s, char *t)
 {
-	int (*rev_compf) (char *, char *);  /* pointer to compare function */
+	int (*compfun) (char *, char *);  /* pointer to compare function */
 
-	if (field > 0)
-		rev_compf = fieldCmp;
-	else if (dirOr)
-		rev_compf = dstrCmp;
-	else if (numeric)
-		rev_compf = numcmp;
-	else if (fold)
-		rev_compf = fstrCmp;
-	else
-		rev_compf = strCmp;
+	compfun = (field > 0) ? fieldCmp : (dirOr) ? dstrCmp :
+		(numeric) ? numcmp : (fold) ? fstrCmp : strCmp;
 
-	if ((*rev_compf)(s, t) < 0)
+	if ((*compfun)(s, t) < 0)
 		return  1;
-	else if ((*rev_compf)(s, t) > 0)
+	else if ((*compfun)(s, t) > 0)
 		return -1;
 	return 0;
 }
@@ -185,12 +177,9 @@ int dstrCmp(char *s, char *t)
 {
 	int i;
 	char v1[MAXLEN], v2[MAXLEN];
-	int (*d_compf) (char *, char *);  /* pointer to compare function */
+	int (*compfun) (char *, char *);  /* pointer to compare function */
 
-	if (fold)
-		d_compf = fstrCmp;
-	else
-		d_compf = strCmp;
+	compfun = (fold) ? fstrCmp : strCmp;
 
 	for (i = 0; *s != '\0'; ++s)
 		if (isalnum(*s) || isblank(*s))
@@ -202,7 +191,7 @@ int dstrCmp(char *s, char *t)
 			v2[i++] = *t;
 	v2[i] = '\0';
 
-	return (*d_compf) (v1, v2);
+	return (*compfun) (v1, v2);
 }
 
 /* isDigitStr: check if string is made of positive integers characters. Return
@@ -221,16 +210,10 @@ int isDigitStr(char *s[])
 int fieldCmp(char *s, char *t)
 {
 	int i;
-	int (*fs_compf) (char *, char *);
+	int (*compfun) (char *, char *);
 
-	if (dirOr)
-		fs_compf = dstrCmp;
-	else if (numeric)
-		fs_compf = numcmp;
-	else if (fold)
-		fs_compf = fstrCmp;
-	else
-		fs_compf = strCmp;
+	compfun = (dirOr) ? dstrCmp : (numeric) ? numcmp :
+		(fold) ? fstrCmp : strCmp;
 
 	for (i = field - 1; *s != '\0' && i > 0; ++s)
 		if (isblank(*s)) {
@@ -247,7 +230,7 @@ int fieldCmp(char *s, char *t)
 			--i;
 			--t;   /* unread 1 character */
 		}
-	return (*fs_compf) (s, t);
+	return (*compfun) (s, t);
 }
 
 /* sort input lines */
@@ -256,8 +239,8 @@ int main(int argc, char *argv[])
 	int nlines;                    /* number of input lines read */     
 
 	/* note: no input error checking */
-	++argv;
 	while (--argc > 0) {
+		++argv;
 		if (strCmp(argv[0], "-n") == 0) 
 			numeric = 1;
 		if (strCmp(argv[0], "-r") == 0)
@@ -274,7 +257,6 @@ int main(int argc, char *argv[])
 				return -1;
 			}
 		}
-		++argv;
 	}
 	if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
 		qSort((void**) lineptr, 0, nlines - 1, 

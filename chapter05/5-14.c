@@ -141,16 +141,13 @@ void swap(void *v[], int i, int j)
 /* reverse: reverse the return value of a function */
 int reverse(char *s, char *t)
 {
-	int (*rev_compf) (char *, char *);  /* pointer to compare function */
+	int (*compfun) (char *, char *);  /* pointer to compare function */
 
-	if (numeric)
-		rev_compf = numcmp;
-	else
-		rev_compf = strCmp;
+	compfun = (numeric) ? numcmp : strCmp;
 
-	if ((*rev_compf)(s, t) < 0)
+	if ((*compfun)(s, t) < 0)
 		return  1;
-	else if ((*rev_compf)(s, t) > 0)
+	else if ((*compfun)(s, t) > 0)
 		return -1;
 	return 0;
 }
@@ -160,13 +157,12 @@ int main(int argc, char *argv[])
 {
 	int nlines;                    /* number of input lines read */     
 
-	++argv;
 	while (--argc > 0) {
+		++argv;
 		if (strCmp(argv[0], "-n") == 0)
 			numeric = 1;
 		if (strCmp(argv[0], "-r") == 0)
 			decreasing = 1;
-		++argv;
 	}
 	if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
 			qSort((void**) lineptr, 0, nlines - 1,

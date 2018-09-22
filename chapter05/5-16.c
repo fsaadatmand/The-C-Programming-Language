@@ -148,20 +148,14 @@ void swap(void *v[], int i, int j)
 /* reverse: reverse the return value of a function */
 int reverse(char *s, char *t)
 {
-	int (*rev_compf) (char *, char *);  /* pointer to compare function */
+	int (*compfun) (char *, char *);  /* pointer to compare function */
 
-	if (dirOr)
-		rev_compf = dstrCmp;
-	else if (numeric)
-		rev_compf = numcmp;
-	else if (fold)
-		rev_compf = fstrCmp;
-	else
-		rev_compf = strCmp;
+	compfun = (dirOr) ? dstrCmp : (numeric) ? numcmp :
+		(fold) ? fstrCmp : strCmp;
 
-	if ((*rev_compf)(s, t) < 0)
+	if ((*compfun)(s, t) < 0)
 		return  1;
-	else if ((*rev_compf)(s, t) > 0)
+	else if ((*compfun)(s, t) > 0)
 		return -1;
 	return 0;
 }
@@ -180,12 +174,9 @@ int dstrCmp(char *s, char *t)
 {
 	int i;
 	char v1[MAXLEN], v2[MAXLEN];
-	int (*d_compf) (char *, char *);  /* pointer to compare function */
+	int (*compfun) (char *, char *);  /* pointer to compare function */
 
-	if (fold)
-		d_compf = fstrCmp;
-	else
-		d_compf = strCmp;
+	compfun = (fold) ? fstrCmp : strCmp;
 
 	for (i = 0; *s != '\0'; ++s)
 		if (isalnum(*s) || isblank(*s))
@@ -197,7 +188,7 @@ int dstrCmp(char *s, char *t)
 			v2[i++] = *t;
 	v2[i] = '\0';
 
-	return (*d_compf) (v1, v2);
+	return (*compfun) (v1, v2);
 }
 
 /* sort input lines */
