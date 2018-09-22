@@ -38,6 +38,7 @@ int         decreasing = 0;       /* 1 if reverse order sort */
 int         fold = 0;             /* 1 id case insensitive sort */
 int         dirOr = 0;            /* 1 if directory order sort */
 int         field = 0;            /* value of field to sort */
+int (*compfun) (char *, char *);
 
 /* getLine: get line into s, return length of s -- pointer version */
 int getLine(char *s, int lim)
@@ -152,14 +153,14 @@ int reverse(char *s, char *t)
 {
 	int (*rev_compf) (char *, char *);  /* pointer to compare function */
 
-	if (numeric && field <= 0)
-		rev_compf = numcmp;
-	else if (fold && !dirOr && field <= 0)
-		rev_compf = fstrCmp;
-	else if (dirOr && field <=0)
-		rev_compf = dstrCmp;
-	else if (field > 0)
+	if (field > 0)
 		rev_compf = fieldCmp;
+	else if (dirOr)
+		rev_compf = dstrCmp;
+	else if (numeric)
+		rev_compf = numcmp;
+	else if (fold)
+		rev_compf = fstrCmp;
 	else
 		rev_compf = strCmp;
 
@@ -222,12 +223,12 @@ int fieldCmp(char *s, char *t)
 	int i;
 	int (*fs_compf) (char *, char *);
 
-	if (numeric)
-		fs_compf = numcmp;
-	else if (fold && !dirOr)
-		fs_compf = fstrCmp;
-	else if (dirOr)
+	if (dirOr)
 		fs_compf = dstrCmp;
+	else if (numeric)
+		fs_compf = numcmp;
+	else if (fold)
+		fs_compf = fstrCmp;
 	else
 		fs_compf = strCmp;
 
@@ -257,7 +258,7 @@ int main(int argc, char *argv[])
 	/* note: no input error checking */
 	++argv;
 	while (--argc > 0) {
-		if (strCmp(argv[0], "-n") == 0)
+		if (strCmp(argv[0], "-n") == 0) 
 			numeric = 1;
 		if (strCmp(argv[0], "-r") == 0)
 			decreasing = 1;

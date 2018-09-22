@@ -150,12 +150,12 @@ int reverse(char *s, char *t)
 {
 	int (*rev_compf) (char *, char *);  /* pointer to compare function */
 
-	if (numeric)
-		rev_compf = numcmp;
-	else if (fold && !dirOr)
-		rev_compf = fstrCmp;
-	else if (dirOr)
+	if (dirOr)
 		rev_compf = dstrCmp;
+	else if (numeric)
+		rev_compf = numcmp;
+	else if (fold)
+		rev_compf = fstrCmp;
 	else
 		rev_compf = strCmp;
 
