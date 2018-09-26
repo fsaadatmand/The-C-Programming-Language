@@ -82,13 +82,14 @@ int main(void)
 	char temp[MAXTOKEN];
 	int  error;
 
+	prevType = 0;
 	while (gettoken() != EOF) {
 		error = 0;
 		strcpy(out, token);
 		while ((type = gettoken()) != '\n') {
 			if (type == PARENS || type == BRACKETS) {
 				if (prevType == '*') {          /* check for precedence */
-					sprintf(temp, "(%s)", out); /* add parentheses */
+					sprintf(temp, "(%s)", out); /* it's a (dcl), add parens */
 					strcpy(out, temp);
 				}
 				strcat(out, token);
