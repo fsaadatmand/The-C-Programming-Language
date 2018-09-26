@@ -1,22 +1,27 @@
-/* Exercise 5-18. Make dcl recover from input error. By Faisal Saadatmand */
+/*
+ * Exercise 5-19. Modify undcl so that it does not add redundant parentheses to
+ * declaration.
+ * By Faisal Saadatmand
+ * */
 
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
-#define MAXTOKEN 100
+#define MAXTOKEN    100
 #define BUFSIZE     100
 
 enum { NAME, PARENS, BRACKETS };
 
 /* functions */
 int  gettoken(void);
+int  getch(void) ;
+void ungetch(int c);
 
 /* Globals */
 char token[MAXTOKEN];                  /* last token string */
 int  tokentype;                        /* type of last token */
 char name[MAXTOKEN];                   /* indentifier name */
-char datatype[MAXTOKEN];               /* data type = char, in, etc. */
 char out[1000];
 char buf[BUFSIZE];                     /* buffer from ungetch */
 int  bufp = 0;                         /* next free position in buf */
@@ -73,22 +78,34 @@ void ungetch(int c)
 /* undcl: convert word descriptions to declarations */
 int main(void)               
 {
-	int  type;
+	int  type, prevType;
 	char temp[MAXTOKEN];
+	int  error;
 
 	while (gettoken() != EOF) {
+		error = 0;
 		strcpy(out, token);
-		while ((type = gettoken()) != '\n')
-			if (type == PARENS || type == BRACKETS)
+		while ((type = gettoken()) != '\n') {
+			if (type == PARENS || type == BRACKETS) {
+				if (prevType == '*') {          /* check for precedence */
+					sprintf(temp, "(%s)", out); /* add parentheses */
+					strcpy(out, temp);
+				}
 				strcat(out, token);
-			else if (type == '*') {
-				sprintf(temp, "(*%s)", out);
+			} else if (type == '*') {
+				sprintf(temp, "*%s", out);     /* no general redundant parens */
 				strcpy(out, temp);
 			} else if (type == NAME) {
 				sprintf(temp, "%s %s", token, out);
 				strcpy(out, temp);
-			} else
+			} else {
 				printf("invalid input at %s\n", token);
+				error = 1;
+			}
+			prevType = type;
+		}
+		if (!error)
+			puts(out);
 	}
 	return 0;
 }
