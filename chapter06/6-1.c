@@ -37,6 +37,14 @@ struct key {
 	{ "while", 0 },
 };
 
+struct key notation[] = {
+	{ "_", 0 },
+	{ "\"", 0 },
+	{ "/", 0 },
+	{ "*", 0 },
+	{ "#", 0 },
+};
+
 int  getword(char *, int);
 int  binsearch(char *, struct key *, int);
 
@@ -77,27 +85,30 @@ void ungetch(int c)          /* push character back on input */
 /* getword: get next word or character from input */
 int getword(char *word, int lim)
 {
-	int  c, getch(void);
+	int   c, getch(void);
 	void  ungetch(int);
-	char *w = word;
+	char  *w = word;
 
 	while (isspace(c = getch()))
 		;
 
+	if (c == '\"')           /* skip sting constants */
+		while ((c = getch()) != EOF && c != '\"')
+			;
+
 	if (c != EOF)
 		*w++ = c;
+
 	if (!isalpha(c) && c != '_') {
 		*w = '\0';
 		return c;
 	}
 
-	for ( ; --lim > 0; w++) {
-		*w = getch();
-		if (!isalnum(*w) && *w != '_') {
+	for ( ; --lim > 0; w++)
+		if (!isalnum(*w = getch()) && *w != '_') {
 			ungetch(*w);
 			break;
 		}
-	}
 	*w = '\0';
 
 	return word[0];
