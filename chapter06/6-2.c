@@ -4,6 +4,7 @@
  * 6 characters, but different  somewhere thereafter. Don't count words within
  * string and comments. Make 6 a parameter that can be set from the command
  * line.
+ * Note: getword comment detection could nbe improved 
  * By Faisal Saadatmand
  */
 
@@ -277,7 +278,7 @@ int main(int argc, char *argv[])
 
 	root = NULL;                       /* initialize root node */
 	while (getword(word, MAXWORD) != EOF)
-		if (isalpha(word[0]))
+		if (isalpha(word[0]) && strlen(word) > nChar)
 			if((p = binsearch(word, keytab, NKEYS)) == NULL) /* skip reserved */
 				root = addtree(root, word);                 /* reserved words */
 	findVariables(root, nChar);
