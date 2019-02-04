@@ -94,7 +94,7 @@ struct tnode *addtree(struct tnode *p, char *w)
 
 	if (p == NULL) {                   /* a new word has arrived */
 		p = talloc();                  /* make a new node */
-		p->word = strdup(w);           /* copy data to it */
+		p->word = strDup(w);           /* copy data to it */
 		p->count = 1;
 		p->match = 0;                  /* initialize match */
 		p->left = p->right = NULL;
@@ -278,8 +278,8 @@ int main(int argc, char *argv[])
 
 	root = NULL;                       /* initialize root node */
 	while (getword(word, MAXWORD) != EOF)
-		if (isalpha(word[0]) && strlen(word) > nChar)
-			if((p = binsearch(word, keytab, NKEYS)) == NULL) /* skip reserved */
+		if (isalpha(word[0]) && (int) strlen(word) > nChar)
+			if ((p = binsearch(word, keytab, NKEYS)) == NULL) /* skip reserved */
 				root = addtree(root, word);                 /* reserved words */
 	findVariables(root, nChar);
 	treeprint(root);
