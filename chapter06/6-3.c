@@ -10,7 +10,6 @@
 #include <stdlib.h>
 
 #define MAXWORD 100
-#define MAXLINES 10000
 #define BUFSIZE 100
 #define NKEYS   (sizeof noisetab / sizeof noisetab[0])
 
@@ -115,7 +114,6 @@ char *strDup(char *s)
 /* addList: add a node with ln, at or before p */
 struct list *addlist(struct list *p, int ln)
 {
-
 	if (p == NULL) {
 		p = (struct list *) malloc(sizeof(struct list));
 		p->number = ln;
