@@ -78,14 +78,6 @@ struct key keytab[] ={
 	{ "while", 0 },
 };
 
-struct key notation[] = {
-	{ "_", 0 },
-	{ "\"", 0 },
-	{ "/*", 0 },
-	{ "*/", 0 },
-	{ "#", 0 },
-};
-
 /* addtree: add a node with w, at or below p */
 struct tnode *addtree(struct tnode *p, char *w)
 {
@@ -258,7 +250,7 @@ int main(int argc, char *argv[])
 	while (getword(word, MAXWORD) != EOF)
 		if (isalpha(word[0]) && (int) strlen(word) > nChar)
 			if ((p = binsearch(word, keytab, NKEYS)) == NULL) /* skip reserved */
-				root = addtree(root, word);                 /* reserved words */
+				root = addtree(root, word);                   /* reserved words */
 	findVariables(root, nChar);
 	treeprint(root);
 	return 0;
