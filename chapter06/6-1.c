@@ -1,7 +1,9 @@
 /*
  * Exercise 6-1. Our version of getword does not properly handle underscores,
- * sting constants, comments, or preprocessor control lines. Write a better
+ * string constants, comments, or preprocessor control lines. Write a better
  * version.
+ * Note: getword underscore, string constant, comments and preprocessor control
+ * line could be improved.
  * By Faisal Saadatmand
  */
 
@@ -21,7 +23,9 @@ int    bufp = 0;             /* next free position in buf */
 struct key {
 	char *word;
 	int count;
-} keytab[] ={
+};
+
+struct key keytab[] = {
 	{ "auto", 0 },
 	{ "break", 0 },
 	{ "case", 0 },
@@ -29,25 +33,30 @@ struct key {
 	{ "const", 0 },
 	{ "continue", 0 },
 	{ "default", 0 },
-	{ "define" , 0 },
-	/* ... */
+	{ "do", 0 },
+	{ "double", 0 },
+	{ "else", 0 },
+	{ "enum", 0 },
+	{ "extern", 0 },
+	{ "float", 0 },
+	{ "goto", 0 },
+	{ "if", 0 },
+	{ "int", 0 },
+	{ "long", 0 },
+	{ "register", 0 },
+	{ "return", 0 },
+	{ "short", 0 },
+	{ "signed", 0 },
+	{ "sizeof", 0 },
+	{ "static", 0 },
+	{ "struct", 0 },
+	{ "switch", 0 },
+	{ "typeof", 0 },
+	{ "union", 0 },
 	{ "unsigned", 0 },
 	{ "void", 0 },
 	{ "volatile", 0 },
 	{ "while", 0 },
-};
-
-struct notation {
-	char *start;
-	char *end;
-};
-
-struct key notation[] = {
-	{ "_", 0 },
-	{ "\"", 0 },
-	{ "/*", 0 },
-	{ "*/", 0 },
-	{ "#", 0 },
 };
 
 int  getword(char *, int);
@@ -96,71 +105,50 @@ int getword(char *word, int lim)
 
 	while (isspace(c = getch()))
 		;
-
+	
 	if (c != EOF)
 		*w++ = c;
 	else
 		return c;
 
-	if (!isalpha(c)) {
-		for ( ; --lim > 0; w++)           /* extract special C char/notation */
-			if (isalnum(*w = getch()) || isspace(*w)) {
-				ungetch(*w);
-				break;
-			}
+	if (!isalpha(c) && c != '_' && c != '\"' && c != '#' && c != '/' && c != '\\') {
 		*w = '\0';
+		return c;
+	}
 
-		/* assess C special char/notation */
-		if (strcmp(word, notation[0].word) == 0)   /* underscore */
-			notation[0].count++;
-		if (strcmp(word, notation[1].word) == 0)   /* string constant */
-			notation[1].count++;
-		if (strcmp(word, notation[2].word) == 0)   /* start of C comment */
-			notation[2].count++;
-		if (strcmp(word, notation[3].word) == 0)   /* end of C comment */
-			notation[2].count = 0;
-		if (strcmp(word, notation[4].word) == 0)   /* preprocessor CL */
-			notation[4].count++;
-
-
-		} else
+	switch (c) {
+	case '\\':                          /* handle escape sequences */
+		c = getch();
+		break;
+	case '\"':                          /* skip words inside string constant */
+		while ((c = getch()) != '\"')
+			if (c == EOF)
+				return c;
+		break;
+	case '#':                          /* skip preprocessor control lines */
+		while ((c = getch()) != '\n')
+			;
+		ungetch(c);
+		break;
+	case '/':                          /* skip words inside C comments */
+		if ((c = getch()) == '*') {
+			while ((c = getch()))
+				if	(c == '*' && (c = getch()) == '/')
+					break; 
+				else if (c == EOF)
+					return c;
+		} else                         /* don't skip pointer variables */
+			ungetch(c);
+		break;
+	default:
 		for ( ; --lim > 0; w++)
 			if (!isalnum(*w = getch()) && *w != '_') {
 				ungetch(*w);
 				break;
 			}
-
-	/* Process word according to C special chars/ notations */
-	if (notation[0].count > 0) {
-		for ( ; --lim > 0; w++)        /* skip words with underscores */
-			if (!isalnum(c = getch())) {
-				ungetch(c);
-				break;
-			}
-		notation[0].count = 0;
+		break;
 	}
 
-	if (notation[1].count > 0) {       /* skip words inside string constant */
-		for ( ; --lim > 0; w++)
-			if ((c = getch()) == '"') {
-				break;
-			}
-		notation[1].count = 0;
-	}
-	if (notation[2].count > 0)        /* skip words inside C comments */
-		for ( ; --lim > 0; w++)
-			if ((c = getch()) == '*') {
-				ungetch(c);
-				break;
-			}
-
-	if (notation[4].count > 0) {       /* skip preprocessor control line */
-		for ( ; --lim > 0; w++)
-			if ((c = getch()) == '\n') {
-				break;
-			}
-		notation[4].count = 0;
-	}
 	*w = '\0';
 	return word[0];
 }

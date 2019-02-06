@@ -26,7 +26,6 @@ char   *strDup(char *);                /* copy string into safe place */
 struct key *binsearch(char *, struct key *, int); 
 void   findVariables(struct tnode *, int);
 
-
 /* Globals */
 char   buf[BUFSIZE];                   /* buffer from ungetch */
 int    bufp = 0;                       /* next free position in buf */
@@ -141,71 +140,50 @@ int getword(char *word, int lim)
 
 	while (isspace(c = getch()))
 		;
-
+	
 	if (c != EOF)
 		*w++ = c;
 	else
 		return c;
 
-	if (!isalpha(c)) {
-		for ( ; --lim > 0; w++)           /* extract special C char/notation */
-			if (isalnum(*w = getch()) || isspace(*w)) {
-				ungetch(*w);
-				break;
-			}
+	if (!isalpha(c) && c != '_' && c != '\"' && c != '#' && c != '/' && c != '\\') {
 		*w = '\0';
+		return c;
+	}
 
-		/* assess C special char/notation */
-		if (strcmp(word, notation[0].word) == 0)   /* underscore */
-			notation[0].count++;
-		if (strcmp(word, notation[1].word) == 0)   /* string constant */
-			notation[1].count++;
-		if (strcmp(word, notation[2].word) == 0)   /* start of C comment */
-			notation[2].count++;
-		if (strcmp(word, notation[3].word) == 0)   /* end of C comment */
-			notation[2].count = 0;
-		if (strcmp(word, notation[4].word) == 0)   /* preprocessor CL */
-			notation[4].count++;
-
-
-		} else
+	switch (c) {
+	case '\\':                          /* handle escape sequences */
+		c = getch();
+		break;
+	case '\"':                          /* skip words inside string constant */
+		while ((c = getch()) != '\"')
+			if (c == EOF)
+				return c;
+		break;
+	case '#':                          /* skip preprocessor control lines */
+		while ((c = getch()) != '\n')
+			;
+		ungetch(c);
+		break;
+	case '/':                          /* skip words inside C comments */
+		if ((c = getch()) == '*') {
+			while ((c = getch()))
+				if	(c == '*' && (c = getch()) == '/')
+					break; 
+				else if (c == EOF)
+					return c;
+		} else                         /* don't skip pointer variables */
+			ungetch(c);
+		break;
+	default:
 		for ( ; --lim > 0; w++)
 			if (!isalnum(*w = getch()) && *w != '_') {
 				ungetch(*w);
 				break;
 			}
-
-	/* Process word according to C special chars/ notations */
-	if (notation[0].count > 0) {
-		for ( ; --lim > 0; w++)        /* skip words with underscores */
-			if (!isalnum(c = getch())) {
-				ungetch(c);
-				break;
-			}
-		notation[0].count = 0;
+		break;
 	}
 
-	if (notation[1].count > 0) {       /* skip words inside string constant */
-		for ( ; --lim > 0; w++)
-			if ((c = getch()) == '"') {
-				break;
-			}
-		notation[1].count = 0;
-	}
-	if (notation[2].count > 0)        /* skip words inside C comments */
-		for ( ; --lim > 0; w++)
-			if ((c = getch()) == '*') {
-				ungetch(c);
-				break;
-			}
-
-	if (notation[4].count > 0) {       /* skip preprocessor control line */
-		for ( ; --lim > 0; w++)
-			if ((c = getch()) == '\n') {
-				break;
-			}
-		notation[4].count = 0;
-	}
 	*w = '\0';
 	return word[0];
 }
@@ -267,8 +245,8 @@ void findVariables(struct tnode *p, int n)
 int main(int argc, char *argv[])
 {
 	struct tnode *root;                /* root node */
-	struct key *p;                     /* currenty searched word */
-	char   word[MAXWORD];              /* current read word */
+	struct key *p;                     /* currently searched word */
+	char   word[MAXWORD];              /* currently read word */
 	int    nChar;                      /* number of characters to match */
 
 	if (argc != 2)
