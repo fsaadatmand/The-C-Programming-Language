@@ -45,17 +45,15 @@ void detabList(char *line, char *modLine, int *list, int listSize)
 	int toNextTabStop;              /* number of spaces to the next tab stop */
 	int column;                     /* current column number/location */
 
-	column = 0;                     /* must start at 0, or algorithm breaks */
-	while (*line) {
+	for (column = 0; *line != '\0'; ++line)
 		if (*line == '\t') {
-			while (column >= *list && listSize > 0) { /* find column in list */
-				++list;
+			while (listSize > 0 && column >= *list) { /* if list exists, find */
+				++list;                               /* tab stop setting in it */
 				--listSize;
 			}
-			if (listSize > 0)
-				toNextTabStop = *list - column;
-			else
-				toNextTabStop = N - (column % N); /* default tab stop setting */
+			/* calculate #blanks to the next tab stop, if user inputed list
+			 * exits, else use default setting */
+			toNextTabStop = (listSize > 0) ? *list - column : N - column % N;
 			while (toNextTabStop-- > 0) {
 				*modLine++ = ' ';
 				++column;
@@ -64,8 +62,6 @@ void detabList(char *line, char *modLine, int *list, int listSize)
 			*modLine++ = *line;
 			++column;
 		}
-		++line;
-	}
 	*modLine = '\0';
 }
 
