@@ -237,27 +237,47 @@ int fieldCmp(char *s, char *t)
 int main(int argc, char *argv[])
 {
 	int nlines;                    /* number of input lines read */     
+	int c;
 
-	/* note: no input error checking */
-	while (--argc > 0) {
-		++argv;
-		if (strCmp(argv[0], "-n") == 0) 
-			numeric = 1;
-		if (strCmp(argv[0], "-r") == 0)
-			decreasing = 1;
-		if (strCmp(argv[0], "-f") == 0)
-			fold = 1;
-		if (strCmp(argv[0], "-d") == 0)
-			dirOr = 1;
-		if (strCmp(argv[0], "-t") == 0) {
-			if (--argc > 0 && isDigitStr(++argv))
-				field = atoi(*argv);
-			else {
-				printf("sort: option requires an agument -- '%c'\n", *++argv[0]);
-				return -1;
-			}
+	while (--argc > 0)
+		if ((*++argv)[0] == '-') {
+			while ((c = *++argv[0]))
+				switch (c) {
+				case ('n'):
+					numeric = 1;
+					break;
+				case ('r'):
+					decreasing = 1;
+					break;
+				case ('f'):
+					fold = 1;
+					break;
+				case ('d'):
+					dirOr = 1;
+					break;
+				case ('t'):
+					if (--argc > 0 && isDigitStr(++argv))
+						field = atoi(*argv);
+					else {
+						printf("sort: option requires a numeric agument -- '%c'\n", c);
+						return -1;
+					}
+					break;
+				default:
+					printf("sort: illegal option %c\n", c);
+					return -1;
+					break;
+				}
+		} else {
+			printf("sort: illegal option '%s'\n", *argv);
+			return -1;
 		}
+
+	if (numeric && dirOr) {
+		printf("sort: opetions '-dn' are incompatible\n");
+		return -1;
 	}
+	
 	if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
 		qSort((void**) lineptr, 0, nlines - 1, 
 				(int (*)(void *, void *))(decreasing ? reverse :
