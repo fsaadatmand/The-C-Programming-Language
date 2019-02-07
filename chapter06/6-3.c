@@ -31,18 +31,6 @@ struct key {
 	int  count;
 };
 
-/* functions */
-int    getword(char *, int, int *);
-struct tnode *talloc(void);            /* alocate memory to new tree node */
-char   *strDup(char *);                /* copy string into safe place */
-struct tnode *addtree(struct tnode *, char *, int);
-void   treeprint(struct tnode *);
-void   printList(struct list *);
-struct key *binsearch(char *, struct key *, int );
-
-/* Globals */
-char   buf[BUFSIZE];                   /* buffer from ungetch */
-int    bufp = 0;                       /* next free position in buf */
 struct key noisetab[] = {
 	{ "a", 0 },
 	{ "and", 0 },
@@ -55,6 +43,19 @@ struct key noisetab[] = {
 	{ "were", 0},
 	{ "with", 0},
 };
+
+/* functions */
+int    getword(char *, int, int *);
+struct tnode *talloc(void);            /* alocate memory to new tree node */
+char   *strDup(char *);                /* copy string into safe place */
+struct tnode *addtree(struct tnode *, char *, int);
+void   treeprint(struct tnode *);
+void   printList(struct list *);
+struct key *binsearch(char *, struct key *, int );
+
+/* Globals */
+char   buf[BUFSIZE];                   /* buffer from ungetch */
+int    bufp = 0;                       /* next free position in buf */
 
 /* getword: get next word or character from input */
 int getword(char *word, int lim, int *ln)
