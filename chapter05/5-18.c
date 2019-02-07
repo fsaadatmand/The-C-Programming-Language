@@ -1,4 +1,7 @@
-/* Exercise 5-18. Make dcl recover from input error. By Faisal Saadatmand */
+/*
+ * Exercise 5-18. Make dcl recover from input error.
+ * By Faisal Saadatmand
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -11,8 +14,10 @@ enum { NAME, PARENS, BRACKETS };
 
 /* functions */
 int  gettoken(void);
-int dcl(void);
-int dirdcl(void);
+int  dcl(void);
+int  dirdcl(void);
+int  getch(void);
+void ungetch(int c);
 
 /* Globals */
 char token[MAXTOKEN];                  /* last token string */
@@ -79,7 +84,7 @@ int dcl (void)
 
 	for (ns = 0; gettoken() == '*'; )  /*count *'s */
 		ns++;
-	if (dirdcl() >= 0) {
+	if (dirdcl() > 0) {
 		while (ns-- > 0)
 			strcat(out, " pointer to");
 	return 0;
@@ -98,9 +103,9 @@ int dirdcl(void)
 			printf("error: missing )\n");
 			return -1;
 		}
-	} else if (tokentype == NAME)      /* variable name */
+	} else if (tokentype == NAME) {    /* variable name */
 		strcpy(name, token);
-	else {
+	} else {
 		printf("error: expected name or (dcl)\n");
 		return -1;
 	}
@@ -112,7 +117,7 @@ int dirdcl(void)
 		strcat(out,  token);
 		strcat(out, " of");
 		}
-	return 0;
+	return 1;
 }
 
 /* convert declaration to words */
