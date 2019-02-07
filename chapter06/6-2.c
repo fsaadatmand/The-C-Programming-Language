@@ -1,5 +1,5 @@
 /* 
- * Exercise 6-2. Write a program that read a C program and prints in
+ * Exercise 6-2. Write a program that reads a C program and prints in
  * alphabetical order each group variable names that are identical in the first
  * 6 characters, but different  somewhere thereafter. Don't count words within
  * string and comments. Make 6 a parameter that can be set from the command
@@ -16,6 +16,7 @@
 #define MAXWORD 100
 #define BUFSIZE 100
 #define NKEYS   (sizeof keytab / sizeof keytab[0])
+#define NSYMBOLS (sizeof symbol / sizeof symbol[0])
 
 /* functions */
 struct tnode *addtree(struct tnode *, char *);
@@ -78,6 +79,15 @@ struct key keytab[] ={
 	{ "while", 0 },
 };
 
+struct key symbol[] = {                /* array is sorted for binary search */
+	{ "\"", 0 },
+	{ "#", 0 },
+	{ "*", 0 },
+	{ "/", 0 },
+	{ "\\", 0 },
+	{ "_", 0 },
+};
+
 /* addtree: add a node with w, at or below p */
 struct tnode *addtree(struct tnode *p, char *w)
 {
@@ -129,19 +139,19 @@ int getword(char *word, int lim)
 	int   c, getch(void);
 	void  ungetch(int);
 	char  *w = word;
+	struct key *p; 
 
 	while (isspace(c = getch()))
 		;
 	
-	if (c != EOF)
+	if (c != EOF) {
 		*w++ = c;
-	else
+		*w = '\0';
+	} else
 		return c;
 
-	if (!isalpha(c) && c != '_' && c != '\"' && c != '#' && c != '/' && c != '\\') {
-		*w = '\0';
+	if (!isalpha(c) && (p = binsearch(word, symbol, NSYMBOLS)) == NULL)
 		return c;
-	}
 
 	switch (c) {
 	case '\\':                          /* handle escape sequences */
@@ -248,8 +258,9 @@ int main(int argc, char *argv[])
 
 	root = NULL;                       /* initialize root node */
 	while (getword(word, MAXWORD) != EOF)
-		if (isalpha(word[0]) && (int) strlen(word) > nChar)
-			if ((p = binsearch(word, keytab, NKEYS)) == NULL) /* skip reserved */
+		if ((isalpha(word[0]) || word[0] == '_' || word[0] == '*')
+				&& (int) strlen(word) > nChar)
+			if ((p = binsearch(word, keytab, NKEYS)) == NULL) /* skip C */
 				root = addtree(root, word);                   /* reserved words */
 	findVariables(root, nChar);
 	treeprint(root);
