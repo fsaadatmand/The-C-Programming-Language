@@ -13,10 +13,12 @@
 
 #define MAXWORD 100
 #define NKEYS (sizeof keytab / sizeof keytab[0])
+#define NSYMBOLS (sizeof symbol / sizeof symbol[0])
 /* or */
 /* #define NKEYS (sizeof keytab / sizeof(struct key)) */
 #define BUFSIZE     100
 
+/* globals */
 char   buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp = 0;             /* next free position in buf */
 
@@ -59,6 +61,16 @@ struct key keytab[] = {
 	{ "while", 0 },
 };
 
+struct key symbol[] = {                /* array is sorted for binary search */
+	{ "\"", 0 },
+	{ "#", 0 },
+	{ "*", 0 },
+	{ "/", 0 },
+	{ "\\", 0 },
+	{ "_", 0 },
+};
+
+/* functions */
 int  getword(char *, int);
 int  binsearch(char *, struct key *, int);
 
@@ -99,22 +111,21 @@ void ungetch(int c)          /* push character back on input */
 /* getword: get next word or character from input */
 int getword(char *word, int lim)
 {
-	int   c, getch(void);
+	int   c, n = -1, getch(void);
 	void  ungetch(int);
 	char  *w = word;
 
 	while (isspace(c = getch()))
 		;
 	
-	if (c != EOF)
+	if (c != EOF) {
 		*w++ = c;
-	else
+		*w = '\0';
+	} else
 		return c;
 
-	if (!isalpha(c) && c != '_' && c != '\"' && c != '#' && c != '/' && c != '\\') {
-		*w = '\0';
+	if (!isalpha(c) && (n = binsearch(word , symbol, NSYMBOLS)) < 0)
 		return c;
-	}
 
 	switch (c) {
 	case '\\':                          /* handle escape sequences */
@@ -137,8 +148,7 @@ int getword(char *word, int lim)
 					break; 
 				else if (c == EOF)
 					return c;
-		} else                         /* don't skip pointer variables */
-			ungetch(c);
+		}
 		break;
 	default:
 		for ( ; --lim > 0; w++)
@@ -154,7 +164,6 @@ int getword(char *word, int lim)
 }
 
 /* count C keywords */
-
 int main(void)
 {
 	int n;
