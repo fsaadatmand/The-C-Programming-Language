@@ -21,7 +21,7 @@ unsigned hash(char *);
 char *strDup(char *);
 struct nlist *lookup(char *);
 struct nlist *install(char *, char *);
-int undef(char *);
+void undef(char *);
 
 /* Globals */
 static struct nlist *hashtab[HASHSIZE];    /* pointer table */
@@ -69,7 +69,7 @@ struct nlist *install(char *name, char *defn)
 		if (np == NULL || (np->name = strDup(name)) == NULL)
 			return NULL;               /* no (heap) memory */
 		hashval = hash(name);
-		np->next = hashtab[hashval]; 
+		np->next = hashtab[hashval];
 		hashtab[hashval] = np;
 	} else                             /* already there */
 		free((void *) np->defn);       /* free previous definition */
@@ -81,20 +81,17 @@ struct nlist *install(char *name, char *defn)
 	return np;
 }
 
-/* undef: remove (name, def) in hashtab */
-int undef(char *s)
+/* undef: remove (name, def) in hash table. Takes name as argument */
+void undef(char *s)
 {
 	struct nlist *np;
 
 	if ((np = lookup(s)) != NULL) {
-		np->next = NULL;               /* clear index/link in node */
-		free((void *) np->name);       /* free array's memory */
-		free((void *) np->defn);       /* free array's memory */
+		free((void *) np->name);       /* free name memory */
+		free((void *) np->defn);       /* free definition memory */
+		hashtab[hash(s)] = np->next;   /* clear index or relink next node */
 		free((void *) np);             /* free node memory */
-		hashtab[hash(s)] = NULL;       /* clear index/link in hash table */
-		return 1;                      /* success */
 	}
-	return -1;                         /* failure. No match found */
 }
 
 int main(void)
@@ -102,32 +99,23 @@ int main(void)
 	struct nlist *p;
 	int i;
 
-	if ((p = install("YES", "1")) != NULL) 
-		printf("YES is replaced by %s\n", p->defn); 
+	/* insert nodes (skipped error checking) */
+	p = install("YES", "1");
+	p = install("NO", "0"); 
 
-	if ((p = install("NO", "0")) != NULL) 
-		printf("NO is replaced by %s\n", p->defn); 
+	printf("Hash Table Values:\n");
+	for (i = 0; i < HASHSIZE; i++)
+		if (hashtab[i] != NULL)
+			printf("%i  name: %s  defn: %s\n", i, hashtab[i]->name, hashtab[i]->defn);
 
-	printf("\n");
-
-	printf("Hash Table values:\n");
-	i = 0;
-	for (p = hashtab[i]; i < HASHSIZE; ++i) {
-		p = hashtab[i];
-		if (p != NULL)
-			printf("%i  name: %s  defn: %s\n", i, p->name, p->defn);
-	}
-
-	printf("\n");
-
+	/* delete a node */
+	printf("\nDelete \"YES\"\n\n");
 	undef("YES");
 
-	printf("Hash Table values (after deletion):\n");
-	i = 0;
-	for (p = hashtab[i]; i < HASHSIZE; ++i) {
-		p = hashtab[i];
-		if (p != NULL)
-			printf("%i  name: %s  defn: %s\n", i, p->name, p->defn);
-	}
+	printf("Hash Table Values (After Deletion):\n");
+	for (i = 0; i < HASHSIZE; i++)
+		if (hashtab[i] != NULL)
+			printf("%i  name: %s  defn: %s\n", i, hashtab[i]->name, hashtab[i]->defn);
+
 	return 0;
 }
