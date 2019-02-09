@@ -106,7 +106,8 @@ int main(void)
 	printf("Hash Table Values:\n");
 	for (i = 0; i < HASHSIZE; i++)
 		if (hashtab[i] != NULL)
-			printf("%i  name: %s  defn: %s\n", i, hashtab[i]->name, hashtab[i]->defn);
+			printf("%i  name: %s  defn: %s\n",
+					i, hashtab[i]->name, hashtab[i]->defn);
 
 	/* delete a node */
 	printf("\nDelete \"YES\"\n\n");
@@ -115,7 +116,7 @@ int main(void)
 	printf("Hash Table Values (After Deletion):\n");
 	for (i = 0; i < HASHSIZE; i++)
 		if (hashtab[i] != NULL)
-			printf("%i  name: %s  defn: %s\n", i, hashtab[i]->name, hashtab[i]->defn);
-
+			printf("%i  name: %s  defn: %s\n",
+					i, hashtab[i]->name, hashtab[i]->defn);
 	return 0;
 }
