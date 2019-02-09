@@ -14,7 +14,6 @@
 #define MAXWORD 100
 #define MAXLEN  5000
 #define BUFSIZE 100
-#define NKEYS (sizeof keytab / sizeof keytab[0])
 #define NSYMBOLS (sizeof symbol / sizeof symbol[0])
 
 struct key {
@@ -143,7 +142,9 @@ int getword(char *word, int lim)
 	return word[0];
 }
 
-/* getLine: get line into s, return length of s -- slightly modified */
+/* getLine: get line into s, return length of s -- modified to skip blanks at
+ * the beginning of the line and not to insert a newline character at the end.
+ * */
 int getLine(char *s, int lim)
 {
 	int c, len;
@@ -157,10 +158,7 @@ int getLine(char *s, int lim)
 		*s++ = c;
 		++len;
 	}
-	if ( c == '\n') {
-		*s++ = c;
-		++len;
-	}
+
 	*s = '\0';
 	return len;
 }
@@ -220,36 +218,33 @@ struct nlist *install(char *name, char *defn)
 	return np;
 }
 
-/* simple define processor: no arguments */
+/* simple define processor (no arguments) */
 int main (void)
 {
 //	struct nlist *p;
 	char word[MAXWORD];
-//	char name[MAXWORD];
 	char defn[MAXLEN];
-	char *keyword = "#define";
-	int found, count = 0, len, i;
+	char *name, *keyword = "#define";
+	int ctrline, len, i;
 
-	found = 0;
-	while (getword(word, MAXWORD) != EOF) {
-		if (word[0] == '#' && !found) {
-			if (strcmp(word, keyword) == 0) {
-				found = 1;
-				count++;
-			}
-		} else if (found) {
+	name = word;                       /* unnecessary. Added for clarity */
+
+	ctrline = 0;
+	while (getword(word, MAXWORD) != EOF)
+		if (word[0] == '#' && !ctrline) {
+			if (strcmp(word, keyword) == 0)
+				ctrline = 1;           /* found processor control line */
+		} else if (ctrline) {          /*  parse name and definition */
 			len = getLine(defn, MAXLEN);
-			install(word, defn);
-			found = 0;
+			install(name, defn);
+			ctrline = 0;
 		}
-	}
 
 	/* print table */
 	printf("Hash Table Values:\n");
 	for (i = 0; i < HASHSIZE; i++)
 		if (hashtab[i] != NULL)
-			printf("%i  name:%s  defn:%s\n", i, hashtab[i]->name, hashtab[i]->defn);
-
-	printf("count = %d\n", count);
+			printf("%i  name: %s  defn: %s\n",
+					i, hashtab[i]->name, hashtab[i]->defn);
 	return 0;
 }
