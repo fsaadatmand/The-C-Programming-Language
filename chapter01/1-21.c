@@ -1,14 +1,14 @@
 /* 
  * Exercise 1-21. Write a program entab that replaces strings of blanks by the
  * minimum number of tabs and blanks to achieve the same spacing. When either a
- * tab or a singl blank would suffice to reach a tab stop, which should be give
+ * tab or a single blank would suffice to reach a tab stop, which should be give
  * preference?
- * By Faisal Saadatmad
+ * By Faisal Saadatmand
  */
 
 /*
- * Answer: in such a case, a singal space is given preference, because otherwise a change 
- * to the value of the tab stop (n) would distored the single space.
+ * Answer: in such a case, a signal space is given preference, because otherwise a change 
+ * to the value of the tab stop (n) would distort the single space.
  */
 
 #include <stdio.h>
@@ -38,7 +38,7 @@ int getLine(char s[], int lim)
 	return i;
 }
 
-/* count function: counts the occurremces of a character in a string */ 
+/* count function: counts the occurrences of a character in a string */ 
 int count(char s[], char c, int p)
 {
 	int nC = 0;               /* number of c occurrences in s[] */

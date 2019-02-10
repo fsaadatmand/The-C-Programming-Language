@@ -3,12 +3,12 @@
  * input with the proper number of blanks to space to the next tab stop. Assume
  * a fixed set of tab stops, say every n columns. Should n be a variable or a
  * symbolic parameter.
- * By Faisal Saadatmad
+ * By Faisal Saadatmand
  */
 
 /*
  * Answer: it is wiser to use a symbolic parameter for the value n rather than
- * a gloabl variable. The value of n should remain constant throughout the
+ * a global variable. The value of n should remain constant throughout the
  * program, for a change in n would break algorithm in functions that depend on
  * a specific value of n. If need be, it is better to change the value of n in
  * a function through a local variable instead.

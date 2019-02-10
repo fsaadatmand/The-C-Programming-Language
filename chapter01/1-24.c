@@ -40,7 +40,7 @@ int getLine(char s[], int lim)
 
 /* findComment function: searches line[] for the first occurrence of the first
  * character of a C comment notation and returns the location on finding a single
- * line comment or -1 on failiure */
+ * line comment or -1 on failure */
 int findComment(char line[], int notation)
 {
 	int i, j;
@@ -61,7 +61,7 @@ int findComment(char line[], int notation)
 	}
 
 	lookForQuote  = YES;
-	/* line[x - 1] check handles escape squences. It is unnecessary for the
+	/* line[x - 1] check handles escape sequences. It is unnecessary for the
 	 * start of the quote but is added for the sake of correctness. */
 	for (i = 0; line[i] != '\0'; ++i) {
 		if (line[i] == comment[0] && line[i + 1] == comment[1]) {
@@ -84,7 +84,7 @@ int findComment(char line[], int notation)
 		if (location > quoteStart && location < quoteEnd)
 			location = -1;       /* not a C comment */
 
-	/* check if notation is inside a muli-line double quotation marks */
+	/* check if notation is inside a multi-line double quotation marks */
 	if (location >= 0 && quoteStart >= 0 && quoteEnd < 0)
 //		if (location < quoteStart)
 			location = -1;       /* not a C comment */
@@ -92,7 +92,7 @@ int findComment(char line[], int notation)
 	return location;
 }
 
-/* delComment function: deletes C comments from line stringn stores result in
+/* delComment function: deletes C comments from line string stores result in
  * modLine */
 int delComment(char line[], char modLine[], int start, int end)
 {
@@ -109,7 +109,7 @@ int delComment(char line[], char modLine[], int start, int end)
 	else if (start >= 0 && end < 0)
 		for (i = 0; i < start; ++i)
 			modLine[i] = line[i];
-	/* end but no start - move text after comment to the begeining  of line */
+	/* end but no start - move text after comment to the beginning  of line */
 	else if (start < 0 && end >= 0)
 		for (j = end + 1; line[j] != '\0'; ++j)  {
 			modLine[i] = line[j];
@@ -125,7 +125,7 @@ int delComment(char line[], char modLine[], int start, int end)
 		}
 	}
 
-	/* end of line formating */
+	/* end of line formatting */
 	if (start < 0 && end < 0)
 		modLine[0] = '\n';
 	else if (start >= 0 && end < 0) {
@@ -153,7 +153,7 @@ int findCharacter(char line[], char symbol[], int charsCount[], int len)
 
 	quoteState = OUT;
 	for (i = 0; i <= len ; ++i)
-		/* line[x - 1] check handles escape squences. */
+		/* line[x - 1] check handles escape sequences. */
 		for (j = 0; line[j] != '\0'; ++j)
 			if (quoteState == OUT && line[j] == '\"' && line[j - 1] != '\\')
 				quoteState = IN;

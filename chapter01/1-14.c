@@ -31,7 +31,7 @@ int main(void)
 			printf("%c ", i + '0');     /* print histogram labels */
 		for (j = 1; j <= characters[i]; ++j)
 			printf("* ");
-		if (characters[i] != EMPTY)     /* skip not inputed charachters */
+		if (characters[i] != EMPTY)     /* skip character */
 			printf("\n");
 	}
 

@@ -52,7 +52,7 @@ void foldLine(char line[], char fldLine[], int lineLen)
 			/* line is outside of a word or if is made up of one word. */
 			if (line[i] == ' ' || line[i] == '\t' || wsPos == 0)
 				fldLine[i] = '\n';     /* break line at current position */
-			/* line is insdie of a word */
+			/* line is inside of a word */
 			else {
 				fldLine[wsPos] = '\n'; /* break line at the previous ws */
 				i = wsPos;             /* read from break point */

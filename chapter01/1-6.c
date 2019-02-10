@@ -11,7 +11,7 @@ int main(void)
 
 	while ((c = getchar()) != EOF)    /* note operator precedence */
 		printf("%i\n", c);
-		
+
 	printf("%i\n", c);
 
 	return 0;

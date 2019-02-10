@@ -14,7 +14,7 @@ int main(void)
 	upper = 300;      /* upper limit */
 	step  = 20;       /* step size */
 
-	fahr = lower;
+	fahr = celsius = lower;
 
 	printf("Celsius\t\tFahrenheit\n");
 
@@ -24,6 +24,5 @@ int main(void)
 		fahr = fahr + step;
 		celsius = celsius + step;
 	}
-
 	return 0;
 }

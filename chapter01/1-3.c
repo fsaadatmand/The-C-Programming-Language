@@ -1,7 +1,7 @@
 /* 
  * Exercise 1-3. Modify the temperature conversion program to print a heading
  * above the table.
- * By Fasial Saadatmand
+ * By Faisal Saadatmand
  */
 
 #include <stdio.h>

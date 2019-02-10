@@ -53,7 +53,7 @@ int main(void)
 		if (len == MAXLINE - 1 &&   /* test for length and previous input */
 				line[MAXLINE - 1] != '\n') {
 			copy(longest, line);            /* save the string */
-			longest[MAXLINE - 2] = '\n';    /* insert a newline charcter before
+			longest[MAXLINE - 2] = '\n';    /* insert a newline character before
 											   the null character */
 			max = len;
 			max += getLine(line, MAXLINE); /* save the value of max */
@@ -65,8 +65,8 @@ int main(void)
 	if (max > 0)                            /* there was a line */
 		printf("%s", longest);
 
-	if (max >= MAXLINE - 1) {               /* print warnning message */
-		printf("Warnning: The longest line is %i characters long.\n", max);
+	if (max >= MAXLINE - 1) {               /* print warning message */
+		printf("Warning: The longest line is %i characters long.\n", max);
 		printf("\t  Only showing the first %i characters\n", MAXLINE);
 	}
 	return 0;
