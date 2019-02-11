@@ -21,7 +21,7 @@ struct tnode {
 
 /* functions */
 int getword(char *, int);
-struct tnode *talloc(void);            /* alocate memory to new tree node */
+struct tnode *talloc(void);            /* allocate memory to new tree node */
 char   *strDup(char *);                /* copy string into safe place */
 struct tnode *addtree(struct tnode *, char *);
 void treeprint(struct tnode *);
@@ -97,7 +97,7 @@ struct tnode *addtree(struct tnode *p, char *w)
 		p->left = p->right = NULL;
 	} else if ((cond = strcmp(w, p->word)) == 0)
 		p->count++;                    /* repeated word */
-	else if (cond < 0)                 /* less thant into left subtree */
+	else if (cond < 0)                 /* less than into left subtree */
 		p->left = addtree(p->left, w);
 	else  
 		p->right = addtree(p->right, w);
@@ -130,7 +130,7 @@ struct tnode *copyTree(struct tnode *p, struct tnode *root)
 }
 
 /* sortTree: performs inorder traversal on root and creates a BST p according
- * to frequencey of occurence */
+ * to frequency of occurrence */
 struct tnode *sortTree(struct tnode *p, struct tnode *root)
 {
 	if (root != NULL) {

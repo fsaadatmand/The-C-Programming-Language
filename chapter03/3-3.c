@@ -38,7 +38,7 @@ int expand(char s1[], char s2[])
 {
 	int i;                     /* read from s1 index */
 	int j;                     /* write to s2 index */
-	int expChar;               /* expanded charater */
+	int expChar;               /* expanded character */
 	int shorthand;             /* shorthand match flag */
 	int modified;              /* return value flag */
 

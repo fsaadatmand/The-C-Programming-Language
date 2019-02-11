@@ -11,7 +11,7 @@ int binSearchOld(int x, int v[], int n);
 int binSearch(int x, int value[], int n);
 
 /* binSearch: find x in value[0] <= value[1] <= ... <= value[n - 1] */
-int binSearchOld(int x, int v[], int n)
+int binSearch(int x, int v[], int n)
 {
 	int low, high, mid;
 
@@ -21,7 +21,7 @@ int binSearchOld(int x, int v[], int n)
 	while (low <= high) {
 		mid = (low + high) / 2;
 		if (x < v[mid])
-			high = mid + 1;
+			high = mid - 1;
 		else if (x > v[mid])
 			low = mid + 1;
 		else
@@ -30,37 +30,31 @@ int binSearchOld(int x, int v[], int n)
 	return -1;             /* no match */
 }
 
-int binSearch(int x, int value[], int n)
+int binSearch_new(int x, int value[], int n)
 {
 	int low, high, mid;
 
 	low = 0;
 	high = n - 1;
 
-	while (mid != low && low < high) {
+	mid = (low + high) / 2;
+	while (low <= high | x != value[mid]) {
 		mid = (low + high) / 2;
-		if (x <= value[mid])
-			high = mid;
+		if (x < value[mid])
+			high = mid - 1;
 		else
 			low = mid + 1;
 	}
-
 	if (x == value[mid])
-		return mid;        /* match found */
-	else
-		return -1;         /* no match */
+		return mid;
+	return -1;
 }
+
 int main(void)
 {
-	int i;
-	int array[12] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+	int array[12] = { 2, 4, 5, 6, 8, 9, 12, 16, 20, 32, 40, 78 };
 	
-//	for (i = 0; i <= 1000000000; ++i)
-//		binSearchOld(6, array, 12);
-//		printf("%i\n", binSearchOld(6, array, 12));
-	for (i = 0; i <= 1000000000; ++i)
-		binSearch(6, array, 12);           /* faster! */
-		printf("%i\n", binSearch(6, array, 12));
+		printf("%i\n", binSearch_new(2, array, 12));
 
 	return 0;
 }

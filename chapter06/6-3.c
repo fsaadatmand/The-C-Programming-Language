@@ -1,4 +1,4 @@
-/* Exercise 6-3. Write a cross-refrencer that prints a list of all words in a
+/* Exercise 6-3. Write a cross-referencer that prints a list of all words in a
  * document, and, for each word, a list of the line numbers on which it occurs.
  * Remove noise words like "the," "and," and so on.
  * By Faisal Saadatmand
@@ -46,7 +46,7 @@ struct key noisetab[] = {
 
 /* functions */
 int    getword(char *, int, int *);
-struct tnode *talloc(void);            /* alocate memory to new tree node */
+struct tnode *talloc(void);            /* allocate memory to new tree node */
 char   *strDup(char *);                /* copy string into safe place */
 struct tnode *addtree(struct tnode *, char *, int);
 void   treeprint(struct tnode *);
@@ -140,7 +140,7 @@ struct tnode *addtree(struct tnode *p, char *w, int ln)
 	} else if ((cond = strcmp(w, p->word)) == 0) {
 		p->count++;                    /* repeated word */
 		p->line = addlist(p->line, ln);
-	} else if (cond < 0)               /* less thant into left subtree */
+	} else if (cond < 0)               /* less than into left subtree */
 		p->left = addtree(p->left, w, ln);
 	else  
 		p->right = addtree(p->right, w, ln);
