@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-unsigned int invert(unsigned int x, int p, int n);
+unsigned int invert(unsigned int, int, int);
 
 unsigned int invert(unsigned int x, int p, int n)
 {
@@ -23,7 +23,7 @@ unsigned int invert(unsigned int x, int p, int n)
 int main(void)
 {
 	unsigned int x = 0XFFFF;
-	int p = 4;                   /* starting postion of bits */
+	int p = 4;                   /* starting position of bits */
 	int n = 4;                   /* number of bits to set */
 
 	printf("%x\n", invert(x, p, n)); 

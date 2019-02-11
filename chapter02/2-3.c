@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <ctype.h>       /* for htoi() */ 
-#include <math.h>        /* for powe() */
+#include <math.h>        /* for pow() */
 #include <string.h>     
 
 #define MAXLINE 1000

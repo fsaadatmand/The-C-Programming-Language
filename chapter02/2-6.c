@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-unsigned int setbits(unsigned int x, int p, int n, unsigned y);
+unsigned int setbits(unsigned int, int, int, unsigned);
 
 unsigned int setbits(unsigned int x, int p, int n, unsigned y)
 {
@@ -22,7 +22,7 @@ int main(void)
 {
 	unsigned int x = 0XF8FF;
 	unsigned int y = 0XF0A2;
-	int p = 8;                   /* starting postion of bits */
+	int p = 8;                   /* starting position of bits */
 	int n = 2;                   /* number of bits to set */
 
 	printf("%x\n", setbits(x, p, n, y)); 
