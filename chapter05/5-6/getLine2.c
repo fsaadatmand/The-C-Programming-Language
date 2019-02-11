@@ -1,7 +1,7 @@
 /*
  * Exercise 5-6. Rewrite appropriate programs from earlier chapters and
  * exercises with pointers instead of array indexing. Good possibilities
- * include getLine (chapter1 and 4), atoi, itoa, and their variants (Chapters
+ * include getLine (chapter 1 and 4), atoi, itoa, and their variants (Chapters
  * 2, 3 and 4), reverse (Chapter 3), and strindex and gettop (Chapter 4)
  * By Faisal Saadatmand
  */
@@ -38,9 +38,7 @@ int main(void)
 	int len;
 	char line[MAXLINE];
 
-	while ((len = getLine(line, MAXLINE)) > 0) {
+	while ((len = getLine(line, MAXLINE)) > 0)
 		printf("%s", line);
-	}
-
 	return 0;
 }

@@ -3,7 +3,7 @@
  * rather than calling alloc to maintain storage. How much faster is the
  * program? 
  * Answer: With the current implementation both clock_t and unix time command
- * report similar runtimes.  perhaps a much bigger data would show a
+ * report similar runtimes.  Perhaps a much bigger data would show a
  * discrepancy in runtimes.
  * By Faisal Saadatmand
  */
@@ -15,7 +15,7 @@
 #define MAXLEN    1000       /* max length of any input line */
 #define ALLOCSIZE 100000      /* storage for alloc */
 
-/* function declerations */
+/* functions */
 int  readlines(char *lineptr[], int nlines, char *p);
 void writelines(char *lineptr[], int nlines);
 int  getLine(char *, int);

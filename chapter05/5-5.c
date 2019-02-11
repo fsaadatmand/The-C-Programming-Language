@@ -15,7 +15,7 @@
  * '\0's if t has fewer than n characters */
 char *strnCpy(char *s, char *t, int n)
 {
-	int nChar;                     /* number of characters coppied */
+	int nChar;                     /* number of characters copied */
 	int t_len;                     /* length of source string */
 
 	t_len = strlen(t);
@@ -35,7 +35,6 @@ char *strnCpy(char *s, char *t, int n)
 			*s++ = '\0';
 			++nChar;
 		}
-
 	return s - n;
 
 }
@@ -71,7 +70,6 @@ int strnCmp(char *s, char *t, int n)
 		if (n == 0)
 			return 0;
 	}
-
 	return *s - *t;
 }
 
@@ -84,10 +82,7 @@ int main(void)
 	char string2[MAXCHAR] = { "compare me with other strings" };
 
 	printf("%s\n", strnCpy(dest1, source, 4));
-
 	printf("%s\n", strnCat (dest2, source, 4));
-
 	printf("%i\n", strnCmp (string1, string2, 4));
-	
 	return 0;
 }

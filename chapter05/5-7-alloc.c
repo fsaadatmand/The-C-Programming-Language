@@ -12,7 +12,7 @@
 #define MAXLEN    1000       /* max length of any input line */
 #define ALLOCSIZE 100000      /* storage for alloc */
 
-/* function declerations */
+/* functions */
 int  readlines(char *lineptr[], int nlines);
 void writelines(char *lineptr[], int nlines);
 int  getLine(char *, int);
@@ -22,7 +22,7 @@ void qsort(char *lineptr[], int left, int right);
 /* global variables */
 char *lineptr[MAXLINES];    /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
-static char *allocp = allocbuf;   /* next fre position */
+static char *allocp = allocbuf;   /* next free position */
 
 /* readlines: read input lines */
 int readlines(char *lineptr[], int maxlines)

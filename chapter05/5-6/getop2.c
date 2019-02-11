@@ -1,7 +1,7 @@
 /*
  * Exercise 5-6. Rewrite appropriate programs from earlier chapters and
  * exercises with pointers instead of array indexing. Good possibilities
- * include getLine (chapter1 and 4), atoi, itoa, and their variants (Chapters
+ * include getLine (chapter 1 and 4), atoi, itoa, and their variants (Chapters
  * 2, 3 and 4), reverse (Chapter 3), and strindex and gettop (Chapter 4)
  * By Faisal Saadatmand
  */
@@ -16,14 +16,14 @@
 #define MAXOP       100          /* max size of operand or operator */
 #define NUMBER      '0'          /* signal that a number was found */
 #define MATH        '1'          /* signal that an operation was found */
-#define END         0            /* singal EOF */
+#define END         0            /* signal EOF */
 #define MAXVAL      100          /* maximum depth of val stack */
 #define BUFSIZE     100
 #define MATCH       0
 #define MAXVAR      26           /* max number of variables */
 #define TOP         val[sp - 1]  /* top of the stack element */ 
 
-/* function decleration */
+/* functions */
 int    getop(char *);
 int    getLine(char *s, int lim);
 void   push(double);
@@ -122,7 +122,7 @@ int getLine(char *s, int lim)
 	return len;
 }
 
-/* printTop: prints the top element in the stack without poping */
+/* printTop: prints the top element in the stack without popping */
 void printTop(void)
 {
 	if (sp > 0)
@@ -159,7 +159,7 @@ void clearStack(void)
 		pop();
 }
 
-/* storeVariable: stores the value of a variable (a to z) to the corrosponding
+/* storeVariable: stores the value of a variable (a to z) to the corresponding
  * memory location in mem */
 void storeVariable(double mem[], char variable)
 {
@@ -169,7 +169,7 @@ void storeVariable(double mem[], char variable)
 		value = lastPrint;          /* fetch last printed value value */
 		mem[MAXVAR] = value;        /* last location is reserved for P */
 	} else {
-		pop();                        /* pop stored value by fetVariable */
+		pop();                        /* pop stored value by fetchVariable */
 		value = pop();                /* variable value - top of the stack */
 		variable = tolower(variable);
 		mem[variable - 'a'] = value;
@@ -177,7 +177,7 @@ void storeVariable(double mem[], char variable)
 	}
 }
 
-/* fetchVariable: fetches variable value from mempry and pushes to the top of
+/* fetchVariable: fetches variable value from memory and pushes to the top of
  * the stack */
 void fetchVariable(double mem[], char variable)
 {

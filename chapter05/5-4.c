@@ -35,6 +35,5 @@ int main(void)
   char string2[] = { "string" };
 
   printf("%i\n", strend(string1, string2));
-  
   return 0;
 }

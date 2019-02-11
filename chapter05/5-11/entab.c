@@ -2,7 +2,7 @@
  * Exercise 5-11. Modify the program and detab (written in exercises in Chapter
  * 1) to accept a list of tab stops as arguments. Use the default tab setting
  * if there are no arguments.
- * By Faisal Saadatmad
+ * By Faisal Saadatmand
  */
 
 #include <stdio.h>
@@ -40,7 +40,7 @@ int getLine(char *s, int lim)
 	return len;
 }
 
-/* count function: counts the occurremces of a character in a string - pointer
+/* count function: counts the occurrences of a character in a string - pointer
  * version */ 
 int count(char *s, char c)
 {

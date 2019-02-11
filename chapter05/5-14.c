@@ -1,6 +1,6 @@
 /*
  * Exercise 5-14. Modify the sort program to handle a -r flag, which indicates
- * sorting in reverse (decreasing) order. be sure that -r works with -n.
+ * sorting in reverse (decreasing) order. Be sure that -r works with -n.
  * By Faisal Saadatmand
  */
 
@@ -26,7 +26,7 @@ int  reverse(char *s, char *t);
 /* Globals */
 char        *lineptr[MAXLINES];   /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
-static char *allocp = allocbuf;   /* next fre position */
+static char *allocp = allocbuf;   /* next free position */
 int         numeric = 0;          /* 1 if numeric sort */
 int         decreasing = 0;       /* 1 if reverse order sort */
 

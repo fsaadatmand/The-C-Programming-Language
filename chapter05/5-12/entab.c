@@ -2,7 +2,7 @@
  * Exercise 5-12. Extend entab and detab to accpt the shorthand
  * 	entab -m +n
  * 	to mean tab stops every n columns, starting at column m. Choose convenient
- * 	(for the user) default behavoir.
+ * 	(for the user) default behaviour.
  * By Faisal Saadatmand
  */
 
@@ -41,7 +41,7 @@ int getLine(char *s, int lim)
 	return len;
 }
 
-/* count function: counts the occurremces of a character in a string - pointer
+/* count function: counts the occurrences of a character in a string - pointer
  * version */ 
 int count(char *s, char c)
 {

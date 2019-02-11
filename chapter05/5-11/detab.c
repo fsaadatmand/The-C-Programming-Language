@@ -14,7 +14,7 @@
 #define MAXARG  1000                /* max number of tab stop arguments */
 #define N       4                   /* default tab stop for every n columns */
 
-/* functions declarations */
+/* functions */
 int  getLine(char *s, int lim);
 int  isDigitStr(char *s[]);
 void detabList(char *line, char *modLine, int *list, int listSize);
@@ -51,7 +51,7 @@ void detabList(char *line, char *modLine, int *list, int listSize)
 				++list;                               /* tab stop setting in it */
 				--listSize;
 			}
-			/* calculate #blanks to the next tab stop, if user inputed list
+			/* calculate #blanks to the next tab stop, if user entered list
 			 * exits, else use default setting */
 			toNextTabStop = (listSize > 0) ? *list - column : N - column % N;
 			while (toNextTabStop-- > 0) {

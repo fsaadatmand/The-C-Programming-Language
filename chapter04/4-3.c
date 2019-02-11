@@ -1,6 +1,6 @@
 /* 
- * Exercise 4-3. Given the basic framwork, it's straightforward to extend the
- * calculator. Add the modulos (%) operator and provisions for negative numbers
+ * Exercise 4-3. Given the basic framework, it's straightforward to extend the
+ * calculator. Add the modulus (%) operator and provisions for negative numbers
  * By Faisal Saadatmand
  */
 
@@ -13,7 +13,7 @@
 #define MAXVAL  100          /* maximum depth of val stack */
 #define BUFSIZE 100
 
-/* function decleration */
+/* functions */
 int    getop(char []);
 void   push(double);
 double pop(void);
@@ -135,7 +135,7 @@ int main(void)
 			printf("\t%.8g\n", pop());
 			break;
 		default:
-			printf("error: unknown comman %s\n", s);
+			printf("error: unknown command %s\n", s);
 			break;
 		}
 	}

@@ -1,7 +1,7 @@
 /*
  * Exercise 5-2. Write getfloat, the floating-point anolog of getfloat. What type
  * does getfloat return as its function value? Integer
- * Alernate version. Perhaps the correct way?
+ * Alternate version. Perhaps the correct way?
  * By Faisal Saadatmand
  */
 

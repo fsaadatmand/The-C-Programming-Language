@@ -10,7 +10,7 @@
 #include <ctype.h>
 #include <math.h>
 
-/* atof: convert string s to doube */
+/* atof: convert string s to double */
 double atof(char s[])
 {
 	int    i, sign, expSign;

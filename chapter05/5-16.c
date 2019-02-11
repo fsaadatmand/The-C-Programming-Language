@@ -31,7 +31,7 @@ int  dstrCmp(char *s, char *t);
 /* Globals */
 char        *lineptr[MAXLINES];   /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
-static char *allocp = allocbuf;   /* next fre position */
+static char *allocp = allocbuf;   /* next free position */
 int         numeric = 0;          /* 1 if numeric sort */
 int         decreasing = 0;       /* 1 if reverse order sort */
 int         fold = 0;             /* 1 id case insensitive sort */

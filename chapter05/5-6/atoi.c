@@ -2,7 +2,7 @@
 /*
  * Exercise 5-6. Rewrite appropriate programs from earlier chapters and
  * exercises with pointers instead of array indexing. Good possibilities
- * include getLine (chapter1 and 4), atoi, itoa, and their variants (Chapters
+ * include getLine (chapter 1 and 4), atoi, itoa, and their variants (Chapters
  * 2, 3 and 4), reverse (Chapter 3), and strindex and gettop (Chapter 4)
  * By Faisal Saadatmand
  */
@@ -26,7 +26,7 @@ int atoi_1(char s[])
 	return n;
 }
 
-/* chater 3 */
+/* chapter 3 */
 
 /* atoi: convert s to integer; version 2 - pointer version */
 int atoi_2(char *s)
@@ -57,6 +57,5 @@ int main(void)
 
 	printf("%i\n", atoi_1(string));
 	printf("%i\n", atoi_2(string));
-
 	return 0;
 }

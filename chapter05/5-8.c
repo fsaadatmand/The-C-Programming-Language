@@ -57,6 +57,5 @@ int main(void)
 		printf("month %i, day %i\n", month, day);
 	else
 		printf("invalid input\n");
-
 	return 0;
 }

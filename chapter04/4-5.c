@@ -18,7 +18,7 @@
 #define MATCH   0
 #define TOP     val[sp - 1]  /* top of the stack element */ 
 
-/* function decleration */
+/* functions */
 int    getop(char []);
 void   push(double);
 double pop(void);

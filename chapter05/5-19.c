@@ -21,7 +21,7 @@ void ungetch(int c);
 /* Globals */
 char token[MAXTOKEN];                  /* last token string */
 int  tokentype;                        /* type of last token */
-char name[MAXTOKEN];                   /* indentifier name */
+char name[MAXTOKEN];                   /* identifier name */
 char out[1000];
 char buf[BUFSIZE];                     /* buffer from ungetch */
 int  bufp = 0;                         /* next free position in buf */

@@ -59,6 +59,5 @@ int main(void)
 			printf("%i\n", position);
 			found++;
 		}
-
 	return found;
 }

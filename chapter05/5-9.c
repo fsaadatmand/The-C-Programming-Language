@@ -58,7 +58,7 @@ char *month_name(int n)
 {
 	static char *name[] = {
 		"illegal month",
-		"january", "February", "March",
+		"January", "February", "March",
 		"April", "May", "June",
 		"July", "August", "September",
 		"October", "November", "December"

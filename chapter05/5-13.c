@@ -22,7 +22,7 @@
 #define ALLOCSIZE 100000     /* storage for alloc */
 #define N          10        /* default value of last lines to print */
 
-/* function declerations */
+/* functions */
 int  readlines(char *lineptr[], int nlines);
 int  getLine(char *, int);
 char *alloc(int);
@@ -31,7 +31,7 @@ int  isDigitStr(char *s[]);
 /* global variables */
 char        *lineptr[MAXLINES];   /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
-static char *allocp = allocbuf;   /* next fre position */
+static char *allocp = allocbuf;   /* next free position */
 
 /* readlines: read input lines */
 int readlines(char *lineptr[], int maxlines)

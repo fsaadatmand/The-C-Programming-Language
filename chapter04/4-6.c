@@ -20,7 +20,7 @@
 #define MAXVAR      26
 #define TOP         val[sp - 1]  /* top of the stack element */ 
 
-/* function decleration */
+/* functions */
 int    getop(char []);
 void   push(double);
 double pop(void);
@@ -168,7 +168,7 @@ void storeVariable(double mem[], char variable)
 		value = lastPrint;          /* fetch last printed value value */
 		mem[MAXVAR] = value;        /* last location is reserved for P */
 	} else {
-		pop();                        /* pop stored value by fetVariable */
+		pop();                        /* pop stored value by fetchVariable */
 		value = pop();                /* variable value - top of the stack */
 		variable = tolower(variable);
 		mem[variable - 'a'] = value;
@@ -176,7 +176,7 @@ void storeVariable(double mem[], char variable)
 	}
 }
 
-/* fetchVariable: fetches variable value from mempry and pushes to the top of
+/* fetchVariable: fetches variable value from memory and pushes to the top of
  * the stack */
 void fetchVariable(double mem[], char variable)
 {

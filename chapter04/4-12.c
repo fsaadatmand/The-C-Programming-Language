@@ -14,7 +14,7 @@ void itoa(int n, char s[]);
 /* itoa: convert n to characters in s. Recursive version */
 void itoa(int n, char s[])
 {
-	int sign, lastDigit;
+	int lastDigit;
 	int static i;                         /* note static type */
 
 	lastDigit = 0;
@@ -54,4 +54,4 @@ int main(void)
 	printf("%s\n", stringNumber);
 
 	return 0;
-}
+} 

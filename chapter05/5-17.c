@@ -33,7 +33,7 @@ int  fieldCmp(char *s, char *t);
 /* Globals */
 char        *lineptr[MAXLINES];   /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
-static char *allocp = allocbuf;   /* next fre position */
+static char *allocp = allocbuf;   /* next free position */
 int         numeric = 0;          /* 1 if numeric sort */
 int         decreasing = 0;       /* 1 if reverse order sort */
 int         fold = 0;             /* 1 id case insensitive sort */
@@ -206,7 +206,7 @@ int isDigitStr(char *s[])
 	return 1;
 }
 
-/* fieldCmp: compare fields according field number inputed by user */
+/* fieldCmp: compare fields according field number entered by user */
 int fieldCmp(char *s, char *t)
 {
 	int i;
@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
 					if (--argc > 0 && isDigitStr(++argv))
 						field = atoi(*argv);
 					else {
-						printf("sort: option requires a numeric agument -- '%c'\n", c);
+						printf("sort: option requires a numeric argument -- '%c'\n", c);
 						return -1;
 					}
 					break;
@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
 		}
 
 	if (numeric && dirOr) {
-		printf("sort: opetions '-dn' are incompatible\n");
+		printf("sort: options '-dn' are incompatible\n");
 		return -1;
 	}
 	

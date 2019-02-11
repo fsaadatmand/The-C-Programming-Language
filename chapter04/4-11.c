@@ -19,7 +19,7 @@
 #define MAXVAR      26
 #define TOP         val[sp - 1]  /* top of the stack element */ 
 
-/* function decleration */
+/* functions */
 int    getop(char []);
 void   push(double);
 double pop(void);
@@ -66,7 +66,7 @@ double pop(void)
 int getop(char s[])
 {
 	int i, c;
-	static int  prevC;            /* over-read character */
+	static int  prevC;                 /* over-read character */
 
 	/* check if there was a previously over-read character */
 	(prevC > 0) ? (c = prevC) : (s[0] = c = getch());
@@ -124,7 +124,7 @@ void ungetch(int c)          /* push character back on input */
 		buf[bufp++] = c;
 }
 
-/* printTop: prints the top element in the stack without poping */
+/* printTop: prints the top element in the stack without popping */
 void printTop(void)
 {
 	if (sp > 0)
@@ -161,7 +161,7 @@ void clearStack(void)
 		pop();
 }
 
-/* storeVariable: stores the value of a variable (a to z) to the corrosponding
+/* storeVariable: stores the value of a variable (a to z) to the corresponding
  * memory location in mem */
 void storeVariable(double mem[], char variable)
 {
@@ -171,15 +171,15 @@ void storeVariable(double mem[], char variable)
 		value = lastPrint;          /* fetch last printed value value */
 		mem[MAXVAR] = value;        /* last location is reserved for P */
 	} else {
-		pop();                        /* pop stored value by fetVariable */
-		value = pop();                /* variable value - top of the stack */
+		pop();                      /* pop stored value by fetchVariable */
+		value = pop();              /* variable value - top of the stack */
 		variable = tolower(variable);
 		mem[variable - 'a'] = value;
 		push(value);
 	}
 }
 
-/* fetchVariable: fetches variable value from mempry and pushes to the top of
+/* fetchVariable: fetches variable value from memory and pushes to the top of
  * the stack */
 void fetchVariable(double mem[], char variable)
 {

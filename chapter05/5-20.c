@@ -1,5 +1,6 @@
 /*
- * Exercise 5-18. Make dcl recover from input error.
+ * Exercise 5-20. Expand dcl to handle declarations with function argument
+ * types, qualifiers like const, and so on.
  * By Faisal Saadatmand
  */
 
@@ -10,7 +11,7 @@
 #define MAXTOKEN    100
 #define BUFSIZE     100
 
-enum { NAME, PARENS, BRACKETS };
+enum { NAME, PARENS, BRACKETS, TYPE };
 
 /* functions */
 int  gettoken(void);
@@ -113,9 +114,9 @@ int dirdcl(void)
 		if (type == PARENS)
 			strcat(out, " function returning");
 		else {
-		strcat(out, " array");
-		strcat(out,  token);
-		strcat(out, " of");
+			strcat(out, " array");
+			strcat(out,  token);
+			strcat(out, " of");
 		}
 	return 1;
 }
@@ -123,10 +124,10 @@ int dirdcl(void)
 /* convert declaration to words */
 int main(void)               
 {
-	while (gettoken() != EOF) {        /* last token on line */
-		strcpy(datatype, token);       /* is the datatype */
+	while (gettoken() != EOF) {                  /* last token on line */
+		strcpy(datatype, token);                 /* is the datatype */
 		out[0] = '\0';
-		if (dcl() < 0 || tokentype != '\n') {                        /* parse rest of line */
+		if (dcl() < 0 || tokentype != '\n') {    /* parse rest of line */
 			printf("syntax error\n");
 			/* error recovery: reset pointers */
 			name[0] = out[0] = datatype[0] = token[0] = buf[0] = '\0';

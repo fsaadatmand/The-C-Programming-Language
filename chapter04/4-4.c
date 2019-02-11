@@ -1,6 +1,6 @@
 /* 
- * Exercise 4-4. Add commands to print the top element of the stack witout
- * poping, to duplicate it, and to swap the top two elements. Add command to
+ * Exercise 4-4. Add commands to print the top element of the stack without
+ * popping, to duplicate it, and to swap the top two elements. Add command to
  * clear the stack.
  * By Faisal Saadatmand
  */
@@ -16,7 +16,7 @@
 #define MATCH   0
 #define TOP     val[sp - 1]  /* top element in stack */ 
 
-/* function decleration */
+/* functions */
 int    getop(char []);
 void   push(double);
 double pop(void);

@@ -22,8 +22,6 @@ int main(void)
   char string2[] = { "function" };
 
   strCat(string1, string2);
-
   printf("%s\n", string1);
-  
   return 0;
 }
