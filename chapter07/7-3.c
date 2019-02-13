@@ -21,6 +21,7 @@
 #define PRINT_D(la,x,w,p,v,nc) (la) ? (nc += printf("%-*.*" # x, w, p, v)) : \
 	(nc += printf("%*.*" # x, w, p, v))
 
+/* functionst */
 int minprintf(char *, ...);
 
 /* minprintf: minimal printf with variable argument list */
