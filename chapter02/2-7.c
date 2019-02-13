@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 
+/* functions */
 unsigned int invert(unsigned int, int, int);
 
 unsigned int invert(unsigned int x, int p, int n)

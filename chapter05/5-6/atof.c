@@ -12,6 +12,9 @@
 #include <ctype.h>
 #include <math.h>
 
+/* functions */
+double atof(char *);
+
 /* atof: convert string s to double */
 double atof(char *s)
 {

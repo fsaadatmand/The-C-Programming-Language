@@ -15,10 +15,11 @@
 #define SLASH_ASTERISK          1
 #define ASTERISK_SLASH          0
 
-int  getLine(char s[], int lim);
-int  findComment(char line[], int notation);
-int  delComment(char line[], char modLine[], int start, int end);
-int  delBlankLine(char s[]);
+/* functions */
+int  getLine(char [], int);
+int  findComment(char [], int );
+int  delComment(char [], char [], int , int);
+int  delBlankLine(char []);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)

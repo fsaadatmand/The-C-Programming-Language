@@ -10,7 +10,8 @@
 #define NCHARS        82           /* number of chars per line, including
 									  the newline and null characters */
 
-int getLine(char s[], int lim);
+/* functions */
+int getLine(char [], int);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)

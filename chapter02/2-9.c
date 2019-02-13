@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 
+/* functions */
 int bitcount(unsigned);
 
 int bitcount(unsigned x)

@@ -8,7 +8,8 @@
 
 #define MAXLINE       1000         /* maximum input line length */
 
-int getLine(char s[], int lim);
+/* functions */
+int getLine(char [], int);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)

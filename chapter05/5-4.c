@@ -6,6 +6,9 @@
 
 #include <stdio.h>
 
+/* functions */
+int strend (char *, char *);
+
 /* strend: returns 1 if t occurs at the end of s, and zero otherwise */
 int strend (char *s, char *t)
 {

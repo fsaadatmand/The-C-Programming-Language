@@ -19,7 +19,8 @@
 #define MAXLINE 1000
 #define N       4          /* tabstop for every n columns */
 
-int getLine(char s[], int lim);
+/* functions */
+int getLine(char [], int);
 void detab(void);
 
 char line[MAXLINE];        /* currently read line */

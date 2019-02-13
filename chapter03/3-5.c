@@ -8,8 +8,9 @@
 #include <stdio.h>
 #include <string.h>
 
-void reverse(char s[]);
-void itob(int number, char convertedNumber[], int base);
+/* functions */
+void reverse(char []);
+void itob(int, char [], int);
 
 /* reverse function: reverse string s in place */
 void reverse(char s[])

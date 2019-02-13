@@ -13,7 +13,8 @@
 
 #define MAXLINE 1000
 
-int htoi(char s[], int len);
+/* functions */
+int htoi(char [], int);
 
 int htoi(char s[], int len)
 {

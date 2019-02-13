@@ -25,18 +25,18 @@
 
 /* functions */
 int    getop(char *);
-int    getLine(char *s, int lim);
+int    getLine(char *, int);
 void   push(double);
 double pop(void);
 void   printTop(void);
 void   duplicateTop (void);
 void   swapTopTwo(void);
 void   clearStack(void);
-void   storeVariable(double mem[], char variable);
-void   fetchVariable(double mem[], char variable);
-void   clearMemory(double mem[], int size);
+void   storeVariable(double [], char);
+void   fetchVariable(double [], char);
+void   clearMemory(double [], int);
 
-/* external variables */
+/* globals */
 int    sp = 0;               /* next free stack position */
 double val[MAXVAL];          /* value stack */
 char   buf[BUFSIZE];         /* buffer from ungetch */

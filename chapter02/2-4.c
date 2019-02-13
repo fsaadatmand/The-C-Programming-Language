@@ -8,7 +8,8 @@
 
 #define MAXCHAR 100
 
-void squeeze(char s1[], char s2[]);
+/* functions */
+void squeeze(char [], char []);
 
 void squeeze(char s1[], char s2[])
 {

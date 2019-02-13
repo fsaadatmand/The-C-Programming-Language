@@ -27,7 +27,7 @@ void   duplicateTop(void);
 void   swapTopTwo(void);
 void   clearStack(void);
 
-/* external variables */
+/* globals */
 int    sp = 0;               /* next free stack position */
 double val[MAXVAL];          /* value stack */
 char   buf[BUFSIZE];         /* buffer from ungetch */

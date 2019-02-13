@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 
+/* functions */
 unsigned int rightrot(unsigned int, int);
 
 unsigned int rightrot(unsigned int x, int n)

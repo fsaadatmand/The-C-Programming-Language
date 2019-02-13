@@ -11,6 +11,10 @@
 
 #define MAXCHAR 32
 
+/* functions */
+char *strnCpy(char *, char *, int);
+char *strnCat(char *, char *, int);
+
 /* strnCpy: copy at most n characters of string t to s. Returns s. Pad with
  * '\0's if t has fewer than n characters */
 char *strnCpy(char *s, char *t, int n)

@@ -51,9 +51,9 @@ char   *strDup(char *);                /* copy string into safe place */
 struct tnode *addtree(struct tnode *, char *, int);
 void   treeprint(struct tnode *);
 void   printList(struct list *);
-struct key *binsearch(char *, struct key *, int );
+struct key *binsearch(char *, struct key *, int);
 
-/* Globals */
+/* globals */
 char   buf[BUFSIZE];                   /* buffer from ungetch */
 int    bufp = 0;                       /* next free position in buf */
 

@@ -6,12 +6,13 @@
 
 #include <stdio.h>
 
+/* functions */
+float fahrToCelsius(float);
+
 float fahrToCelsius(float fahr)
 {
 	float celsius;
-
 	celsius = (5.0 / 9.0) * (fahr-32.0);
-
 	return celsius;
 }
 
@@ -27,9 +28,7 @@ int main(void)
 	step  = 20;       /* step size */
 
 	fahr = lower;
-
 	printf("Fahrenheit\tCelsius\n");
-
 	while (fahr <= upper) {
 		celsius = fahrToCelsius(fahr);
 		printf("%10.0f\t%7.1f\n", fahr, celsius);

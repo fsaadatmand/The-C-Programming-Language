@@ -18,10 +18,10 @@
 #define YES     1
 #define NO      0
 
-/* functions declarations */
-int  getLine(char s[], int lim);
-int  count(char s[], char c, int p);
-void entab(char line[], char modLine[]);
+/* functions */
+int  getLine(char [], int);
+int  count(char [], char, int);
+void entab(char [], char []);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)

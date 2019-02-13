@@ -8,8 +8,9 @@
 #include <string.h>
 #include <limits.h>
 
-void reverse(char s[]);
-void itoa(int n, char s[]);
+/* functions */
+void reverse(char []);
+void itoa(int, char []);
 
 /* reverse function: reverse string s in place, recursive version */
 void reverse(char s[])

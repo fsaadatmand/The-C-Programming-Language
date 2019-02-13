@@ -34,12 +34,12 @@ void   printTop(void);
 void   duplicateTop (void);
 void   swapTopTwo(void);
 void   clearStack(void);
-void   storeVariable(double mem[], char variable);
-void   fetchVariable(double mem[], char variable);
-void   clearMemory(double mem[], int size);
-void   ungets(char s[]);
+void   storeVariable(double [], char);
+void   fetchVariable(double [], char);
+void   clearMemory(double [], int);
+void   ungets(char []);
 
-/* external variables */
+/* globals */
 int    sp = 0;               /* next free stack position */
 double val[MAXVAL];          /* value stack */
 char   buf[BUFSIZE];         /* buffer from ungetch */

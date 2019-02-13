@@ -12,8 +12,11 @@
 
 #define MAXCHAR 100
 
-/* chapter 1 */
+/* functions */
+int atoi_1(char []);
+int atoi_2(char *);
 
+/* chapter 1 */
 /* atoi: convert s to integer - pointer version */
 int atoi_1(char s[])
 {
@@ -27,7 +30,6 @@ int atoi_1(char s[])
 }
 
 /* chapter 3 */
-
 /* atoi: convert s to integer; version 2 - pointer version */
 int atoi_2(char *s)
 {

@@ -11,9 +11,10 @@
 #define YES           1
 #define NO            0
 
-int  getLine(char s[], int lim);
-int  delTrailingWS(char s[], int len);
-void reverse(char s1[], char s2[], int len);
+/* functions */
+int  getLine(char [], int);
+int  delTrailingWS(char [], int);
+void reverse(char [], char [], int);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)

@@ -14,11 +14,11 @@
 #define NUMBER '0'
 #define MAXVAL 100
 
-/* function declarations */
+/* functions */
 void   push(double);
 double pop(void);
 
-/* external variables */
+/* globals */
 int    sp = 0;               /* next free stack position */
 double val[MAXVAL];          /* value stack */
 

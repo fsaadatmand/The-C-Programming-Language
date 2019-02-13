@@ -11,8 +11,9 @@
 #define MAXLINE        1000        /* maximum input line length */
 #define LINE_LENGTH    81          /* maximum output line length */
 
-int    getLine(char s[], int lim);
-void   foldLine(char line[], char fldLine[], int lineLen);
+/* functions */
+int    getLine(char [], int);
+void   foldLine(char [], char [], int);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)

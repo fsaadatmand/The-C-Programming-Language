@@ -8,19 +8,20 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAXLINES  5000       /* max #lines to be stored */
-#define MAXLEN    1000       /* max length of any input line */
-#define ALLOCSIZE 100000      /* storage for alloc */
+#define MAXLINES  5000            /* max #lines to be stored */
+#define MAXLEN    1000            /* max length of any input line */
+#define ALLOCSIZE 100000          /* storage for alloc */
 
 /* functions */
-int  readlines(char *lineptr[], int nlines);
-void writelines(char *lineptr[], int nlines);
+int  readlines(char *[], int);
+void writelines(char *[], int);
 int  getLine(char *, int);
 char *alloc(int);
-void qsort(char *lineptr[], int left, int right);
+void qsort(char *[], int, int);
+void swap(char *[], int, int);
 
-/* global variables */
-char *lineptr[MAXLINES];    /* pointers to text lines */
+/* globals */
+char *lineptr[MAXLINES];          /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
 static char *allocp = allocbuf;   /* next free position */
 
@@ -35,7 +36,7 @@ int readlines(char *lineptr[], int maxlines)
 		if (nlines >= maxlines || (p = alloc(len)) == NULL)
 			return -1;
 		else {
-			line[len - 1] = '\0';   /* delete newline character */
+			line[len - 1] = '\0'; /* delete newline character */
 			strcpy(p, line);
 			lineptr[nlines++] = p;
 		}
@@ -60,12 +61,12 @@ int getLine(char *s, int lim)
 	return len;
 }
 
-char *alloc(int n)               /* return pointer to n characters */
+char *alloc(int n)                /* return pointer to n characters */
 {
 	if (allocbuf + ALLOCSIZE - allocp >=n) {        /* it fits */
 		allocp += n;
-		return allocp - n;                       /* old p */
-	} else                            /* not enough room */
+		return allocp - n;        /* old p */
+	} else                        /* not enough room */
 		return 0;
 }
 

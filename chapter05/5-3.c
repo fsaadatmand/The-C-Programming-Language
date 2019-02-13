@@ -6,6 +6,9 @@
 
 #include <stdio.h>
 
+/* functions */
+void strCat(char *, char *);
+
 /* concatenate t to end of s; s must be big enough */
 void strCat(char *s, char *t)
 {

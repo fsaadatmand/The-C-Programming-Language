@@ -10,11 +10,12 @@
 #define BUFSIZE  100
 #define SIZE     100
 
+/* functions */
 int  getch(void);
 void unget(int);
 int  getfloat(double *);
 
-/* global variable */
+/* global */
 char   buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp = 0;             /* next free position in buf */
 

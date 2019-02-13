@@ -23,7 +23,7 @@ struct nlist *lookup(char *);
 struct nlist *install(char *, char *);
 void undef(char *);
 
-/* Globals */
+/* globals */
 static struct nlist *hashtab[HASHSIZE];    /* pointer table */
 
 /*strDup: make a duplicate of s. Error checking is handled by the caller */

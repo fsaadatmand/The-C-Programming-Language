@@ -6,9 +6,10 @@
 
 #include <stdio.h>
 
-int day_of_year(int year, int month, int day);
-void month_day(int year, int yearday, int *pmonth, int *pday);
-char *month_name(int n); 
+/* functions */
+int day_of_year(int, int, int);
+void month_day(int, int, int *, int *);
+char *month_name(int ); 
 
 static char daytab[2][13] = {
 	{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},

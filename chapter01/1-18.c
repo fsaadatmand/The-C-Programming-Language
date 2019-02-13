@@ -10,9 +10,10 @@
 #define YES           1
 #define NO            0
 
-int  getLine(char s[], int lim);
-int  delTrailingWS(char s[], int len);
-void delBlankLns(char s[], int len);
+/* functions */
+int  getLine(char [], int);
+int  delTrailingWS(char [], int);
+void delBlankLns(char [], int);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)

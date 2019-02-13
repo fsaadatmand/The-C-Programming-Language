@@ -10,7 +10,8 @@
 
 #define MAXCHAR 100
 
-int any(char s1[], char s2[]);
+/* functions */
+int any(char [], char []);
 
 int any(char s1[], char s2[])
 {

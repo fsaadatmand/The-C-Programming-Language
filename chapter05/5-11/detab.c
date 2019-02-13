@@ -15,9 +15,9 @@
 #define N       4                   /* default tab stop for every n columns */
 
 /* functions */
-int  getLine(char *s, int lim);
-int  isDigitStr(char *s[]);
-void detabList(char *line, char *modLine, int *list, int listSize);
+int  getLine(char *, int);
+int  isDigitStr(char *[]);
+void detabList(char *, char *, int *, int);
 
 /* getLine: get line into s, return length of s -- pointer version */
 int getLine(char *s, int lim)

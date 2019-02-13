@@ -16,6 +16,10 @@
 #define YES 1
 #define NO  0
 
+/* funstions */
+int getLine(char [], int);
+int expand(char [], char []);
+
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)
 {

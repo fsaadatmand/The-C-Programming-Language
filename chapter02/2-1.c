@@ -11,6 +11,10 @@
 #include <float.h>
 #include <math.h>
 
+/* functions */
+void computeRanges(void);
+void stdLibraryMacros(void);
+
 void computeRanges(void)
 {
 	/* characters */

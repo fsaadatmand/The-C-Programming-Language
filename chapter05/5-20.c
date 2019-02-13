@@ -18,9 +18,9 @@ int  gettoken(void);
 int  dcl(void);
 int  dirdcl(void);
 int  getch(void);
-void ungetch(int c);
+void ungetch(int);
 
-/* Globals */
+/* globals */
 char token[MAXTOKEN];                  /* last token string */
 int  tokentype;                        /* type of last token */
 char name[MAXTOKEN];                   /* identifier name */

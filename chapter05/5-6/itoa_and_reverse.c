@@ -11,9 +11,11 @@
 
 #define MAXCHAR 100
 
-/*
- * chapter 3
- */
+/* functions */
+void reverse(char *);
+void *itoa_1(int, char *);
+
+/* chapter 3 */
 
 /* reverse function: reverse string s in place */
 void reverse(char *s)

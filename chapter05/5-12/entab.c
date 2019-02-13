@@ -14,14 +14,14 @@
 #define MAXLINE 1000
 #define MAXARG  20                  /* max number of tabstop arguments */
 
-/* Global variables */
-int n = 4;                          /* default tabstop for every n columns */
-
 /* functions declarations */
-int  getLine(char *s, int lim);
-int  count(char *s, char c);
-int  isDigitStr(char *s[]);
-void entab(char *line, char *modLine, int *list, int listSize);
+int  getLine(char *, int);
+int  count(char *, char);
+int  isDigitStr(char *[]);
+void entab(char *, char *, int *, int);
+
+/* globals */
+int n = 4;                          /* default tabstop for every n columns */
 
 /* getLine: get line into s, return length of s -- pointer version */
 int getLine(char *s, int lim)

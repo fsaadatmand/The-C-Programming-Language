@@ -8,8 +8,9 @@
 
 #define MAXLINE       1000         /* maximum input line length */
 
-int  getLine(char s[], int lim);
-void toLowercase(char line[]);
+/* functions */
+int  getLine(char [], int);
+void toLowercase(char []);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)

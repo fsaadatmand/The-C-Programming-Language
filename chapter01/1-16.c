@@ -10,8 +10,9 @@
 
 #define MAXLINE 1000          /* maximum input line length */
 
-int  getLine(char s[], int lim);
-void copy(char to[], char from[]);
+/* functionst */
+int  getLine(char [], int);
+void copy(char [], char []);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)

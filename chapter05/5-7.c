@@ -16,12 +16,13 @@
 #define ALLOCSIZE 100000      /* storage for alloc */
 
 /* functions */
-int  readlines(char *lineptr[], int nlines, char *p);
-void writelines(char *lineptr[], int nlines);
+int  readlines(char *[], int, char *);
+void writelines(char *[], int);
 int  getLine(char *, int);
-void qsort(char *lineptr[], int left, int right);
+void qsort(char *[], int, int);
+void swap(char *[], int, int);
 
-/* global variables */
+/* globals */
 char *lineptr[MAXLINES];    /* pointers to text lines */
 
 /* readlines: read input lines */

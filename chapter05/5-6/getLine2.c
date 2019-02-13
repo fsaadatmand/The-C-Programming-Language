@@ -12,6 +12,9 @@
 
 #define MAXLINE 1000
 
+/* functions */
+int getLine(char *, int);
+
 /* getLine: get line into s, return length of s -- pointer version */
 int getLine(char *s, int lim)
 {

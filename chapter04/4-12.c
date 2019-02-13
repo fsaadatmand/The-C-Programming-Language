@@ -9,7 +9,8 @@
 #include <string.h>
 #include <limits.h>
 
-void itoa(int n, char s[]);
+/* functions */
+void itoa(int, char []);
 
 /* itoa: convert n to characters in s. Recursive version */
 void itoa(int n, char s[])

@@ -10,9 +10,10 @@
 
 #define MAXLINE       10000         /* maximum input line length */
 
-int  getLine(char s[], int lim);
-void escape(char line[], char modLine[]);
-void escapeRev(char line[], char modLine[]);
+/* functions */
+int  getLine(char [], int);
+void escape(char [], char []);
+void escapeRev(char [], char []);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)

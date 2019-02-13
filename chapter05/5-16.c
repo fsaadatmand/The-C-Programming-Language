@@ -15,20 +15,20 @@
 #define ALLOCSIZE  10000     /* storage for memory[] */
 
 /* functions */
-int  getLine(char *s, int lim);
-int  readlines(char *lineptr[], int nlines);
-void witelines(char *lineptr[], int nlines);
+int  getLine(char *, int);
+int  readlines(char *[], int);
+void witelines(char *[], int);
 char *alloc(int);
-void qSort(void *lineptr[], int left, int right,
-		int (*comp)(void *, void *));
+void qSort(void *[], int, int,
+		int (*)(void *, void *));
 int  numcmp(char *, char *);
-int  strCmp(char *s, char *t);
-int  reverse(char *s, char *t);
-int  fstrCmp(char *s, char *t);
-int  dstrCmp(char *s, char *t);
+int  strCmp(char *, char *);
+int  reverse(char *, char *);
+int  fstrCmp(char *, char *);
+int  dstrCmp(char *, char *);
 
 
-/* Globals */
+/* globals */
 char        *lineptr[MAXLINES];   /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
 static char *allocp = allocbuf;   /* next free position */

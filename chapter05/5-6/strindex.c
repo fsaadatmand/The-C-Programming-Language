@@ -10,9 +10,11 @@
 
 #define MAXLINE 1000          /* maximum input line length */
 
-int getLine(char *line, int lim);
-int strindex(char *source, char *searchfor);
+/* functions */
+int getLine(char *, int);
+int strindex(char *, char *);
 
+/* globals */
 char pattern[] = "ould";      /* pattern to search for */
 
 /* getLine: get line into s, return length of s -- pointer version */

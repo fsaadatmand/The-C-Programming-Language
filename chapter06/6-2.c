@@ -27,7 +27,7 @@ char   *strDup(char *);                /* copy string into safe place */
 struct key *binsearch(char *, struct key *, int); 
 void   findVariables(struct tnode *, int);
 
-/* Globals */
+/* globals */
 char   buf[BUFSIZE];                   /* buffer from ungetch */
 int    bufp = 0;                       /* next free position in buf */
 

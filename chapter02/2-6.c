@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 
+/* functions */
 unsigned int setbits(unsigned int, int, int, unsigned);
 
 unsigned int setbits(unsigned int x, int p, int n, unsigned y)

@@ -23,12 +23,12 @@
 #define N          10        /* default value of last lines to print */
 
 /* functions */
-int  readlines(char *lineptr[], int nlines);
+int  readlines(char *[], int);
 int  getLine(char *, int);
 char *alloc(int);
-int  isDigitStr(char *s[]);
+int  isDigitStr(char *[]);
 
-/* global variables */
+/* globals */
 char        *lineptr[MAXLINES];   /* pointers to text lines */
 static char allocbuf[ALLOCSIZE];  /* storage for alloc */
 static char *allocp = allocbuf;   /* next free position */
