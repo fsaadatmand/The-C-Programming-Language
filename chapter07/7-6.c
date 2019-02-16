@@ -51,19 +51,18 @@ int main(int argc, char *argv[])
 			f1ln++;                        /* count successfully read lines */
 		if (getLine(file[2], f2line, MAXLEN) > 0)
 			f2ln++;                        /* count successfully read lines */
-
 		if ((result = strcmp(f1line, f2line)) != 0)
 			break;                         /* found mismatching line */
 	}
+
+	fclose(file[1]);
+	fclose(file[2]);
 
 	if (result != 0) {
 		fprintf(stdout, "%s: %i: %s", f1name, f1ln, f1line);
 		fprintf(stdout, "%s: %i: %s", f2name, f2ln, f2line);
 	} else
 		printf("%s and %s are identical\n", f1name, f2name);
-
-	fclose(file[1]);
-	fclose(file[2]);
 
 	exit(EXIT_SUCCESS);
 }
