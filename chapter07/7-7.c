@@ -44,13 +44,13 @@ int fgetLine(FILE *fp, char *line, int max)
 int main(int argc, char *argv[])
 {
 	char line[MAXLINE];
-	long lineno = 0;
+	long lineno;
 	int c, except = 0, number = 0, found = 0;
 	char *prog = argv[0];
 	char *pattern;
 	FILE *fp;
 
-	while (--argc > 0 && (*++argv)[0] == '-')
+	while (--argc > 0 && (*++argv)[0] == '-')    /* check for flags */
 		while ((c = *++argv[0]))
 			switch (c) {
 			case 'x':
@@ -68,27 +68,23 @@ int main(int argc, char *argv[])
 
 	if (argc < 1)
 		printf("Usage: find -x -n pattern\n");
-	else if (argc == 1)
-		while (getLine(line, MAXLINE) > 0) {
-			lineno++;
+	else if (argc == 1) {              /* input from stdin */
+		for (lineno = 1; getLine(line, MAXLINE) > 0; lineno++)
 			if ((strstr(line, *argv) != NULL) != except) {
 				if (number)
 					printf ("%ld:", lineno);
 				printf("%s", line);
 				found++;
 			}
-		} 
-	else {
-		pattern = *argv;               /* save a point to the pattern */
+	} else {                           /* input from file or set of files */
+		pattern = *argv;               /* save a pointer to the pattern */
 		while (argc-- > 1) {
 			if ((fp = fopen(*++argv, "r")) == NULL) {
 				fprintf(stderr, "%s: can't open %s\n", prog, *argv);
 				exit(EXIT_FAILURE);
-			} 
-			lineno = 0;
+			}
 			while (!feof(fp))
-				while (fgetLine(fp, line, MAXLINE) > 0) {
-					lineno++;
+				for (lineno = 1; fgetLine(fp, line, MAXLINE) > 0; lineno++)
 					if ((strstr(line, pattern) != NULL) != except) {
 						printf("%s:", *argv);    /* print file name */
 						if (number)
@@ -96,7 +92,6 @@ int main(int argc, char *argv[])
 						printf("%s", line);
 						found++;
 					}
-				}
 			fclose(fp);
 		}
 	}
