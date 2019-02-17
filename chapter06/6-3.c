@@ -52,6 +52,8 @@ struct tnode *addtree(struct tnode *, char *, int);
 void   treeprint(struct tnode *);
 void   printList(struct list *);
 struct key *binsearch(char *, struct key *, int);
+struct tnode *freetree(struct tnode *);
+struct list *freelist(struct list *);
 
 /* globals */
 char   buf[BUFSIZE];                   /* buffer from ungetch */
@@ -188,6 +190,29 @@ struct key *binsearch(char *word, struct key *tab, int n)
 	return NULL;
 }
 
+/* freellist: frees allocated heap memory of linked list */
+struct list *freelist(struct list *node)
+{
+	if (node->next != NULL) {
+		freelist(node->next);
+		free(node);
+	}
+	return node;
+}
+
+/* freetree: frees allocated heap memory of tree */
+struct tnode *freetree(struct tnode *node)
+{
+	if (node != NULL) {
+		freetree(node->left);
+		freetree(node->right);
+		free(node->word);
+		freelist(node->line);          /* delete linked list nodes */
+		free(node->line);              /* delete linked list */
+		free(node);
+	}
+	return node;
+}
 int main(void)
 {
 	struct tnode *root;                /* root node */
@@ -206,5 +231,6 @@ int main(void)
 			root = addtree(root, word, lineNumb);
 	}
 	treeprint(root);
+	root = freetree(root);             /* clean up */
 	return 0;
 }
