@@ -22,6 +22,7 @@ char *strDup(char *);
 struct nlist *lookup(char *);
 struct nlist *install(char *, char *);
 void undef(char *);
+void freetable(struct nlist *[], int);
 
 /* globals */
 static struct nlist *hashtab[HASHSIZE];    /* pointer table */
@@ -94,6 +95,19 @@ void undef(char *s)
 	}
 }
 
+/* freetable: free table's (and its content's) allocated memory from heap */
+void freetable(struct nlist *node[], int size)
+{
+	int i;
+
+	for (i = 0; i < size; i++)
+		if (node[i] != NULL) {
+			free(node[i]->name);
+			free(node[i]->defn);
+			free(node[i]);
+		}
+}
+
 int main(void)
 {
 	struct nlist *p;
@@ -118,5 +132,7 @@ int main(void)
 		if (hashtab[i] != NULL)
 			printf("%i  name: %s  defn: %s\n",
 					i, hashtab[i]->name, hashtab[i]->defn);
+
+	freetable(hashtab, HASHSIZE);      /* clean up */
 	return 0;
 }

@@ -49,6 +49,7 @@ char *strDup(char *);
 unsigned hash(char *);
 struct nlist *lookup(char *);
 struct nlist *install(char *, char *);
+void freetable(struct nlist *[], int);
 
 /* binsearch: find word in tab[0]...tab[n - 1] */
 struct key *binsearch(char *word, struct key *tab, int n)
@@ -218,6 +219,19 @@ struct nlist *install(char *name, char *defn)
 	return np;
 }
 
+/* freetable: free table's (and its content's) allocated memory from heap */
+void freetable(struct nlist *node[], int size)
+{
+	int i;
+
+	for (i = 0; i < size; i++)
+		if (node[i] != NULL) {
+			free(node[i]->name);
+			free(node[i]->defn);
+			free(node[i]);
+		}
+}
+
 /* simple define processor (no arguments) */
 int main (void)
 {
@@ -246,5 +260,6 @@ int main (void)
 		if (hashtab[i] != NULL)
 			printf("%i  name: %s  defn: %s\n",
 					i, hashtab[i]->name, hashtab[i]->defn);
+	freetable(hashtab, HASHSIZE);      /* clean up */
 	return 0;
 }
