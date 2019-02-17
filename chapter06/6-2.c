@@ -26,6 +26,7 @@ struct tnode *talloc(void);            /* alocate memory to new tree node */
 char   *strDup(char *);                /* copy string into safe place */
 struct key *binsearch(char *, struct key *, int); 
 void   findVariables(struct tnode *, int);
+struct tnode *freetree(struct tnode *);
 
 /* globals */
 char   buf[BUFSIZE];                   /* buffer from ungetch */
@@ -196,6 +197,17 @@ struct tnode *talloc(void)
 	return (struct tnode *) malloc(sizeof(struct tnode));
 }
 
+/* freetree: free allocated heap memory of node tree */
+struct tnode *freetree(struct tnode *node)
+{
+	if (node != NULL) {
+		freetree(node->left);
+		freetree(node->right);
+		free(node->word);
+		free(node);
+	}
+	return node;
+}
 /*strDup: make a duplicate of s */
 char *strDup(char *s)
 {
@@ -264,5 +276,6 @@ int main(int argc, char *argv[])
 				root = addtree(root, word);                   /* reserved words */
 	findVariables(root, nChar);
 	treeprint(root);
+	root = freetree(root);             /* clean up */
 	return 0;
 }

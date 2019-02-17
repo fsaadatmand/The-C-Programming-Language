@@ -27,6 +27,7 @@ struct tnode *addtree(struct tnode *, char *);
 void treeprint(struct tnode *);
 struct tnode *copyTree(struct tnode *, struct tnode *);
 struct tnode *sortTree(struct tnode *, struct tnode *);
+struct tnode *freetree(struct tnode *);
 
 /* globals */
 char   buf[BUFSIZE];                   /* buffer from ungetch */
@@ -134,13 +135,24 @@ struct tnode *copyTree(struct tnode *p, struct tnode *root)
 struct tnode *sortTree(struct tnode *p, struct tnode *root)
 {
 	if (root != NULL) {
-		sortTree(p, root->left);
+		p = sortTree(p, root->left);
 		p = copyTree(p, root);
-		sortTree(p, root->right);
+		p = sortTree(p, root->right);
 	}
 	return p;
 }
 
+/* freetree: free allocated heap memory of node tree */
+struct tnode *freetree(struct tnode *node)
+{
+	if (node != NULL) {
+		freetree(node->left);
+		freetree(node->right);
+		free(node->word);
+		free(node);
+	}
+	return node;
+}
 int main(void)
 {
 	struct tnode *root;                /* root node */
@@ -154,5 +166,7 @@ int main(void)
 			root = (addtree(root, word));
 	sRoot = sortTree(sRoot, root);
 	treeprint(sRoot);
+	root = freetree(root);             /* clean up */
+	sRoot = freetree(sRoot);           /* clean up */
 	return 0;
 }
