@@ -250,7 +250,7 @@ int main (void)
 	char word[MAXWORD];
 	char defn[MAXLEN];
 	char *name, *keyword = "#define";
-	int ctrline, len;
+	int ctrline;
 
 	name = word;                       /* unnecessary. Added for clarity */
 
@@ -259,8 +259,8 @@ int main (void)
 		if (word[0] == '#' && !ctrline) {
 			if (strcmp(word, keyword) == 0)
 				ctrline = 1;           /* found processor control line */
-		} else if (ctrline) {          /*  parse name and definition */
-			len = getLine(defn, MAXLEN);
+		} else if (ctrline) {          /* parse name and definition */
+			getLine(defn, MAXLEN);
 			install(name, defn);
 			ctrline = 0;
 		}
