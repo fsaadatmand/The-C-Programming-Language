@@ -69,7 +69,7 @@ int main(void) {
 	int x, y, z;
 	int nchar;
 
-	printf("Enter an integer: ");
+	printf("Enter 3 integers: ");
 	nchar = minscanf("%i %i %i", &x, &y, &z);
 	printf("%i %i %i\n", x, y, z);
 	printf("Number of elements: %i\n", nchar);
