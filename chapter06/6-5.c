@@ -22,6 +22,7 @@ char *strDup(char *);
 struct nlist *lookup(char *);
 struct nlist *install(char *, char *);
 void undef(char *);
+void printtab(struct nlist *[], int);
 void freetable(struct nlist *[], int);
 
 /* globals */
@@ -95,6 +96,16 @@ void undef(char *s)
 	}
 }
 
+/* printtab: prints content of hashtable, linear scan */
+void printtab(struct nlist *node[], int size)
+{
+	int i;
+	for (i = 0; i < size; i++)
+		if (node[i] != NULL)
+			printf("%i  name: %s  defn: %s\n",
+					i, node[i]->name, node[i]->defn);
+}
+
 /* freetable: free table's (and its content's) allocated memory from heap */
 void freetable(struct nlist *node[], int size)
 {
@@ -111,27 +122,20 @@ void freetable(struct nlist *node[], int size)
 int main(void)
 {
 	struct nlist *p;
-	int i;
 
 	/* insert nodes (skipped error checking) */
 	p = install("YES", "1");
 	p = install("NO", "0"); 
 
 	printf("Hash Table Values:\n");
-	for (i = 0; i < HASHSIZE; i++)
-		if (hashtab[i] != NULL)
-			printf("%i  name: %s  defn: %s\n",
-					i, hashtab[i]->name, hashtab[i]->defn);
+	printtab(hashtab, HASHSIZE);
 
 	/* delete a node */
 	printf("\nDelete \"YES\"\n\n");
 	undef("YES");
 
 	printf("Hash Table Values (After Deletion):\n");
-	for (i = 0; i < HASHSIZE; i++)
-		if (hashtab[i] != NULL)
-			printf("%i  name: %s  defn: %s\n",
-					i, hashtab[i]->name, hashtab[i]->defn);
+	printtab(hashtab, HASHSIZE);
 
 	freetable(hashtab, HASHSIZE);      /* clean up */
 	return 0;

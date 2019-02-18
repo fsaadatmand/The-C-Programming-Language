@@ -49,6 +49,7 @@ char *strDup(char *);
 unsigned hash(char *);
 struct nlist *lookup(char *);
 struct nlist *install(char *, char *);
+void printtab(struct nlist *[], int);
 void freetable(struct nlist *[], int);
 
 /* binsearch: find word in tab[0]...tab[n - 1] */
@@ -218,6 +219,16 @@ struct nlist *install(char *name, char *defn)
 		return NULL;
 	return np;
 }
+/* printtab: prints content of hashtable, linear scan */
+void printtab(struct nlist *node[], int size)
+{
+	int i;
+
+	for (i = 0; i < size; i++)
+		if (node[i] != NULL)
+			printf("%i  name: %s  defn: %s\n",
+					i, node[i]->name, node[i]->defn);
+}
 
 /* freetable: free table's (and its content's) allocated memory from heap */
 void freetable(struct nlist *node[], int size)
@@ -239,7 +250,7 @@ int main (void)
 	char word[MAXWORD];
 	char defn[MAXLEN];
 	char *name, *keyword = "#define";
-	int ctrline, len, i;
+	int ctrline, len;
 
 	name = word;                       /* unnecessary. Added for clarity */
 
@@ -253,13 +264,8 @@ int main (void)
 			install(name, defn);
 			ctrline = 0;
 		}
-
-	/* print table */
 	printf("Hash Table Values:\n");
-	for (i = 0; i < HASHSIZE; i++)
-		if (hashtab[i] != NULL)
-			printf("%i  name: %s  defn: %s\n",
-					i, hashtab[i]->name, hashtab[i]->defn);
+	printtab(hashtab, HASHSIZE);
 	freetable(hashtab, HASHSIZE);      /* clean up */
 	return 0;
 }
