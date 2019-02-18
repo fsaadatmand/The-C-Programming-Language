@@ -213,6 +213,7 @@ struct tnode *freetree(struct tnode *node)
 	}
 	return node;
 }
+
 int main(void)
 {
 	struct tnode *root;                /* root node */
