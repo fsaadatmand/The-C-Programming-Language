@@ -72,7 +72,6 @@ int main(void)
 		printf("The longest line is %i characters long.\n", max); 
 		printf("Only showing the first %i characters\n", MAXLINE);
 	}
-
 	return 0;
 }
 

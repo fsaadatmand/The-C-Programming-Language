@@ -49,7 +49,7 @@ int count(char s[], char c, int p)
 	return nC;
 }
 
-/* entab function: replaces blanks with the minimum of number tabs and blanks */
+/* entab function: replaces blanks with the minimum number of tabs and blanks */
 void entab(char line[], char modLine[])
 {
 	int i;                    /* index for read line */

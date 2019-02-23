@@ -20,6 +20,8 @@
 int  getLine(char [], int);
 int  findComment(char [], int);
 int  delComment(char [], char [], int , int);
+void findCharacter(char [], char [], int [], int);
+void checkSyntax(char [], int [], int);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)
@@ -147,7 +149,7 @@ int delComment(char line[], char modLine[], int start, int end)
 
 /* findCharcter function: counts the occurrence of a characters from symbol in
  * line and stores results in charsCount. len is the length of symbol array */
-int findCharacter(char line[], char symbol[], int charsCount[], int len)
+void findCharacter(char line[], char symbol[], int charsCount[], int len)
 {
 	int  i, j;
 	static int quoteState;               /* double quote state flag */
