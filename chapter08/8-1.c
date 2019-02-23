@@ -16,6 +16,10 @@
 #define OUT   1                        /* standard output file */
 #define ERROR 2                        /* standard error file */
 
+/* functions */
+void filecopy(int, int);
+void error(char *, ...);
+
 void filecopy(int in, int out)
 {
 	char buf[BUFSIZ];
@@ -40,18 +44,18 @@ void error(char *fmt, ...)
 
 int main(int argc, char *argv[])
 {
-	int f1;                            /* file descriptor */
+	int fd;                            /* file descriptor */
 	char *prog = argv[0];              /* program name */
 
 	if (argc == 1)
 		filecopy(IN, OUT);
 	else
 		while (--argc > 0)
-			if ((f1 = open(argv[1], O_RDONLY, 0)) == -1)
+			if ((fd = open(argv[1], O_RDONLY, 0)) == -1)
 				error("%s: can't open %s", prog, argv[1]);
 			else {
-				filecopy(f1, OUT);
-				close(f1);
+				filecopy(fd, OUT);
+				close(fd);
 			}
 	exit(EXIT_SUCCESS);
 }
