@@ -1,7 +1,7 @@
 /*
  * Exercise 7-3. Revise minprintf to handle more of the other facilities of
  * printf.
- * Note: flags (excepts for left adjust) and variable width and length are not implemented.
+ * Note: all flags (except for left adjust) and variable width/length are not implemented.
  * By Faisal Saadatmand
  */
 
@@ -173,5 +173,3 @@ int main(void)
 	printf("%-15.10s\n", "hello, world");
 	return 0;
 }
-
-
