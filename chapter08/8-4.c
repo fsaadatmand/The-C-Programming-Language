@@ -14,6 +14,7 @@
 #define EOF        (-1)
 #define BUFSIZ     1024
 #define OPEN_MAX   20                  /* max #files open at once */
+#define NEWLINE    '\n'
 
 typedef struct _iobuf {
 	int  cnt;                          /* characters left */
@@ -35,6 +36,7 @@ enum _flags {
 	_UNBUF   = 04,                     /* file is unbuffered */
 	_EOF     = 010,                    /* EOF has occurred on this file */
 	_ERR     = 020,                    /* error occurred on this file */
+	_LNBUF   = 040,                    /* file is line buffered */
 };
 
 /* functions */
@@ -48,11 +50,16 @@ int fseek(FILE *, long, int);
 #define feof(p)    (((p)->flag & _EOF) != 0)
 #define ferror(p)  (((p)->flag & _ERR) != 0)
 #define fileno(p)  ((p)->fd)
+#define linebuf(p) (((p)->flag & _LNBUF) !=0)
+#define unbuf(p)   (((p)->flag & _UNBUF) !=0)
 
 #define getc(p) (--(p)->cnt >= 0 \
 		? (unsigned char) *(p)->ptr++ : _fillbuf(p))
 #define putc(x,p) (--(p)->cnt >= 0 \
-		? *(p)->ptr++ = (x) : _flushbuf((x),p))
+		? (linebuf((p)) \
+			? ((x) == NEWLINE \
+				? _flushbuf((x),(p)) : (*(p)->ptr++ = (x))) \
+				: (*(p)->ptr++ = (x))) : _flushbuf((x),(p)))
 
 #define getchar()   getc(stdin)
 #define putchar(x)  putc((x), stdout)
@@ -122,31 +129,43 @@ int _fillbuf(FILE *fp)
 int _flushbuf(int x, FILE *fp)
 {
 	int bufsize;
+	int n;
 
 	if ((fp->flag & (_WRITE | _EOF | _ERR)) != _WRITE)
 		return EOF;
 	bufsize = (fp->flag & _UNBUF) ? 1 : BUFSIZ;
-	if (fp->base == NULL) {              /* no buffer yet */
+	if (fp->base == NULL) {             /* no buffer yet */
 		if ((fp->base = (char *) malloc(bufsize)) == NULL)
 			return EOF;                /* can't get buffer */
 		*fp->base = '\0';              /* initialize string */
 	}
+
+	if (linebuf(fp) && x == NEWLINE)   /* line buffered output */
+		if ((bufsize = BUFSIZ - fp->cnt) != 1)
+			*fp->ptr = x;
+
 	fp->ptr = fp->base;
+
 	if (bufsize == 1)                  /* unbuffered output */
 		*fp->ptr = x;
+
 	if (*fp->ptr != '\0' || bufsize == 1) {
-		fp->cnt = write(fileno(fp), fp->ptr, bufsize);
-		if (fp->cnt != bufsize) {
+		n = write(fileno(fp), fp->ptr, bufsize);
+		if (n != bufsize) {
 			fp->flag |= _ERR;
 			fp->cnt = 0;
 			return EOF;
 		}
 	}
-	if (bufsize > 1) {                  /* buffered output */
+
+	if (linebuf(fp) && x == NEWLINE) {
+		fp->cnt = BUFSIZ;              /* rest buffering */
+		return (unsigned char) *fp->ptr;
+	} else if (bufsize != 1) {
 		*fp->ptr = x;
-		fp->cnt = BUFSIZ - 1;           /* reset counter */
+		fp->cnt = BUFSIZ - 1;
 	}
-	return (unsigned char) *fp->ptr++ ;
+	return (unsigned char) *fp->ptr++;
 }
 
 /* fflush: on output stream, write unwritten buffered data. On input stream,
@@ -156,12 +175,15 @@ int fflush(FILE *fp)
 	int bufsize;
 	FILE *cond;                        /* loop condition */
 	
+	if (unbuf(fp) || linebuf(fp))
+		return 0;
+
 	if (fp == NULL) {                  /* flush all output stream */
 		fp = _iob;
 		cond = _iob + OPEN_MAX;
 	} else                             /* flush fp's buffer */
 		cond = fp + 1;
-		
+
 	for ( ; fp < cond; fp++) {
 		if ((fp->flag & (_WRITE | _EOF | _ERR)) != _WRITE)
 			return EOF;
@@ -212,7 +234,7 @@ int fseek(FILE *fp, long offset, int origin)
 
 FILE _iob[OPEN_MAX] = {                 /* stdin, stdout, stderr */
 	{ 0, (char *) 0, (char *) 0, _READ, 0 },
-	{ 0, (char *) 0, (char *) 0, _WRITE, 1 },
+	{ 0, (char *) 0, (char *) 0, _WRITE | _LNBUF, 1 },
 	{ 0, (char *) 0, (char *) 0, _WRITE | _UNBUF, 2 }
 };
 
@@ -231,9 +253,9 @@ int main(int argc, char *argv[])
 			else {
 				while ((c = getc(fp)) != EOF)
 					putchar(c);
-	//			fseek(fp, -5L, 1);
-	//			while ((c = getc(fp)) != EOF)
-	//				putchar(c);
+//				fseek(fp, -5L, 1);
+//				while ((c = getc(fp)) != EOF)
+//					putchar(c);
 				fclose(fp);
 			}
 	if (ferror(stdout))
