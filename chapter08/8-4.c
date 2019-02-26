@@ -128,7 +128,7 @@ int _flushbuf(int x, FILE *fp)
 
 	if (fp->flag & _UNBUF)
 		bufsize = 1;
-	else if (fp->flag & _EOF)          /* coordinate with fflush */
+	else if (fp->flag & _EOF)          /* flush only written data (fflush) */
 		bufsize = BUFSIZ - fp->cnt;
 	else
 		bufsize = BUFSIZ;
@@ -173,7 +173,7 @@ int fflush(FILE *fp)
 	for ( ; fp < cond; fp++) {
 		if ((fp->flag & (_WRITE | _EOF | _ERR)) != _WRITE)
 			return EOF;
-		fp->flag |= _EOF;              /* coordinate with _flushbuf */
+		fp->flag |= _EOF;              /* singal EOF to _flushbuf */
 		if (_flushbuf(*fp->ptr, fp) < 0)
 			return EOF;
 		*fp->ptr = '\0';
