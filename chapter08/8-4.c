@@ -123,10 +123,17 @@ int _flushbuf(int x, FILE *fp)
 {
 	int bufsize;
 
-	if ((fp->flag & (_WRITE | _EOF | _ERR)) != _WRITE)
+	if ((fp->flag & (_WRITE | _ERR)) != _WRITE)
 		return EOF;
-	bufsize = (fp->flag & _UNBUF) ? 1 : BUFSIZ;
-	if (fp->base == NULL) {              /* no buffer yet */
+
+	if (fp->flag & _UNBUF)
+		bufsize = 1;
+	else if (fp->flag & _EOF)          /* coordinate with fflush */
+		bufsize = BUFSIZ - fp->cnt;
+	else
+		bufsize = BUFSIZ;
+
+	if (fp->base == NULL) {            /* no buffer yet */
 		if ((fp->base = (char *) malloc(bufsize)) == NULL)
 			return EOF;                /* can't get buffer */
 		*fp->base = '\0';              /* initialize string */
@@ -137,14 +144,17 @@ int _flushbuf(int x, FILE *fp)
 	if (*fp->ptr != '\0' || bufsize == 1) {
 		fp->cnt = write(fileno(fp), fp->ptr, bufsize);
 		if (fp->cnt != bufsize) {
-			fp->flag |= _ERR;
+			if (fp->cnt == -1)
+				fp->flag |= _EOF;
+			else
+				fp->flag |= _ERR;
 			fp->cnt = 0;
 			return EOF;
 		}
 	}
-	if (bufsize > 1) {                  /* buffered output */
+	if (bufsize != 1) {                /* buffered output */
 		*fp->ptr = x;
-		fp->cnt = BUFSIZ - 1;           /* reset counter */
+		fp->cnt = BUFSIZ - 1;          /* reset counter */
 	}
 	return (unsigned char) *fp->ptr++ ;
 }
@@ -153,7 +163,6 @@ int _flushbuf(int x, FILE *fp)
  * the effect is undefined. NULL flushes all output streams. */
 int fflush(FILE *fp)
 {
-	int bufsize;
 	FILE *cond;                        /* loop condition */
 	
 	if (fp == NULL) {                  /* flush all output stream */
@@ -161,18 +170,12 @@ int fflush(FILE *fp)
 		cond = _iob + OPEN_MAX;
 	} else                             /* flush fp's buffer */
 		cond = fp + 1;
-		
 	for ( ; fp < cond; fp++) {
 		if ((fp->flag & (_WRITE | _EOF | _ERR)) != _WRITE)
 			return EOF;
-		bufsize = BUFSIZ - fp->cnt;
-		fp->ptr = fp->base;
-		fp->cnt = write(fileno(fp), fp->ptr, bufsize);
-		if (fp->cnt != bufsize) {
-			fp->flag |= _ERR;
-			fp->cnt = 0;
+		fp->flag |= _EOF;              /* coordinate with _flushbuf */
+		if (_flushbuf(*fp->ptr, fp) < 0)
 			return EOF;
-		}
 		*fp->ptr = '\0';
 		fp->cnt = 0;
 	}
@@ -210,7 +213,7 @@ int fseek(FILE *fp, long offset, int origin)
 	return 0;
 }
 
-FILE _iob[OPEN_MAX] = {                 /* stdin, stdout, stderr */
+FILE _iob[OPEN_MAX] = {                /* stdin, stdout, stderr */
 	{ 0, (char *) 0, (char *) 0, _READ, 0 },
 	{ 0, (char *) 0, (char *) 0, _WRITE, 1 },
 	{ 0, (char *) 0, (char *) 0, _WRITE | _UNBUF, 2 }
