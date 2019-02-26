@@ -128,7 +128,7 @@ int _flushbuf(int x, FILE *fp)
 
 	if (fp->flag & _UNBUF)
 		bufsize = 1;
-	else if (fp->flag & _EOF)          /* flush only written data (fflush) */
+	else if (fp->flag & _EOF)          /* flush written data only (fflush) */
 		bufsize = BUFSIZ - fp->cnt;
 	else
 		bufsize = BUFSIZ;
