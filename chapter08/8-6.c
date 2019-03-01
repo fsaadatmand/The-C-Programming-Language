@@ -62,7 +62,7 @@ void *knr_malloc(unsigned nbytes)
 	}
 }
 
-/* knr_calloc: general-purpose storage allocator */
+/* knr_calloc: general-purpose storage allocator. Initialize memory to zeros */
 void *knr_calloc(unsigned m, unsigned size)
 {
 	unsigned char *p;                  /* char is exactly 1 byte */
