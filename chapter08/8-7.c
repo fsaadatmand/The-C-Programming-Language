@@ -1,5 +1,5 @@
 /*
- * Exercise 8-6. The standard library function calloc(m, size) returns a
+ * Exercise 8-7. The standard library function calloc(m, size) returns a
  * pointer to n objects of size size, with the storage initialized to zero.
  * Write calloc, by calling malloc or by modifying it.
  * By Faisal Saadatmand
