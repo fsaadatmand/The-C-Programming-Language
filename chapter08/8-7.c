@@ -124,17 +124,22 @@ void knr_free(void *ap)
 
 #include <stdio.h>	
 
+/* change these values to test error checking */
 #define SIZE 20 
 #define LENGTH 21
 
 int main(void)
 {
+	int i;
 	char *s;
 	
-	if ((s = (char *) knr_malloc(LENGTH * sizeof(char))) == NULL)
-		printf("Invalid size\n");
-	else
-		printf("valid size\n");
+	if ((s = (char *) knr_malloc(LENGTH * sizeof(char))) != NULL) {
+		for (i = 0; i < LENGTH - 1; i++)
+			s[i] = i + '0';
+		s[i] = '\0';
+		printf("%s\n", s);
+	} else
+		fprintf(stderr, "Invalid size\n");
 
 	knr_free(s);
 
