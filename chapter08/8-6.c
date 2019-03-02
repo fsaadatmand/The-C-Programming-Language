@@ -23,7 +23,7 @@ static Header base;                    /* empty list to get started */
 static Header *freep = NULL;           /* start of free list */
 
 void *knr_malloc(unsigned);
-Header *morecore(unsigned);
+static Header *morecore(unsigned);
 void knr_free(void *);
 
 /* knr_malloc: general-purpose storage allocator */
@@ -32,7 +32,6 @@ void *knr_malloc(unsigned nbytes)
 	Header *p;                         /* pointer to current block */
 	Header *prevp;                     /* pointer to previous block */
 
-	Header *morecore(unsigned);
 	unsigned nunits;
 
 	/* round up to allocate in units of sizeof(Header) */
@@ -62,22 +61,20 @@ void *knr_malloc(unsigned nbytes)
 	}
 }
 
-/* knr_calloc: general-purpose storage allocator. Initialize memory to zeros */
-void *knr_calloc(unsigned m, unsigned size)
+/* my_calloc: general-purpose storage allocator. Initialize memory to zeros */
+void *my_calloc(unsigned m, unsigned size)
 {
 	unsigned char *p;                  /* char is exactly 1 byte */
 	unsigned i;
 
 	if ((p = (unsigned char *) knr_malloc(m * size)) != NULL)
-		for (i = 0; i < (m * size); i++)
-			p[i] &= 0x0;               /* clear each byte */
-
+		for (i = 0; i < m * size; i++)
+			p[i] &= 0x0u;              /* clear each byte */
 	return (void *) p; 
 }
 
 /* morecore: ask system for more memory */
-//static Header *morecore(unsigned nu)
-Header *morecore(unsigned nu)
+static Header *morecore(unsigned nu)
 {
 	char *cp;                          /* pointer to chunk of memory */
 	char *sbrk(int);
@@ -120,33 +117,25 @@ void knr_free(void *ap)
 #include <stdio.h>	
 
 #define SIZE 20 
-#define STRLEN 21
+#define LENGTH 21
 
 int main(void)
 {
-	int *ap, i;
+	int *array, i;
 	char *s;
 	
-//	ap = (int *) knr_malloc(SIZE * sizeof(int));
-	ap = (int *) knr_calloc(SIZE, sizeof(int));
+	array = (int *) my_calloc(SIZE, sizeof(int));
+	s = (char *) my_calloc(LENGTH, sizeof(char));
 
-	for (i = 0; i < SIZE; i++) {
-		ap[i] = i;
-		printf("%i ", ap[i]);
-	}
-
+	for (i = 0; i < SIZE; i++)
+		printf("%i ", array[i]);
 	printf("\n");
 
-//	s = (char *) knr_malloc(SIZE * sizeof(char));
-	s = (char *) knr_calloc(STRLEN, sizeof(char));
+	for (i = 0; i < LENGTH - 1; i++)
+		printf("%i ", s[i]);
+	printf("\n");
 
-	for (i = 0; i < STRLEN - 1; i++)
-//		printf("%i", s[i]);
-		s[i] = i + '0';
-	s[i] = '\0';
-	printf("%s\n", s);
-
-	knr_free(ap);
+	knr_free(array);
 	knr_free(s);
 
 	return 0;
