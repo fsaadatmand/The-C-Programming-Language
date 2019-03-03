@@ -134,7 +134,6 @@ int main(void)
 		knr_free(array);
 	}
 
-
 	if ((s = (char *) my_calloc(LENGTH, sizeof(char))) == NULL)
 		fprintf(stderr, "my_calloc: Can't allocate memory");
 	else {
