@@ -4,11 +4,10 @@
  * Write calloc, by calling malloc or by modifying it.
  * By Faisal Saadatmand
  */
-#include <limits.h>
 
 #define NULL        0
 #define NALLOC      1024                /* minimum #units to request */
-#define MAX_BYTES   1048576            /* 1 Megabytes */
+#define MAXBYTES    1048576            /* 1 Megabytes */
 
 typedef long Align;                    /* for alignment to long boundary */
 
@@ -36,7 +35,7 @@ void *knr_malloc(unsigned nbytes)
 	Header *prevp;                     /* pointer to previous block */
 	unsigned nunits;
 
-	if (nbytes > MAX_BYTES)
+	if (nbytes > MAXBYTES)             /* error check */
 		return NULL;
 
 	/* round up to allocate in units of sizeof(Header) */
@@ -100,13 +99,21 @@ static Header *morecore(unsigned nu)
 void knr_free(void *ap)
 {
 	Header *bp, *p;
+	int valid;
 
-	if (ap != NULL) {
+	valid = 1;
+	if (ap == NULL)                        /* error checking */
+		valid = 0;
+	else {
 		bp = (Header *) ap - 1;            /* point to block header */
+		if (bp->s.size <= 1)        /* must be at least 2 units: */
+			valid = 0;              /* 1 for header, 1 for mem block */ 
+	}
 
+	if (valid) {
 		for (p = freep ; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
 			if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
-				break;                     /* free block at start or end of arena */
+				break;              /* free block at start or end of arena */
 
 		if (bp + bp->s.size == p->s.ptr) { /* join to upper nbr */
 			bp->s.size += p->s.ptr->s.size;
@@ -124,17 +131,15 @@ void knr_free(void *ap)
 
 #include <stdio.h>	
 
-/* change these values to test error checking */
-#define SIZE 20 
-#define LENGTH 21
+#define SIZE 21                      /* chenge to test error checking */
 
 int main(void)
 {
 	int i;
 	char *s;
 	
-	if ((s = (char *) knr_malloc(LENGTH * sizeof(char))) != NULL) {
-		for (i = 0; i < LENGTH - 1; i++)
+	if ((s = (char *) knr_malloc(SIZE * sizeof(char))) != NULL) {
+		for (i = 0; i < SIZE - 1; i++)
 			s[i] = i + '0';
 		s[i] = '\0';
 		printf("%s\n", s);

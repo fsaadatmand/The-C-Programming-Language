@@ -8,7 +8,7 @@
 
 #define NULL        0
 #define NALLOC      1024                /* minimum #units to request */
-#define MAXBYTES   1048576            /* 1 Megabytes */
+#define MAXBYTES    1048576            /* 1 Megabytes */
 
 typedef long Align;                    /* for alignment to long boundary */
 

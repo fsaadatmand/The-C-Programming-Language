@@ -4,6 +4,7 @@
  * Write calloc, by calling malloc or by modifying it.
  * By Faisal Saadatmand
  */
+
 #define NULL   0
 #define NALLOC 1024                    /* minimum #units to request */
 
@@ -60,7 +61,7 @@ void *knr_malloc(unsigned nbytes)
 		prevp = p;                     /* save current pointer's address */
 	}
 }
-
+#include <string.h>
 /* my_calloc: general-purpose storage allocator. Initialize memory to zeros */
 void *my_calloc(unsigned m, unsigned size)
 {
