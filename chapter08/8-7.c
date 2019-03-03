@@ -6,9 +6,10 @@
  * By Faisal Saadatmand
  */
 
-#define NULL        0
-#define NALLOC      1024                /* minimum #units to request */
-#define MAXBYTES    1048576            /* 1 Megabytes */
+#include <stddef.h>                    /* for NULL */
+#include <limits.h>                    /* for INT_MAX */
+
+#define NALLOC      1024               /* minimum #units to request */
 
 typedef long Align;                    /* for alignment to long boundary */
 
@@ -36,7 +37,7 @@ void *knr_malloc(unsigned nbytes)
 	Header *prevp;                     /* pointer to previous block */
 	unsigned nunits;
 
-	if (nbytes > MAXBYTES)             /* error check */
+	if (nbytes == 0 || nbytes > INT_MAX)    /* error check */
 		return NULL;
 
 	/* round up to allocate in units of sizeof(Header) */
@@ -132,19 +133,15 @@ void knr_free(void *ap)
 
 #include <stdio.h>	
 
-#define SIZE 21                      /* chenge to test error checking */
+#define SIZE 21                        /* chenge value to test error checking */
 
 int main(void)
 {
-	int i;
 	char *s;
 	
-	if ((s = (char *) knr_malloc(SIZE * sizeof(char))) != NULL) {
-		for (i = 0; i < SIZE - 1; i++)
-			s[i] = i + '0';
-		s[i] = '\0';
-		printf("%s\n", s);
-	} else
+	if ((s = (char *) knr_malloc(SIZE * sizeof(char))) != NULL)
+		printf("Valid size\n");
+	else
 		fprintf(stderr, "Invalid size\n");
 
 	knr_free(s);

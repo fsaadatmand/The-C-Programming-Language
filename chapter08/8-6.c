@@ -5,7 +5,8 @@
  * By Faisal Saadatmand
  */
 
-#define NULL   0
+#include <stddef.h>                    /* for NULL */
+
 #define NALLOC 1024                    /* minimum #units to request */
 
 typedef long Align;                    /* for alignment to long boundary */
