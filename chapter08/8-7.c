@@ -1,7 +1,8 @@
 /*
- * Exercise 8-7. The standard library function calloc(m, size) returns a
- * pointer to n objects of size size, with the storage initialized to zero.
- * Write calloc, by calling malloc or by modifying it.
+ * Exercise 8-7. malloc accepts a size request without checking its
+ * plausibility; free believes that the block it is asked to free contains a
+ * valid size field. Improve these routines so they take more pains with error
+ * checking.
  * By Faisal Saadatmand
  */
 
@@ -66,13 +67,13 @@ void *knr_malloc(unsigned nbytes)
 }
 
 /* my_calloc: general-purpose storage allocator. Initialize memory to zeros */
-void *my_calloc(unsigned  m, unsigned size)
+void *my_calloc(unsigned  n, unsigned size)
 {
-	unsigned char *p;                  /* char is exactly 1 byte */
+	unsigned char *p;                 /* char is exactly 1 byte */
 	unsigned i;
 
-	if ((p = (unsigned char *) knr_malloc(m * size)) != NULL)
-		for (i = 0; i < m * size; i++)
+	if ((p = (unsigned char *) knr_malloc(n * size)) != NULL)
+		for (i = 0; i < n * size; i++)
 			p[i] &= 0x0u;              /* clear each byte */
 	return (void *) p; 
 }
