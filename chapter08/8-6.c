@@ -1,5 +1,5 @@
 /*
- * Exercise 8-6. The standard library function calloc(m, size) returns a
+ * Exercise 8-6. The standard library function calloc(n, size) returns a
  * pointer to n objects of size size, with the storage initialized to zero.
  * Write calloc, by calling malloc or by modifying it.
  * By Faisal Saadatmand
@@ -63,13 +63,13 @@ void *knr_malloc(unsigned nbytes)
 }
 #include <string.h>
 /* my_calloc: general-purpose storage allocator. Initialize memory to zeros */
-void *my_calloc(unsigned m, unsigned size)
+void *my_calloc(unsigned n, unsigned size)
 {
 	unsigned char *p;                  /* char is exactly 1 byte */
 	unsigned i;
 
-	if ((p = (unsigned char *) knr_malloc(m * size)) != NULL)
-		for (i = 0; i < m * size; i++)
+	if ((p = (unsigned char *) knr_malloc(n * size)) != NULL)
+		for (i = 0; i < n * size; i++)
 			p[i] &= 0x0u;              /* clear each byte */
 	return (void *) p; 
 }
@@ -125,19 +125,23 @@ int main(void)
 	int *array, i;
 	char *s;
 	
-	array = (int *) my_calloc(SIZE, sizeof(int));
-	s = (char *) my_calloc(LENGTH, sizeof(char));
+	if ((array = (int *) my_calloc(SIZE, sizeof(int))) == NULL)
+		fprintf(stderr, "my_calloc: Can't allocate memory");
+	else {
+		for (i = 0; i < SIZE; i++)
+			printf("%i ", array[i]);
+		printf("\n");
+		knr_free(array);
+	}
 
-	for (i = 0; i < SIZE; i++)
-		printf("%i ", array[i]);
-	printf("\n");
 
-	for (i = 0; i < LENGTH - 1; i++)
-		printf("%i ", s[i]);
-	printf("\n");
-
-	knr_free(array);
-	knr_free(s);
-
+	if ((s = (char *) my_calloc(LENGTH, sizeof(char))) == NULL)
+		fprintf(stderr, "my_calloc: Can't allocate memory");
+	else {
+		for (i = 0; i < LENGTH - 1; i++)
+			printf("%i ", s[i]);
+		printf("\n");
+		knr_free(s);
+	}
 	return 0;
 }
