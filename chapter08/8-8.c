@@ -67,13 +67,13 @@ void *knr_malloc(unsigned nbytes)
 }
 
 /* my_calloc: general-purpose storage allocator. Initialize memory to zeros */
-void *my_calloc(unsigned  m, unsigned size)
+void *my_calloc(unsigned  n, unsigned size)
 {
 	unsigned char *p;                  /* char is exactly 1 byte */
 	unsigned i;
 
-	if ((p = (unsigned char *) knr_malloc(m * size)) != NULL)
-		for (i = 0; i < m * size; i++)
+	if ((p = (unsigned char *) knr_malloc(n * size)) != NULL)
+		for (i = 0; i < n * size; i++)
 			p[i] &= 0x0u;              /* clear each byte */
 	return (void *) p; 
 }
@@ -202,5 +202,9 @@ int main(void)
 		s[i] = '\0';
 		printf("%s\n", s);
 	}
+
+	knr_free(array);
+	knr_free(s);
+
 	return 0;
 }
