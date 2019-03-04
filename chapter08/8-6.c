@@ -2,6 +2,10 @@
  * Exercise 8-6. The standard library function calloc(n, size) returns a
  * pointer to n objects of size size, with the storage initialized to zero.
  * Write calloc, by calling malloc or by modifying it.
+ *
+ * Note: to clear memory, you could use memset function in my_calloc instead,
+ * but without measures faster.
+ *
  * By Faisal Saadatmand
  */
 
@@ -62,17 +66,22 @@ void *knr_malloc(unsigned nbytes)
 		prevp = p;                     /* save current pointer's address */
 	}
 }
-#include <string.h>
+
 /* my_calloc: general-purpose storage allocator. Initialize memory to zeros */
 void *my_calloc(unsigned n, unsigned size)
 {
 	unsigned char *p;                  /* char is exactly 1 byte */
+	Header *hp;
+	unsigned bsize;                    /* actual block size in bytes */
 	unsigned i;
 
-	if ((p = (unsigned char *) knr_malloc(n * size)) != NULL)
-		for (i = 0; i < n * size; i++)
+	if ((p = (unsigned char *) knr_malloc(n * size)) != NULL) {
+		hp = (Header *) p - 1;
+		bsize = (hp->s.size - 1) * sizeof(Header);
+		for (i = 0; i < bsize - 1; i++)
 			p[i] &= 0x0u;              /* clear each byte */
-	return (void *) p; 
+	}
+	return (void *) p;
 }
 
 /* morecore: ask system for more memory */
