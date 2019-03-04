@@ -3,6 +3,12 @@
  * p of n characters into the free list maintained by malloc and free. By using
  * bfree, a user can add a static or external array to the free list at any
  * time.
+ *
+ * Note: The header is inserted into the freed block, which occupies 1 unit.
+ * Moreover,  Bfree rounds down the freed stack memory if n is not a multiple
+ * of Header. This means some bytes are unmanaged by the free list--they are
+ * practically lost.
+ *
  * By Faisal Saadatmand
  */
 
@@ -137,22 +143,25 @@ void knr_free(void *ap)
 }
 
 /* bfree: free an arbitrary block p of n characters into the free list
- * maintained by malloc and free. n must be a multiple of size Header and at
- * least Header + 1. Return 0 on success, -1 on failure. */
+ * maintained by malloc and free. n least Header * 2 (2 units). Return 0 on
+ * success, -1 on failure. */
 int bfree(void *p, unsigned n)
 {
 	Header *hp;                        /* ptr to block header */
 	unsigned nunits;                   /* number of units required */
 
-	if (n <= sizeof(Header)            /* block doesn't fit header */
-			|| (n % sizeof(Header)) != 0) /* or is not a multiple of 16 */
+	if (n == 0)
+		nunits = n;                    /* avoid division by 0 */
+	else
+		nunits =  n / sizeof(Header);  /* round down */
+
+	if (nunits <= 1)                   /* must be at least 2 units */
 		return -1;
 
-	nunits = n / sizeof(Header);       /* no rounding up is necessary */
 	hp = (Header *) p;                 /* insert header at p[0] */
 	hp->s.size = nunits;
 
-	if (freep == NULL) {               /* no list yet. Create a degenerate list */
+	if (freep == NULL) {               /* no list yet. Create a degenerate one */
 		base.s.ptr = freep = &base;
 		base.s.size = 0;
 	}
@@ -167,23 +176,25 @@ int bfree(void *p, unsigned n)
 /* change these values to test bfree */
 #define SIZE    320
 #define SIZE2   160 
-#define LIM     2                      /* to walk through the free list */
 #define NCHAR   94                     /* number of ascii char to print */
 
 int main(void)
 {
-	char array[SIZE];                /* statically allocated array */
+	char array[SIZE];                  /* statically allocated array */
 	char *s;
 	Header *p;
 	int i;
+	int nblocks;                       /* # of added blocks to free list */
 
+	nblocks = 1;                       /* 1 to account for degenerate list */
 	/* free array's mem block */
 	if (bfree(array, sizeof(array)) < 0) {
-		fprintf(stderr, "bfree: block size must be more than %d Bytes and a multiple of %d\n"
-				, (int) sizeof(Header), (int) sizeof(Header));
+		fprintf(stderr, "bfree: block size must be at least %d bytes\n"
+				, (int) sizeof(Header) * 2);
 	} else {
 		printf("*** Add array's memory block to free list ***\n");
-		for (p = &base, i = 1; i <= LIM; p = p->s.ptr, i++)
+		nblocks++;
+		for (p = &base, i = 1; i <= nblocks; p = p->s.ptr, i++)
 			printf("block %i (address: %p size: %u ptr: %p)\n"
 					, i, p, p->s.size, p->s.ptr);
 		printf("\n");
@@ -194,7 +205,7 @@ int main(void)
 		fprintf(stderr, "can't allocate memory\n");
 	else {
 		printf("*** allocate freed memory with knr_malloc ***\n");
-		for (p = &base, i = 1; i <= LIM; p = p->s.ptr, i++)
+		for (p = &base, i = 1; i <= nblocks; p = p->s.ptr, i++)
 			printf("block %i (address: %p size: %u ptr: %p)\n"
 					, i, p, p->s.size, p->s.ptr);
 		printf("\n");
