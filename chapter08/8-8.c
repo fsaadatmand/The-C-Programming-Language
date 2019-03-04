@@ -115,12 +115,12 @@ void knr_free(void *ap)
 	int valid;
 
 	valid = 1;
-	if (ap == NULL)                        /* error checking */
+	if (ap == NULL)                    /* error checking */
 		valid = 0;
 	else {
-		bp = (Header *) ap - 1;            /* point to block header */
-		if (bp->s.size <= 1)        /* must be at least 2 units: */
-			valid = 0;              /* 1 for header, 1 for mem block */ 
+		bp = (Header *) ap - 1;        /* point to block header */
+		if (bp->s.size <= 1)           /* must be at least 2 units: */
+			valid = 0;                 /* 1 for header, 1 for mem block */ 
 	}
 
 	if (valid) {
@@ -180,11 +180,11 @@ int bfree(void *p, unsigned n)
 
 int main(void)
 {
+	Header *p;
 	char array[SIZE];                  /* statically allocated array */
 	char *s;
-	Header *p;
-	int i;
 	int nblocks;                       /* # of added blocks to free list */
+	int i;
 
 	nblocks = 1;                       /* 1 to account for degenerate list */
 	/* free array's mem block */
