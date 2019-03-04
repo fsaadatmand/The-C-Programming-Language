@@ -109,12 +109,12 @@ void knr_free(void *ap)
 	int valid;
 
 	valid = 1;
-	if (ap == NULL)                        /* error checking */
+	if (ap == NULL)                    /* error checking */
 		valid = 0;
 	else {
-		bp = (Header *) ap - 1;            /* point to block header */
-		if (bp->s.size <= 1)        /* must be at least 2 units: */
-			valid = 0;              /* 1 for header, 1 for mem block */ 
+		bp = (Header *) ap - 1;        /* point to block header */
+		if (bp->s.size <= 1)           /* must be at least 2 units: */
+			valid = 0;                 /* 1 for header, 1 for mem block */ 
 	}
 
 	if (valid) {
@@ -122,7 +122,7 @@ void knr_free(void *ap)
 			if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
 				break;              /* free block at start or end of arena */
 
-		if (bp + bp->s.size == p->s.ptr) { /* join to upper nbr */
+		if (bp + bp->s.size == p->s.ptr) {  /* join to upper nbr */
 			bp->s.size += p->s.ptr->s.size;
 			bp->s.ptr = p->s.ptr->s.ptr;
 		} else
