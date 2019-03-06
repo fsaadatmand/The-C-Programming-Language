@@ -11,6 +11,9 @@
  * parameter-type-list --> parameter-list | parameter-list , ...
  * paramerter-list --> parameter-declaration | parameter-list , parameter-declaration
  * parameter-declaration --> declaration-specifiers dcl   // handled by main, dcl, dirdcl
+ * E -> T | T , ...
+ * T -> T-dcl | T , Tdcl
+ * Tdcl -> dclSpec dcl
  */
 
 #include <stdio.h>
@@ -106,8 +109,44 @@ void dcl (void)
 		strcat(out, " pointer to");
 }
 
-void parmDcl(void)
+
+void paramdcl(void)
 {
+	int ns;
+	char tempName[MAXTOKEN];
+
+	strcpy(tempName, name);
+
+	for (ns = 0; gettoken() == '*'; )  /*count *'s */
+		ns++;
+	if (tokentype != ',' && tokentype != ')')
+		dirdcl();
+	while (ns-- > 0)
+		strcat(out, " pointer to");
+	strcpy(name, tempName);             /* restore function name */
+}
+
+char parmDataType[1100];
+
+void paramList(void)
+{
+
+	while (gettoken() != ')') {
+		if (tokentype == NAME)
+			if (tokentype != ',')
+				sprintf(parmDataType, " %s", token);
+		paramdcl();
+
+		if (tokentype == ',' || tokentype == ')') {
+			strcat(out, parmDataType);
+			if (tokentype == ',')
+				strcat(out, " and" );
+		           /* try paramlist-> paramlist, paramdcl */
+			else
+				break;
+		}
+	}
+
 }
 
 /* dirdcl: parse a direct declarator */
@@ -134,8 +173,9 @@ void dirdcl(void)
 			if (type == PARENS)
 				strcat(out, " function returning");
 			else if (type == '(') {
-				strcat(out, " funtion accepts ");
-				parmDcl();
+				strcat(out, " function accepts");
+				paramList();
+				strcat(out, " returning");
 			} else {
 			strcat(out, " array");
 			strcat(out,  token);
