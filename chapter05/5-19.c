@@ -11,11 +11,13 @@
 #define MAXTOKEN    100
 #define BUFSIZE     100
 
+#define SKIP_BLANKS(c)  while (((c) = getch()) == ' ' || (c) == '\t')
+
 enum { NAME, PARENS, BRACKETS };
 
 /* functions */
 int  gettoken(void);
-int  getch(void) ;
+int  getch(void);
 void ungetch(int);
 
 /* globals */
@@ -33,10 +35,11 @@ int gettoken(void)
 	void ungetch(int);
 	char *p = token;
 
-	while ((c = getch()) == ' ' || c == '\t')
-		;
+	SKIP_BLANKS(c);
+
 	if (c == '(') {
-		if ((c = getch()) == ')') {
+		SKIP_BLANKS(c);                /* allow spaces in parens */
+		if (c == ')') {
 			strcpy(token, "()");
 			return tokentype = PARENS;
 		} else {
@@ -44,17 +47,19 @@ int gettoken(void)
 			return tokentype = '(';
 		}
 	} else if (c == '[') {
-		for (*p++ = c; (*p++ = getch()) != ']'; )
-			;
-		*p = '\0';
+		for (*p++ = c; (*p = getch()) != ']'; p++)
+			if (*p == '\n')            /* error check: missing ']' */
+				return *p;
+		*++p = '\0';
 		return tokentype = BRACKETS;
 	} else if (isalpha(c)) {
-		for (*p++ = c; isalnum(c = getch()); )
-			*p++ = c;
+		for (*p++ = c; isalnum(c = getch()); p++)
+			*p = c;
 		*p = '\0';
 		ungetch(c);
 		return tokentype = NAME;
-	} else return tokentype = c;
+	} else
+		return tokentype = c;
 }
 
 /* getch: get a (possibly pushed back) character */
@@ -67,7 +72,7 @@ int getch(void)
 void ungetch(int c)
 {
 	if (c == EOF)
-		bufp = 0;            /* clear buffer */
+		bufp = 0;                      /* clear buffer */
 
 	if (bufp >= BUFSIZE && c != EOF)
 		printf("ungetch: too many characters\n");
@@ -76,37 +81,41 @@ void ungetch(int c)
 }
 
 /* undcl: convert word descriptions to declarations */
+void undcl(void)
+{
+	int  type, is_dcl, error;
+	char temp[1100];           /* increased size to avoid potential overflow */
+
+	is_dcl = error = 0;
+	strcpy(out, token);
+	while ((type = gettoken()) != '\n') {
+		if (type == PARENS || type == BRACKETS) {
+			if (is_dcl) {          /* check if previous token is the start of dcl */
+				sprintf(temp, "(%s)", out);
+				strcpy(out, temp);
+				is_dcl = 0;
+				}
+			strcat(out, token);
+		} else if (type == '*') {
+			sprintf(temp, "*%s", out);
+			strcpy(out, temp);
+			is_dcl = 1;
+		} else if (type == NAME) {
+			sprintf(temp, "%s %s", token, out);
+			strcpy(out, temp);
+		} else {
+			printf("invalid input at %s\n", token);
+			error = 1;
+		}
+	}
+	if (!error)
+		printf("%s\n", out);
+}
+
 int main(void)               
 {
-	int  type, prevType;
-	char temp[MAXTOKEN];
-	int  error;
-
-	prevType = 0;
-	while (gettoken() != EOF) {
-		error = 0;
-		strcpy(out, token);
-		while ((type = gettoken()) != '\n') {
-			if (type == PARENS || type == BRACKETS) {
-				if (prevType == '*') {          /* check for precedence */
-					sprintf(temp, "(%s)", out); /* it's a (dcl), add parens */
-					strcpy(out, temp);
-				}
-				strcat(out, token);
-			} else if (type == '*') {
-				sprintf(temp, "*%s", out);     /* no general redundant parens */
-				strcpy(out, temp);
-			} else if (type == NAME) {
-				sprintf(temp, "%s %s", token, out);
-				strcpy(out, temp);
-			} else {
-				printf("invalid input at %s\n", token);
-				error = 1;
-			}
-			prevType = type;
-		}
-		if (!error)
-			puts(out);
-	}
+	while (gettoken() != EOF)
+		if (tokentype != '\n')         /* skip empty input lines */
+			undcl();
 	return 0;
 }
