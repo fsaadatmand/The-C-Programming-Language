@@ -4,6 +4,15 @@
  * By Faisal Saadatmand
  */
 
+/* Grammer:
+ * dcl --> *'s opt dirdcl
+ * dirdcl --> name | (dcl) | dirtdcl() | dirdcl(parameter-list) | dirdcl[optional size]
+ *
+ * parameter-type-list --> parameter-list | parameter-list , ...
+ * paramerter-list --> parameter-declaration | parameter-list , parameter-declaration
+ * parameter-declaration --> declaration-specifiers dcl   // handled by main, dcl, dirdcl
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -21,6 +30,7 @@ void dcl(void);
 void dirdcl(void);
 int  getch(void);
 void ungetch(int);
+void paratypelist(void);
 
 /* globals */
 char token[MAXTOKEN];                  /* last token string */
@@ -96,6 +106,10 @@ void dcl (void)
 		strcat(out, " pointer to");
 }
 
+void parmDcl(void)
+{
+}
+
 /* dirdcl: parse a direct declarator */
 void dirdcl(void)
 {
@@ -116,20 +130,19 @@ void dirdcl(void)
 	}
 
 	if (!error) {
-		while ((type = gettoken()) == PARENS || type == BRACKETS)
+		while ((type = gettoken()) == PARENS || type == BRACKETS || type == '(')
 			if (type == PARENS)
 				strcat(out, " function returning");
-			else {
+			else if (type == '(') {
+				strcat(out, " funtion accepts ");
+				parmDcl();
+			} else {
 			strcat(out, " array");
 			strcat(out,  token);
 			strcat(out, " of");
 			}
 	}
 }
-
-// parameter-type-list      loop that gets the tokens include ',' and stops at ')'
-// parameter-declaration    checks tokens according to grammer
-// declaration-specifiers   datatype?
 
 /* convert declaration to words */
 int main(void)               
