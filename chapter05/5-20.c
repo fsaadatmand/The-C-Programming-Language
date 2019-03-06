@@ -1,19 +1,17 @@
 /*
  * Exercise 5-20. Expand dcl to handle declarations with function argument
  * types, qualifiers like const, and so on.
- * By Faisal Saadatmand
- */
-
-/* Grammer:
- * dcl --> *'s opt dirdcl
- * dirdcl --> name | (dcl) | dirtdcl() | dirdcl(parameter-list) | dirdcl[optional size]
+ * Grammer (simplified):
  *
- * parameter-type-list --> parameter-list | parameter-list , ...
- * paramerter-list --> parameter-declaration | parameter-list , parameter-declaration
- * parameter-declaration --> declaration-specifiers dcl   // handled by main, dcl, dirdcl
- * E -> T | T , ...
- * T -> T-dcl | T , Tdcl
- * Tdcl -> dclSpec dcl
+ * declaration:
+ * dcl --> *'s opt dirdcl
+ * dirdcl --> name | (dcl) | dirtdcl() | dirdcl(paramlist) | dirdcl[size opt]
+ *
+ * function parameter's declaration:
+ * paramlist --> paramdecl | paramlist , paramdecl
+ * paramdecl --> declaration-specifiers dcl
+ *
+ * By Faisal Saadatmand
  */
 
 #include <stdio.h>
@@ -33,13 +31,15 @@ void dcl(void);
 void dirdcl(void);
 int  getch(void);
 void ungetch(int);
-void paratypelist(void);
+void paramList(void);
+void paramdcl(void);
 
 /* globals */
 char token[MAXTOKEN];                  /* last token string */
 int  tokentype;                        /* type of last token */
 char name[MAXTOKEN];                   /* identifier name */
 char datatype[MAXTOKEN];               /* data type = char, int, etc. */
+char paramDataType[1000];              /* parameter data type */
 char out[1000];
 char buf[BUFSIZE];                     /* buffer from ungetch */
 int  bufp = 0;                         /* next free position in buf */
@@ -109,46 +109,6 @@ void dcl (void)
 		strcat(out, " pointer to");
 }
 
-
-void paramdcl(void)
-{
-	int ns;
-	char tempName[MAXTOKEN];
-
-	strcpy(tempName, name);
-
-	for (ns = 0; gettoken() == '*'; )  /*count *'s */
-		ns++;
-	if (tokentype != ',' && tokentype != ')')
-		dirdcl();
-	while (ns-- > 0)
-		strcat(out, " pointer to");
-	strcpy(name, tempName);             /* restore function name */
-}
-
-char parmDataType[1100];
-
-void paramList(void)
-{
-
-	while (gettoken() != ')') {
-		if (tokentype == NAME)
-			if (tokentype != ',')
-				sprintf(parmDataType, " %s", token);
-		paramdcl();
-
-		if (tokentype == ',' || tokentype == ')') {
-			strcat(out, parmDataType);
-			if (tokentype == ',')
-				strcat(out, " and" );
-		           /* try paramlist-> paramlist, paramdcl */
-			else
-				break;
-		}
-	}
-
-}
-
 /* dirdcl: parse a direct declarator */
 void dirdcl(void)
 {
@@ -182,6 +142,38 @@ void dirdcl(void)
 			strcat(out, " of");
 			}
 	}
+}
+
+void paramdcl(void)
+{
+	int ns;
+	char prevName[MAXTOKEN];
+
+	strcpy(prevName, name);            /* save main function's name */
+
+	for (ns = 0; gettoken() == '*'; )  /*count *'s */
+		ns++;
+	if (tokentype != ',' && tokentype != ')') /* backtrack: try paramlist -> paramlist, paramdcl */
+		dirdcl();
+	while (ns-- > 0)
+		strcat(out, " pointer to");
+	strcpy(name, prevName);             /* restore mian function's name */
+}
+
+void paramList(void)
+{
+	do {
+		gettoken();
+		if (tokentype == NAME)
+			if (tokentype != ',')
+				sprintf(paramDataType, " %s", token);
+		paramdcl();
+		if (tokentype == ',' || tokentype == ')') {
+			strcat(out, paramDataType);
+			if (tokentype == ',')
+				strcat(out, " and" );
+		}
+	} while (tokentype != ')');
 }
 
 /* convert declaration to words */
