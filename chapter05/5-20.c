@@ -1,15 +1,18 @@
 /*
  * Exercise 5-20. Expand dcl to handle declarations with function argument
  * types, qualifiers like const, and so on.
+ *
  * Grammer (simplified):
+ *  declaration:
+ *   dcl -> *'s opt dirdcl
+ *   dirdcl -> name | (dcl) | dirtdcl() | dirdcl(paramlist) | dirdcl[size opt]
  *
- * declaration:
- * dcl --> *'s opt dirdcl
- * dirdcl --> name | (dcl) | dirtdcl() | dirdcl(paramlist) | dirdcl[size opt]
+ *  function parameter's declaration:
+ *   paramlist -> paramdecl | paramlist , paramdecl
+ *   paramdecl -> declaration-specifiers dcl
  *
- * function parameter's declaration:
- * paramlist --> paramdecl | paramlist , paramdecl
- * paramdecl --> declaration-specifiers dcl
+ * TODO: error checking is still finicky, e.g.: "int f(" will not recover; add
+ * type-qualifiers support.
  *
  * By Faisal Saadatmand
  */
@@ -18,9 +21,10 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MAXTOKEN    100
-#define BUFSIZE     100
-
+#define MAXTOKEN        100
+#define BUFSIZE         100
+#define EMPTY_LINE      (tokentype == '\n')
+#define RECOVER         while (tokentype != EOF && gettoken() != '\n')    
 #define SKIP_BLANKS(c)  while (((c) = getch()) == ' ' || (c) == '\t')
 
 enum { NAME, PARENS, BRACKETS };
@@ -43,7 +47,6 @@ char paramDataType[1000];              /* parameter data type */
 char out[1000];
 char buf[BUFSIZE];                     /* buffer from ungetch */
 int  bufp = 0;                         /* next free position in buf */
-int  error;                            /* signals parsing failure */
 
 /* gettoekn: return next token */
 int gettoken(void)
@@ -65,7 +68,7 @@ int gettoken(void)
 		}
 	} else if (c == '[') {
 		for (*p++ = c; (*p = getch()) != ']'; p++)
-			if (*p == '\n')            /* error check: missing ']' */
+			if (*p == '\n')            /* error check for missing ']' */
 				return *p;
 		*++p = '\0';
 		return tokentype = BRACKETS;
@@ -89,7 +92,7 @@ int getch(void)
 void ungetch(int c)
 {
 	if (c == EOF)
-		bufp = 0;                      /* clear buffer */
+		bufp = 0;            /* clear buffer */
 
 	if (bufp >= BUFSIZE && c != EOF)
 		printf("ungetch: too many characters\n");
@@ -114,60 +117,50 @@ void dirdcl(void)
 {
 	int type;
 	
-	error = 0;
 	if (tokentype == '(') {            /* ( dcl ) */
 		dcl ();
-		if (tokentype != ')') {
+		if (tokentype != ')')
 			printf("error: missing )\n");
-			error = 1;
-		}
 	} else if (tokentype == NAME)      /* variable name */
 		strcpy(name, token);
-	else {
+	else 
 		printf("error: expected name or (dcl)\n");
-		error = 1;
-	}
 
-	if (!error) {
-		while ((type = gettoken()) == PARENS || type == BRACKETS || type == '(')
-			if (type == PARENS)
-				strcat(out, " function returning");
-			else if (type == '(') {
-				strcat(out, " function accepts");
-				paramList();
-				strcat(out, " returning");
-			} else {
-			strcat(out, " array");
-			strcat(out,  token);
-			strcat(out, " of");
-			}
-	}
+	while ((type = gettoken()) == PARENS || type == BRACKETS || type == '(')
+		if (type == PARENS)
+			strcat(out, " function returning");
+		else if (type == '(') {
+			strcat(out, " function accepts");
+			paramList();
+			strcat(out, " returning");
+		} else {
+		strcat(out, " array");
+		strcat(out,  token);
+		strcat(out, " of");
+		}
 }
 
 void paramdcl(void)
 {
-	int ns;
 	char prevName[MAXTOKEN];
 
-	strcpy(prevName, name);            /* save main function's name */
-
-	for (ns = 0; gettoken() == '*'; )  /*count *'s */
-		ns++;
-	if (tokentype != ',' && tokentype != ')') /* backtrack: try paramlist -> paramlist, paramdcl */
-		dirdcl();
-	while (ns-- > 0)
-		strcat(out, " pointer to");
+	strcpy(prevName, name);             /* save main function's name */
+	dcl();                              /* note: dcl will skip current token */
 	strcpy(name, prevName);             /* restore mian function's name */
 }
 
 void paramList(void)
 {
 	do {
-		gettoken();
-		if (tokentype == NAME)
-			if (tokentype != ',')
-				sprintf(paramDataType, " %s", token);
-		paramdcl();
+		if (gettoken() == '\n') {
+			printf("error: parameters syntax\n");
+			continue;
+		}
+//			gettoken();
+		if (tokentype == NAME) {
+			sprintf(paramDataType, " %s", token);
+			paramdcl();
+		}
 		if (tokentype == ',' || tokentype == ')') {
 			strcat(out, paramDataType);
 			if (tokentype == ',')
@@ -182,13 +175,14 @@ int main(void)
 	while (gettoken() != EOF) {        /* last token on line */
 		strcpy(datatype, token);       /* is the datatype */
 		out[0] = '\0';
-		if (tokentype != '\n') {       /* skip empty input lines */
-			dcl();
-			if (tokentype != '\n')
-				printf("syntax error\n");
-			else if (!error)
-				printf("%s: %s %s\n", name, out, datatype);
-		}
-	}
+		if (EMPTY_LINE)
+			continue;                  /* skip empty input lines */
+		dcl();
+		if (tokentype != '\n') {
+			printf("syntax error\n");
+			RECOVER;
+		} else
+			printf("%s: %s %s\n", name, out, datatype);
+}
 	return 0;
 }
