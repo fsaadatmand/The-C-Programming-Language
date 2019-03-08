@@ -10,7 +10,9 @@
 #define MAXTOKEN    100
 #define BUFSIZE     100
 
+#define EMPTY_LINE       '\n'
 #define SKIP_BLANKS(c)  while (((c) = getch()) == ' ' || (c) == '\t')
+#define RECOVER         while (gettoken() != '\n')
 
 enum { NAME, PARENS, BRACKETS };
 
@@ -29,7 +31,6 @@ char datatype[MAXTOKEN];               /* data type = char, int, etc. */
 char out[1000];
 char buf[BUFSIZE];                     /* buffer from ungetch */
 int  bufp = 0;                         /* next free position in buf */
-int  error;                            /* signals parsing failure */
 
 /* gettoekn: return next token */
 int gettoken(void)
@@ -100,30 +101,23 @@ void dirdcl(void)
 {
 	int type;
 	
-	error = 0;
 	if (tokentype == '(') {            /* ( dcl ) */
 		dcl ();
-		if (tokentype != ')') {
+		if (tokentype != ')')
 			printf("error: missing )\n");
-			error = 1;
-		}
 	} else if (tokentype == NAME)      /* variable name */
 		strcpy(name, token);
-	else {
+	else
 		printf("error: expected name or (dcl)\n");
-		error = 1;
-	}
 
-	if (!error) {
-		while ((type = gettoken()) == PARENS || type == BRACKETS)
-			if (type == PARENS)
-				strcat(out, " function returning");
-			else {
-			strcat(out, " array");
-			strcat(out,  token);
-			strcat(out, " of");
-			}
-	}
+	while ((type = gettoken()) == PARENS || type == BRACKETS)
+		if (type == PARENS)
+			strcat(out, " function returning");
+		else {
+		strcat(out, " array");
+		strcat(out,  token);
+		strcat(out, " of");
+		}
 }
 
 /* convert declaration to words */
@@ -132,13 +126,14 @@ int main(void)
 	while (gettoken() != EOF) {        /* last token on line */
 		strcpy(datatype, token);       /* is the datatype */
 		out[0] = '\0';
-		if (tokentype != '\n') {       /* skip empty input lines */
-			dcl();
-			if (tokentype != '\n')
-				printf("syntax error\n");
-			else if (!error)
-				printf("%s: %s %s\n", name, out, datatype);
-		}
+		if (tokentype == EMPTY_LINE)
+			continue;                  /* skip empty input lines */
+		dcl();
+		if (tokentype != '\n') {
+			printf("syntax error\n");
+			RECOVER;
+		} else
+			printf("%s: %s %s\n", name, out, datatype);
 	}
 	return 0;
 }
