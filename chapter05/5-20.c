@@ -11,7 +11,7 @@
  *   paramlist -> paramdecl | paramlist , paramdecl
  *   paramdecl -> declaration-specifiers dcl
  *
- * TODO: error checking is still finicky, e.g.: "int f(" will not recover; add
+ * TODO: error checking is still finicky, e.g.: "int f(char f()" will not recover; add
  * type-qualifiers support.
  *
  * By Faisal Saadatmand
@@ -27,7 +27,7 @@
 #define RECOVER         while (tokentype != EOF && gettoken() != '\n')    
 #define SKIP_BLANKS(c)  while (((c) = getch()) == ' ' || (c) == '\t')
 
-enum { NAME, PARENS, BRACKETS };
+enum { NAME, PARENS, BRACKETS, ERROR };
 
 /* functions */
 int  gettoken(void);
@@ -119,25 +119,33 @@ void dirdcl(void)
 	
 	if (tokentype == '(') {            /* ( dcl ) */
 		dcl ();
-		if (tokentype != ')')
+		if (tokentype != ')') {
+			tokentype = ERROR;
 			printf("error: missing )\n");
-	} else if (tokentype == NAME)      /* variable name */
-		strcpy(name, token);
-	else 
-		printf("error: expected name or (dcl)\n");
-
-	while ((type = gettoken()) == PARENS || type == BRACKETS || type == '(')
-		if (type == PARENS)
-			strcat(out, " function returning");
-		else if (type == '(') {
-			strcat(out, " function accepts");
-			paramList();
-			strcat(out, " returning");
-		} else {
-		strcat(out, " array");
-		strcat(out,  token);
-		strcat(out, " of");
 		}
+	} else if (tokentype == NAME) {      /* variable name */
+		strcpy(name, token);
+	} else { 
+		tokentype = ERROR;
+		printf("error: expected name or (dcl)\n");
+	}
+
+	if (tokentype != ERROR) {
+		while ((type = gettoken()) == PARENS || type == BRACKETS || type == '(')
+			if (type == PARENS)
+				strcat(out, " function returning");
+			else if (type == '(') {
+				strcat(out, " function accepts");
+				paramList();
+				strcat(out, " returning");
+				if (tokentype == ERROR)
+					break;
+			} else {
+			strcat(out, " array");
+			strcat(out,  token);
+			strcat(out, " of");
+		}
+	}
 }
 
 void paramdcl(void)
@@ -154,9 +162,10 @@ void paramList(void)
 	do {
 		if (gettoken() == '\n') {
 			printf("error: parameters syntax\n");
+			tokentype = ERROR;
 			continue;
 		}
-//			gettoken();
+
 		if (tokentype == NAME) {
 			sprintf(paramDataType, " %s", token);
 			paramdcl();
@@ -166,7 +175,7 @@ void paramList(void)
 			if (tokentype == ',')
 				strcat(out, " and" );
 		}
-	} while (tokentype != ')');
+	} while (tokentype != ')' && tokentype != ERROR);
 }
 
 /* convert declaration to words */
@@ -178,10 +187,9 @@ int main(void)
 		if (EMPTY_LINE)
 			continue;                  /* skip empty input lines */
 		dcl();
-		if (tokentype != '\n') {
+		if (tokentype != '\n' || tokentype == ERROR)
 			printf("syntax error\n");
-			RECOVER;
-		} else
+		else
 			printf("%s: %s %s\n", name, out, datatype);
 }
 	return 0;

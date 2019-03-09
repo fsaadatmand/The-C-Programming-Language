@@ -7,14 +7,13 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MAXTOKEN    100
-#define BUFSIZE     100
-
-#define EMPTY_LINE       '\n'
+#define MAXTOKEN        100
+#define BUFSIZE         100
+#define EMPTY_LINE      (tokentype == '\n')
+#define RECOVER         while (tokentype != EOF && gettoken() != '\n')
 #define SKIP_BLANKS(c)  while (((c) = getch()) == ' ' || (c) == '\t')
-#define RECOVER         while (gettoken() != '\n')
 
-enum { NAME, PARENS, BRACKETS };
+enum { NAME, PARENS, BRACKETS, ERROR };
 
 /* functions */
 int  gettoken(void);
@@ -67,7 +66,7 @@ int gettoken(void)
 }
 
 /* getch: get a (possibly pushed back) character */
-int getch(void) 
+int getch(void)
 {
 	return (bufp > 0) ? buf[--bufp] : getchar();
 }
@@ -103,21 +102,27 @@ void dirdcl(void)
 	
 	if (tokentype == '(') {            /* ( dcl ) */
 		dcl ();
-		if (tokentype != ')')
+		if (tokentype != ')') {
 			printf("error: missing )\n");
-	} else if (tokentype == NAME)      /* variable name */
-		strcpy(name, token);
-	else
-		printf("error: expected name or (dcl)\n");
-
-	while ((type = gettoken()) == PARENS || type == BRACKETS)
-		if (type == PARENS)
-			strcat(out, " function returning");
-		else {
-		strcat(out, " array");
-		strcat(out,  token);
-		strcat(out, " of");
+			tokentype = ERROR;
 		}
+	} else if (tokentype == NAME) {     /* variable name */
+		strcpy(name, token);
+	} else {
+		printf("error: expected name or (dcl)\n");
+		tokentype = ERROR;
+	}
+
+	if (tokentype != ERROR) {
+		while ((type = gettoken()) == PARENS || type == BRACKETS)
+			if (type == PARENS)
+				strcat(out, " function returning");
+			else {
+			strcat(out, " array");
+			strcat(out, token);
+			strcat(out, " of");
+		}
+	}
 }
 
 /* convert declaration to words */
@@ -126,13 +131,12 @@ int main(void)
 	while (gettoken() != EOF) {        /* last token on line */
 		strcpy(datatype, token);       /* is the datatype */
 		out[0] = '\0';
-		if (tokentype == EMPTY_LINE)
+		if (EMPTY_LINE)
 			continue;                  /* skip empty input lines */
 		dcl();
-		if (tokentype != '\n') {
+		if (tokentype != '\n' || tokentype == ERROR)
 			printf("syntax error\n");
-			RECOVER;
-		} else
+		else
 			printf("%s: %s %s\n", name, out, datatype);
 	}
 	return 0;
