@@ -80,10 +80,10 @@ void computeRanges(void)
 	/* see IEEE 754 standards */
 	float fltMin, fltMax;
 	double dblMin, dblMax, mantissa, exponent;
+	int i;
 	
 	mantissa = 1.0;
 	exponent = 1.0;
-	int i;
 	for (i = 0; i < 23; ++i)
 		 mantissa /= 2;
 	for (i = 0; i < 127; ++i)
@@ -168,13 +168,13 @@ void stdLibraryMacros(void)
 
 int main(void)
 {
-	printf("\t**** Computed Ranges *****\n");
+	printf("\t**** Computed Manually *****\n");
 	computeRanges();
 
-	printf("\n\t**** Library function Ranges *****\n");
+	printf("\n\t**** Computed Using Library functions *****\n");
 	stdLibraryRanges();
 
-	printf("\n\t**** Library Macros Ranges *****\n");
+	printf("\n\t**** Printed Using Library Macros in limits.h *****\n");
 	stdLibraryMacros();
 
 	return 0;
