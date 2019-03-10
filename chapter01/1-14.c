@@ -56,6 +56,6 @@ int main(void)
 	for (i = 0; i <= MAXCHAR; ++i)          /* print histogram labels */
 		if (characters[i] != EMPTY)
 			printf ("%c ", i + '0');
-		printf("\n");
+	printf("\n");
 	return 0;
 }
