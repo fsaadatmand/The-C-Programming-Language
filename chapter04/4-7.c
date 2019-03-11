@@ -12,7 +12,6 @@
  */
 
 #include <stdio.h>
-#include <ctype.h>
 #include <string.h>          /* for strcmp() */
 
 #define MAXLEN      10000
@@ -27,7 +26,6 @@ void   ungets(char *);
 char   buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp = 0;             /* next free position in buf */
 char   s[MAXLEN];
-char   *ps;
 
 /* getch: get a (possibly pushed back) character */
 int getch(void)
