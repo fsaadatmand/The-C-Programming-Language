@@ -22,83 +22,73 @@ int getLine(char s[], int lim)
 
 	for (i = 0; i < lim - 1 && (c = getchar()) != EOF && c != '\n'; ++i)
 		s[i] = c;
-
-	if (c == '\n') {
-		s[i] = c;
-		++i;
-	}
-
+	if (c == '\n')
+		s[i++] = c;
 	s[i] = '\0';
-
 	return i;
 }
 
-void escape(char line[], char modLine[])
+/* escape: copy string t to s and convert characters like newline and tab into
+ * visible escape sequences */
+void escape(char s[], char t[])
 {
-	int i, j = 0;
+	int i, j;
 
-	for (i = 0; line[i] != '\0'; ++i) {
-		switch (line[i]) {
+	for (i = j = 0; t[i] != '\0'; ++i, ++j)
+		switch (t[i]) {
 		case '\t':
-			modLine[j] = '\\';
-			modLine[j + 1] = 't';
-			++j;
+			s[j++] = '\\';
+			s[j] = 't';
 			break;
 		case '\n':
-			modLine[j] = '\\';
-			modLine[j + 1] = 'n';
-			++j;
+			s[j++] = '\\';
+			s[j] = 'n';
 			break;
 		default:
-			modLine[j] = line[i];
+			s[j] = t[i];
 			break;
 		}
-		++j;
-	}
-	modLine[j] = '\0';
+	s[j] = '\0';
 }
 
-void escapeRev(char line[], char modLine[])
+/* escapeRev: copy string t to s and convert escape sequences like \n and \t
+ * into newline and tab characters. */
+void escapeRev(char s[], char t[])
 {
-	int i, j = 0;
+	int i, j;
 
-	for (i = 0; line[i] != '\0'; ++i) {
-		switch (line[i]) {
+	for (i = j = 0; t[i] != '\0'; ++i, ++j)
+		switch (t[i]) {
 		case '\\':
-			switch (line[i + 1]) {
+			switch (t[++i]) {
 			case 't':
-				modLine[j] = '\t';
-				++i;
+				s[j] = '\t';
 				break;
 			case 'n':
-				modLine[j] = '\n';
-				++i;
+				s[j] = '\n';
 				break;
 			default:
-				modLine[j] = line[i];
+				s[j] = t[i];
 				break;
 			}
 			break;
 		default:
-			modLine[j] = line[i];
+			s[j] = t[i];
 			break;
 		}
-		++j;
-	}
-	modLine[j] = '\0';
+	s[j] = '\0';
 }
 
 int main(void)
 {
-	char len;
 	char line[MAXLINE];
 	char modLine[MAXLINE];
 
-	while ((len = getLine(line, MAXLINE)) > 0) {
-	//	escape(line, modLine);
-	//	printf("%s", modLine);
-		escapeRev(line, modLine);
+	while (getLine(line, MAXLINE) > 0) {
+		escape(modLine, line);
 		printf("%s", modLine);
+//		escapeRev(modLine, line);
+//		printf("%s", modLine);
 	}
 	return 0;
 }
