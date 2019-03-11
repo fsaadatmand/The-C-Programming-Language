@@ -15,7 +15,7 @@ int strend(char *s, char *t)
 {
 	unsigned slen, tlen;
 
-	if ((slen = strlen(s)) >= (tlen = strlen(t)))
+	if ((slen = strlen(s)) >= (tlen = strlen(t)))  /* check s's boundaries */
 		for (s += slen - tlen; *s == *t; s++, t++)
 			if (*s == '\0')
 				return 1;              /* ends match */
