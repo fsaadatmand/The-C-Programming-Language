@@ -16,9 +16,8 @@ int getLine(char s[], int lim)
 {
 	int c, i, halt = 0;
 
-	c = getchar();
-	for (i = 0; halt == 0; ++i) {
-		if (c == EOF)
+	for (i = 0; !halt; ++i) {          /* loop rewrite */
+		if ((c = getchar()) == EOF)
 			halt = 1;
 
 		if (c == '\n')
@@ -27,17 +26,13 @@ int getLine(char s[], int lim)
 		if (i > lim - 1)
 			halt = 1;
 
-		if (halt == 0) {
+		if (!halt)
 			s[i] = c;
-			c = getchar();
-		}		
 	}
 	--i;
 
-	if (c == '\n') {
-		s[i] = c;
-		++i;
-	}
+	if (c == '\n')
+		s[i++] = c;
 
 	s[i] = '\0';
 
@@ -46,10 +41,9 @@ int getLine(char s[], int lim)
 
 int main(void)
 {
-	int  len;                 /* current line length */
-	char line[MAXLINE];       /* current input line */
+	char line[MAXLINE];                /* current input line */
 
-	while ((len = getLine(line, MAXLINE)) > 0)
+	while (getLine(line, MAXLINE) > 0)
 		printf("%s", line);
 	return 0;
 }
