@@ -12,24 +12,20 @@ int strend (char *, char *);
 /* strend: returns 1 if t occurs at the end of s, and zero otherwise */
 int strend (char *s, char *t)
 {
-  int t_len;
+  int tlen = 0;
 
-  while (*++s)          /* find end of s */
-    ;
+  while (*s)            /* find end of s */
+    ++s;
 
-  t_len = 0;
-  while (*t++)          /* find end of t */
-    ++t_len;            /* find length of t */
+  while (*t) {          /* find end of t */
+	  ++t;
+	  ++tlen;           /* find length of t */
+  }
+  
+  while (*--s == *--t)
+	  --tlen;
 
-  ++t_len;              /* account for '\0' */
-
-  while (*s-- == *t--)
-    --t_len;
-
-  if (t_len == 0)
-    return 1;
-  else
-    return 0;
+  return (tlen == 0) ? 1 : 0;
 }
 
 int main(void)
