@@ -8,31 +8,18 @@
 #include <string.h>
 
 /* functions */
-int strend (char *, char *);
+int strend(char *, char *);
 
 /* strend: returns 1 if t occurs at the end of s, and zero otherwise */
-int strend (char *s, char *t)
+int strend(char *s, char *t)
 {
-	int slen = 0;
-	int tlen = 0;
-	
-	while (*s) {          /* find end of s */
-		++s;
-		++slen;
-	}
-	
-	while (*t) {          /* find end of t */
-		++t;
-		++tlen;           /* find length of t */
-	}
-  
-	if (slen < tlen)
-		return 0;
-	
-	while (tlen--)
-		if (*--s != *--t)
-			return 0;
-	return 1;
+	unsigned slen, tlen;
+
+	if ((slen = strlen(s)) >= (tlen = strlen(t)))
+		for (s += slen - tlen; *s == *t; s++, t++)
+			if (*s == '\0')
+				return 1;              /* ends match */
+	return 0;
 }
 
 int main(void)
