@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 /* functions */
 int strend (char *, char *);
@@ -12,27 +13,34 @@ int strend (char *, char *);
 /* strend: returns 1 if t occurs at the end of s, and zero otherwise */
 int strend (char *s, char *t)
 {
-  int tlen = 0;
-
-  while (*s)            /* find end of s */
-    ++s;
-
-  while (*t) {          /* find end of t */
-	  ++t;
-	  ++tlen;           /* find length of t */
-  }
+	int slen = 0;
+	int tlen = 0;
+	
+	while (*s) {          /* find end of s */
+		++s;
+		++slen;
+	}
+	
+	while (*t) {          /* find end of t */
+		++t;
+		++tlen;           /* find length of t */
+	}
   
-  while (*--s == *--t)
-	  --tlen;
-
-  return (tlen == 0) ? 1 : 0;
+	if (slen < tlen)
+		return 0;
+	
+	while (tlen--)
+		if (*--s != *--t)
+			return 0;
+	return 1;
 }
 
 int main(void)
 {
-  char string1[] = { "this is a string" };
-  char string2[] = { "string" };
+	char string1[] = { "this is a string" };
+	char string2[] = { "string" };
 
-  printf("%i\n", strend(string1, string2));
-  return 0;
+	printf("%i\n", strend(string1, string2));
+	
+	return 0;
 }
