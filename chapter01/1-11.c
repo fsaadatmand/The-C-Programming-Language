@@ -1,6 +1,11 @@
 /*
 * Exercise 1-11. How would you test the word count program? What kinds of input
 * are most likely to uncover bugs if there are any?
+*
+* Answer: According to this definition of a word (characters grouped together),
+* means that inputs such as hyphenated words, word's with apostrophise, etc.,
+* will be counted as one word.  
+*
 * By Faisal Saadatmand
 */
 
@@ -27,6 +32,6 @@ int main(void)
 			++nw;
 		}
 	}
-	printf("%d %d %d\n", nl, nw, nc);
+	printf("lines: %d words: %d character: %d\n", nl, nw, nc);
 	return 0;
 }
