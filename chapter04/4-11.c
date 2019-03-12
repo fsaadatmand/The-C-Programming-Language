@@ -5,10 +5,10 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>          /* for atof() */
+#include <stdlib.h>              /* for atof() */
 #include <ctype.h>
-#include <string.h>          /* for strcmp() */
-#include <math.h>            /* for math commands */
+#include <string.h>              /* for strcmp() */
+#include <math.h>                /* for math commands */
 
 #define MAXOP       100          /* max size of operand or operator */
 #define NUMBER      '0'          /* signal that a number was found */
@@ -31,7 +31,6 @@ void   clearStack(void);
 void   storeVariable(double [], char);
 void   fetchVariable(double [], char);
 void   clearMemory(double [], int);
-void   ungets(char []);
 
 /* globals */
 int    sp = 0;               /* next free stack position */
@@ -111,17 +110,6 @@ int getop(char s[])
 int getch(void)              /* get a (possibly pushed back) character */
 {
 	return (bufp > 0) ? buf[--bufp] : getchar();
-}
-
-void ungetch(int c)          /* push character back on input */
-{
-	if (c == EOF)
-		bufp = 0;            /* clear buffer */
-
-	if (bufp >= BUFSIZE && c != EOF)
-		printf("ungetch: too many characters\n");
-	else
-		buf[bufp++] = c;
 }
 
 /* printTop: prints the top element in the stack without popping */
