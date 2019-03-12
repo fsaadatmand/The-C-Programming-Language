@@ -2,9 +2,8 @@
  * Exercise 7-5. Rewrite the postfix calculator of Chapter 4 to use scanf
  * and/or sscanf to do the input and number conversion.
  *
- * Note: Rewrote getop to use getchar and ungetc to peak at the next character
- * before calling scanf to handle the input and number conversion. getop takes
- * a double as an argument.
+ * Note: use ungetc instead of K&R's ungetch to pushback a character onto
+ * the stdin for scanf to pick up.
  *
  * Faisal Saadatmand
  */
@@ -50,28 +49,22 @@ double pop(void)
 /* getop: get next operator or numeric operand - scanf version */
 int getop(double *number)
 {
-	char c, sign;
+	char c;
 
-	sign = 0;
-	while (isblank(c = getchar()))     /* skip blank characters */
-			;
+	if (scanf("%c", &c) != 1)
+		return EOF;
 
-	if (c == '+' || c == '-') {        /* check for sign */
-		sign = c;
-		if (!isdigit(c = getchar()) && c != '.') { /* take a peak */
-			ungetc(c, stdin);          /* not a sign (possible operator) */
-			return sign;               
-		}
+	while (isblank(c))
+		scanf("%c", &c);
+
+	if (!isdigit(c) && c != '.')
+		return c;                      /* not a number */
+
+	if (isdigit(c) || c == '.') {
+		ungetc(c, stdin);              /* push back */
+		scanf("%lf", number);
 	}
-
-	if (isdigit(c) || c == '.') {      /* take a peak */
-		ungetc(c, stdin);              /* push c back onto input stream */
-		if (sign > 0)
-			ungetc(sign, stdin);
-		if (scanf("%lf", number) == 1) /* scan and convert numbers */
-			return NUMBER;
-	}
-	return c;
+	return NUMBER;
 }
 
 /* reverse polish calculator - scanf/sscanf version */
