@@ -46,7 +46,8 @@ char datatype[MAXTOKEN];               /* data type = char, int, etc. */
 char paramDataType[1000];              /* parameter data type */
 char out[1000];
 char buf[BUFSIZE];                     /* buffer from ungetch */
-int  bufp = 0;                         /* next free position in buf */
+int  bufp;                             /* next free position in buf */
+int  pushedEOF;                        /* signals EOF has been pushed-back */
 
 /* gettoekn: return next token */
 int gettoken(void)
@@ -83,18 +84,20 @@ int gettoken(void)
 }
 
 /* getch: get a (possibly pushed back) character */
-int getch(void) 
+int getch(void)
 {
-	return (bufp > 0) ? buf[--bufp] : getchar();
+	return (bufp > 0) ? buf[--bufp] : (pushedEOF) ? EOF : getchar();
 }
 
-/* ungetch: push character back on input */
+/* ungerch: push character back on input */
 void ungetch(int c)
 {
-	if (c == EOF)
-		bufp = 0;            /* clear buffer */
+	if (c == EOF) {
+		pushedEOF = 1;
+		return;
+	}
 
-	if (bufp >= BUFSIZE && c != EOF)
+	if (bufp >= BUFSIZE)
 		printf("ungetch: too many characters\n");
 	else
 		buf[bufp++] = c;
@@ -130,21 +133,22 @@ void dirdcl(void)
 		printf("error: expected name or (dcl)\n");
 	}
 
-	if (tokentype != ERROR) {
-		while ((type = gettoken()) == PARENS || type == BRACKETS || type == '(')
-			if (type == PARENS)
-				strcat(out, " function returning");
-			else if (type == '(') {
-				strcat(out, " function accepts");
-				paramList();
-				strcat(out, " returning");
-				if (tokentype == ERROR)
-					break;
-			} else {
-			strcat(out, " array");
-			strcat(out,  token);
-			strcat(out, " of");
-		}
+	if (tokentype == ERROR)
+		return;
+
+	while ((type = gettoken()) == PARENS || type == BRACKETS || type == '(')
+		if (type == PARENS)
+			strcat(out, " function returning");
+		else if (type == '(') {
+			strcat(out, " function accepts");
+			paramList();
+			strcat(out, " returning");
+			if (tokentype == ERROR)
+				return;
+		} else {
+		strcat(out, " array");
+		strcat(out,  token);
+		strcat(out, " of");
 	}
 }
 
@@ -163,19 +167,21 @@ void paramList(void)
 		if (gettoken() == '\n') {
 			printf("error: parameters syntax\n");
 			tokentype = ERROR;
-			continue;
+			return;
 		}
 
 		if (tokentype == NAME) {
 			sprintf(paramDataType, " %s", token);
 			paramdcl();
 		}
-		if (tokentype == ',' || tokentype == ')') {
+		if (tokentype == ERROR)
+			return;
+		else if (tokentype == ',' || tokentype == ')') {
 			strcat(out, paramDataType);
 			if (tokentype == ',')
 				strcat(out, " and" );
 		}
-	} while (tokentype != ')' && tokentype != ERROR);
+	} while (tokentype != ')'); 
 }
 
 /* convert declaration to words */

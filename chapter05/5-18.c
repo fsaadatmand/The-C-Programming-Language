@@ -10,7 +10,7 @@
 #define MAXTOKEN        100
 #define BUFSIZE         100
 #define EMPTY_LINE      (tokentype == '\n')
-#define RECOVER         while (tokentype != EOF && gettoken() != '\n')
+#define RECOVER(c)       while (((c) = getch()) != '\n')
 #define SKIP_BLANKS(c)  while (((c) = getch()) == ' ' || (c) == '\t')
 
 enum { NAME, PARENS, BRACKETS, ERROR };
@@ -29,7 +29,8 @@ char name[MAXTOKEN];                   /* identifier name */
 char datatype[MAXTOKEN];               /* data type = char, int, etc. */
 char out[1000];
 char buf[BUFSIZE];                     /* buffer from ungetch */
-int  bufp = 0;                         /* next free position in buf */
+int  bufp;                             /* next free position in buf */
+int  pushedEOF;                        /* signals EOF has been pushed-back */
 
 /* gettoekn: return next token */
 int gettoken(void)
@@ -68,16 +69,18 @@ int gettoken(void)
 /* getch: get a (possibly pushed back) character */
 int getch(void)
 {
-	return (bufp > 0) ? buf[--bufp] : getchar();
+	return (bufp > 0) ? buf[--bufp] : (pushedEOF) ? EOF : getchar();
 }
 
-/* ungetch: push character back on input */
+/* ungerch: push character back on input */
 void ungetch(int c)
 {
-	if (c == EOF)
-		bufp = 0;                      /* clear buffer */
+	if (c == EOF) {
+		pushedEOF = 1;
+		return;
+	}
 
-	if (bufp >= BUFSIZE && c != EOF)
+	if (bufp >= BUFSIZE)
 		printf("ungetch: too many characters\n");
 	else
 		buf[bufp++] = c;
@@ -106,37 +109,42 @@ void dirdcl(void)
 			printf("error: missing )\n");
 			tokentype = ERROR;
 		}
-	} else if (tokentype == NAME) {     /* variable name */
+	} else if (tokentype == NAME) {    /* variable name */
 		strcpy(name, token);
 	} else {
 		printf("error: expected name or (dcl)\n");
 		tokentype = ERROR;
 	}
 
-	if (tokentype != ERROR) {
-		while ((type = gettoken()) == PARENS || type == BRACKETS)
-			if (type == PARENS)
-				strcat(out, " function returning");
-			else {
-			strcat(out, " array");
-			strcat(out, token);
-			strcat(out, " of");
-		}
+	if (tokentype == ERROR)
+		return;
+
+	while ((type = gettoken()) == PARENS || type == BRACKETS)
+		if (type == PARENS)
+			strcat(out, " function returning");
+		else {
+		strcat(out, " array");
+		strcat(out, token);
+		strcat(out, " of");
 	}
 }
 
 /* convert declaration to words */
 int main(void)               
 {
+	int c;
+
 	while (gettoken() != EOF) {        /* last token on line */
 		strcpy(datatype, token);       /* is the datatype */
 		out[0] = '\0';
 		if (EMPTY_LINE)
 			continue;                  /* skip empty input lines */
 		dcl();
-		if (tokentype != '\n' || tokentype == ERROR)
+		if (tokentype != '\n') {
 			printf("syntax error\n");
-		else
+//			RECOVER(c);
+//			ungetch(c);
+		} else
 			printf("%s: %s %s\n", name, out, datatype);
 	}
 	return 0;
