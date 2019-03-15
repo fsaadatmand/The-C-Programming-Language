@@ -9,6 +9,7 @@
 /* getLine (Chapter 1) */
 
 #include <stdio.h>
+#include <string.h>
 
 #define MAXLINE 1000
 
@@ -18,19 +19,19 @@ int getLine(char *, int);
 /* getLine function: read a line into s, return length - pointer version */
 int getLine(char *s, int lim)
 {
-	int c, len;
+	int c;
+	char *len;
 
-	for (len = 0; len < lim - 1 && (c = getchar()) != EOF && c != '\n'; ++len)
+	len = s;
+	while (--lim > 0 && (c = getchar()) != EOF && c != '\n')
 		*s++ = c;
 
-	if (c == '\n') {
+	if (c == '\n')
 		*s++ = c;
-		++len;
-	}
 
 	*s = '\0';
 
-	return len;
+	return strlen(len);
 }
 
 int main(void)
