@@ -1,12 +1,13 @@
-f/*
+/*
  * Exercise 4-7. Write a routine ungets(s) that will push back an entire string
  * onto the input. Should ungets know about buf and bufp, or should it just use
  * ungetch?  
  *
- * Answer: ungets should know about buf and bufp so as to be independent of
- * ungetc, in the case latter is not needed. Moreover, if the buffer overloaded
- * ungets would print the error rather than ungetch, which makes it easier to
- * debug errors.
+ * Answer: on one hand, the only clear advantage in ungets gaining direct
+ * access to buf and bufp seems to be the ability to print the error message
+ * directly rather than through ungetch. On the other, since ungetc is just
+ * ungetch wrapped in a for loop, it makes sense to use ungetch and reduce code
+ * duplication.
  *
  * Faisal Saadatmand
  */
@@ -20,7 +21,7 @@ f/*
 /* functions */
 int    getch(void);
 void   ungetch(int);
-void   ungets(char *);
+void   ungets(char []);
 
 /* globals */
 char   buf[BUFSIZE];         /* buffer from ungetch */
@@ -43,15 +44,12 @@ void ungetch(int c)
 }
 
 /* ungets: push back s onto the input */
-void ungets(char *s)
+void ungets(char s[])
 {
 	int len;
 
 	for (len = strlen(s); len >= 0 ; --len)
-		if (bufp >= BUFSIZE)
-			printf("ungets: too many characters\n");
-		else
-			buf[bufp++] = s[len];
+		ungetch(s[len]);
 }
 
 /* test ungets */

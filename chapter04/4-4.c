@@ -11,10 +11,9 @@
 
 #define MAXOP   100          /* max size of operand or operator */
 #define NUMBER  '0'          /* signal that a number was found */
-#define MAXVAL  100          /* maximum depth of val stack */
+#define MAXVAL  100
 #define BUFSIZE 100
-#define MATCH   0
-#define TOP     val[sp - 1]  /* top element in stack */ 
+#define TOP     val[sp - 1]  /* top element in stack */
 
 /* functions */
 int    getop(char []);
@@ -28,11 +27,11 @@ void   swapTopTwo(void);
 void   clearStack(void);
 
 /* globals */
-int    sp = 0;               /* next free stack position */
+int    sp;                   /* next free stack position */
 double val[MAXVAL];          /* value stack */
 char   buf[BUFSIZE];         /* buffer from ungetch */
-int    bufp = 0;             /* next free position in buf */
-int    sign = 1;             /* positive or negative */
+int    bufp;                 /* next free position in buf */
+int    stackcmd;             /* stack commands flag */
 
 /* push: push f onto value stack */
 void push(double f)
@@ -46,9 +45,9 @@ void push(double f)
 /* pop: pop and return top value from stack */
 double pop(void)
 {
-	if (sp > 0) {
+	if (sp > 0)
 		return val[--sp];
-	} else {
+	else {
 		printf("error: stack empty\n");
 		return 0.0;
 	}
@@ -57,24 +56,22 @@ double pop(void)
 /* getop: get next operator or numeric operand */
 int getop(char s[])
 {
-	int i, c, nextC;
+	int i, c;
 
 	while ((s[0] = c = getch()) == ' ' || c == '\t')
 		;
 	s[1] = '\0';
 
-	if (c == '-') {                        /* possible negative number */
-		if (isdigit(nextC = getch())) {    /* peak at the next character */
-			s[0] = c = nextC;              /* a negative number */
-			sign = -1;                     /* set sign */
-		} else if (nextC != EOF)           /* an operator, let c fall-through */
-			ungetch(nextC);                /* push back nextC onto input */
-	}
-
-	if (!isdigit(c) && c != '.') 
-		return c;                          /* not a number */
-	
 	i = 0;
+	if (c == '-')            /* check sign */
+		if (!isdigit(s[++i] = c = getch())) {
+			ungetch(c);                    
+			c = s[0];        /* not a sign */
+		}
+
+	if (!isdigit(c) && c != '.')
+		return c;            /* not a number */
+
 	if (isdigit(c))
 		while (isdigit(s[++i] = c = getch()))
 			;
@@ -88,12 +85,14 @@ int getop(char s[])
 	return NUMBER;
 }
 
-int getch(void)              /* get a (possibly pushed back) character */
+/* getch: get a (possibly pushed back) character */
+int getch(void)
 {
 	return (bufp > 0) ? buf[--bufp] : getchar();
 }
 
-void ungetch(int c)          /* push character back on input */
+/* ungetch: push character back on input */
+void ungetch(int c)
 {
 	if (bufp >= BUFSIZE)
 		printf("ungetch: too many characters\n");
@@ -104,17 +103,19 @@ void ungetch(int c)          /* push character back on input */
 /* printTop: prints the top element in the stack */
 void printTop(void)
 {
-	if (sp > 0)
+	if (sp > 0) {
 		printf("\t%.8g\n", TOP);
-	else
-		printf("stack is empty\n");
+		stackcmd = 1;
+	}
 }
 
 /* deleteTop: deletes the top element in the stack */
 void duplicateTop(void)
 {
-	if (sp > 0)
+	if (sp > 0) {
 		push(TOP);
+		printTop();
+	}
 }
 
 /* swapTopTwo: swaps top two elements */
@@ -127,8 +128,8 @@ void duplicateTop(void)
 		 top2 = pop();
 		 push(top1);
 		 push(top2);
-	 } else
-		 printf("not enough elements\n");
+		 printTop();
+	 }
 }
 
 /* clear: clears the entire stack */
@@ -136,6 +137,7 @@ void clearStack(void)
 {
 	while (sp > 0)
 		pop();
+	printTop();
 }
 
 /* reverse Polish Calculator */
@@ -148,8 +150,7 @@ int main(void)
 	while ((type = getop(s)) != EOF) {
 		switch (type) {
 		case NUMBER:
-			push(sign * atof(s));
-			sign = 1;
+			push(atof(s));
 			break;
 		case '+':
 			push(pop() + pop());
@@ -188,7 +189,9 @@ int main(void)
 			clearStack();
 			break;
 		case '\n':
-			printf("\t%.8g\n", pop());
+			if (!stackcmd)
+				printf("\t%.8g\n", pop());
+			stackcmd = 0;
 			break;
 		default:
 			printf("error: unknown command %s\n", s);

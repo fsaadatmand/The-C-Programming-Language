@@ -1,23 +1,22 @@
 /*
- * Exercise 4-11. Modify getop so that it doesn't need to use ungetch.
- * Hint: use an internal static variable.
+ * Exercise 4-11. Modify getop so that it doesn't need to use ungetch. Hint:
+ * use an internal static variable.
  * Faisal Saadatmand
  */
 
 #include <stdio.h>
-#include <stdlib.h>              /* for atof() */
+#include <stdlib.h>          /* for atof() */
 #include <ctype.h>
-#include <string.h>              /* for strcmp() */
-#include <math.h>                /* for math commands */
+#include <string.h>          /* for strcmp() */
+#include <math.h>            /* for math commands */
 
-#define MAXOP       100          /* max size of operand or operator */
-#define NUMBER      '0'          /* signal that a number was found */
-#define MATH        '1'          /* signal that an operation was found */
-#define MAXVAL      100          /* maximum depth of val stack */
-#define BUFSIZE     100
-#define MATCH       0
-#define MAXVAR      26
-#define TOP         val[sp - 1]  /* top of the stack element */ 
+#define MAXOP   100          /* max size of operand or operator */
+#define NUMBER  '0'          /* signal that a number was found */
+#define MATH    '1'          /* signal that an operation was found */
+#define MAXVAL  100          /* maximum depth of val stack */
+#define BUFSIZE 100
+#define MAXVAR  26
+#define TOP     val[sp - 1]  /* top element in stack */
 
 /* functions */
 int    getop(char []);
@@ -25,19 +24,21 @@ void   push(double);
 double pop(void);
 int    getch(void);
 void   printTop(void);
-void   duplicateTop (void);
+void   duplicateTop(void);
 void   swapTopTwo(void);
 void   clearStack(void);
-void   storeVariable(double [], char);
-void   fetchVariable(double [], char);
-void   clearMemory(double [], int);
+int    mathfunction(char []);
+void   storeVariable(void);
+void   fetchVariable(void);
+void   clearMemory(void);
 
 /* globals */
-int    sp = 0;               /* next free stack position */
+int    sp;                   /* next free stack position */
 double val[MAXVAL];          /* value stack */
+double mem[MAXVAR];          /* variables values */
 char   buf[BUFSIZE];         /* buffer from ungetch */
-int    bufp = 0;             /* next free position in buf */
-int    sign = 1;             /* positive or negative */
+int    bufp;                 /* next free position in buf */
+int    stackcmd;             /* stack commands flag */
 char   variable;             /* current input variable */ 
 double lastPrint;            /* last printed value */
 
@@ -53,9 +54,9 @@ void push(double f)
 /* pop: pop and return top value from stack */
 double pop(void)
 {
-	if (sp > 0) {
+	if (sp > 0)
 		return val[--sp];
-	} else {
+	else {
 		printf("error: stack empty\n");
 		return 0.0;
 	}
@@ -65,29 +66,24 @@ double pop(void)
 int getop(char s[])
 {
 	int i, c;
-	static int  prevC;                 /* over-read character */
+	static int prevC;        /* over-read character */
 
-	/* check if there was a previously over-read character */
 	(prevC > 0) ? (c = prevC) : (s[0] = c = getch());
 
-	if (c == ' ' || c == '\t')
-		while ((s[0] = c = getch()) == ' ' || c == '\t')
-			s[1] = '\0';
-
-	if (c == '-') {                    /* possible negative number */
-		if (isdigit(s[0] = c = prevC = getch()))
-			sign = -1;                 /* is negative number */
-		else
-			return '-';                /* an operator */
-	}
-
-	if (!isdigit(c) && !isalpha(c) && c != '.') {
-		prevC = 0;                     /* no over-read character */
-		return c;                      /* not a number */
+	if (isblank(c)) {
+		while (isblank(s[0] = c = getch()))
+			;
+		s[1] = '\0';
 	}
 
 	i = 0;
-	if (isalpha(c)) {                  /* math functions and variables */
+	if (c == '-')            /* check sign */
+		if (!isdigit(s[++i] = c = getch())) {
+			prevC = c;
+			return s[0];     /* not a sign */
+		}
+
+	if (isalpha(c)) {        /*  math functions */
 		while (isalpha(s[++i] = c = getch()))
 			;
 		s[i] = '\0';
@@ -95,11 +91,15 @@ int getop(char s[])
 		return MATH;
 	}
 
-	i = 0;
+	if (!isdigit(c) && c != '.') {
+		prevC = 0;
+		return c;            /* not a number */
+	}
+
 	if (isdigit(c))
 		while (isdigit(s[++i] = c = getch()))
 			;
-	if( c == '.')                      /* collect fraction part */
+	if( c == '.')            /* collect fraction part */
 		while (isdigit(s[++i] = c = getch()))
 			;
 	s[i] = '\0';
@@ -107,28 +107,40 @@ int getop(char s[])
 	return NUMBER;
 }
 
-int getch(void)              /* get a (possibly pushed back) character */
+/* getch: get a (possibly pushed back) character */
+int getch(void)
 {
 	return (bufp > 0) ? buf[--bufp] : getchar();
 }
 
-/* printTop: prints the top element in the stack without popping */
+/* ungetch: push character back on input */
+void ungetch(int c)
+{
+	if (bufp >= BUFSIZE)
+		printf("ungetch: too many characters\n");
+	else
+		buf[bufp++] = c;
+}
+
+/* printTop: prints the top element in the stack */
 void printTop(void)
 {
-	if (sp > 0)
+	if (sp > 0) {
 		printf("\t%.8g\n", TOP);
-	else
-		printf("stack is empty\n");
+		stackcmd = 1;
+	}
 }
 
-/* duplicateTop: duplicate the top element in the stack */
-void duplicateTop (void)
+/* deleteTop: deletes the top element in the stack */
+void duplicateTop(void)
 {
-	if (sp > 0)
+	if (sp > 0) {
 		push(TOP);
+		printTop();
+	}
 }
 
-/* swapTopTwos: swaps top two elements */
+/* swapTopTwo: swaps top two elements */
  void swapTopTwo(void)
  {
 	 double top1, top2;
@@ -138,54 +150,70 @@ void duplicateTop (void)
 		 top2 = pop();
 		 push(top1);
 		 push(top2);
-	 } else
-		 printf("not enough elements\n");
- }
+		 printTop();
+	 }
+}
 
 /* clear: clears the entire stack */
 void clearStack(void)
 {
 	while (sp > 0)
 		pop();
+	printTop();
 }
 
-/* storeVariable: stores the value of a variable (a to z) to the corresponding
- * memory location in mem */
-void storeVariable(double mem[], char variable)
+/* mathf: call the appropriate math function according to value of s */
+int mathfunction(char s[])
 {
-	double value;
+	double op2;
 
-	if (variable == 'P') {          /* last printed value variable */
-		value = lastPrint;          /* fetch last printed value value */
-		mem[MAXVAR] = value;        /* last location is reserved for P */
-	} else {
-		pop();                      /* pop stored value by fetchVariable */
-		value = pop();              /* variable value - top of the stack */
-		variable = tolower(variable);
-		mem[variable - 'a'] = value;
-		push(value);
-	}
+	if (strcmp(s, "sin") == 0)
+		push(sin(pop()));
+	else if (strcmp(s, "cos") == 0)
+		push(cos(pop()));
+	else if (strcmp(s, "exp") == 0)
+		push(exp(pop()));
+	else if (strcmp(s, "sqrt") == 0)
+		push(sqrt(pop()));
+	else if (strcmp(s, "pow") == 0) {
+		op2 = pop();
+		push(pow(pop(), op2));
+	} else
+		return 0;
+	return 1;
+}
+
+/* storeVariable: stores the value of a variable (a to z) to the corrosponding
+ * memory location in mem */
+void storeVariable(void)
+{
+	pop();                             /* pop stored value by fetchVariable */
+	variable = tolower(variable);
+	mem[variable - 'a'] = pop();       /* variable value - top of the stack */
+	stackcmd = 1;                      /* skip pop print */
 }
 
 /* fetchVariable: fetches variable value from memory and pushes to the top of
  * the stack */
-void fetchVariable(double mem[], char variable)
+void fetchVariable(void)
 {
-	if (variable == 'P')          /* last printed value variable */
-		push(mem[MAXVAR]);        /* last location is reserved for P */	
+	if (variable == 'R')
+		push(lastPrint);
 	else {
 		variable = tolower(variable);
-		push(mem[variable - 'a']); /* push value to the top of the stack */
+		push(mem[variable - 'a']);
 	}
 }
 
 /* clearMemory: initializes values of mem to 0 */
-void clearMemory(double mem[], int size)
+void clearMemory(void)
 {
 	int i;
 
-	for (i = 0; i <= size; ++i)
+	for (i = 0; i <= MAXVAR; ++i)
 		mem[i] = 0;
+	printf("memory cleared\n");
+	stackcmd = 1;                      /* skip pop print */
 }
 
 /* reverse Polish Calculator */
@@ -194,13 +222,11 @@ int main(void)
 	int type;
 	double op2;
 	char s[MAXOP];
-	static double mem[MAXVAR];          /* variables values */
-
+	
 	while ((type = getop(s)) != EOF) {
 		switch (type) {
 		case NUMBER:
-			push(sign * atof(s));
-			sign = 1;
+			push(atof(s));
 			break;
 		case '+':
 			push(pop() + pop());
@@ -238,33 +264,21 @@ int main(void)
 		case '~':
 			clearStack();
 			break;
-		case '$':
-			storeVariable(mem, variable);
+		case '=':
+			storeVariable();
 			break;
 		case '\n':
-			lastPrint = pop();
-			printf("\t%.8g\n", lastPrint);
-			storeVariable(mem, 'P');    /* store last printed value in P */
+			if (!stackcmd)
+				printf("\t%.8g\n", lastPrint = pop());
+			stackcmd = 0;
 			break;
 		case MATH:
 			if (strlen(s) == 1) {
 				variable = s[0];
-				fetchVariable(mem, variable);
-			} else if (strcmp(s, "sin") == MATCH)
-				push(sin(pop()));
-			else if (strcmp(s, "cos") == MATCH)
-				push(cos(pop()));
-			else if (strcmp(s, "exp") == MATCH)
-				push(exp(pop()));
-			else if (strcmp(s, "sqrt") == MATCH)
-				push(sqrt(pop()));
-			else if (strcmp(s, "pow") == MATCH) {
-				op2 = pop();
-				push(pow(pop(), op2));
-			} else if (strcmp(s, "mc") == MATCH) {
-				clearMemory(mem, MAXVAR);
-				printf("memory cleared\n");		
-			} else
+				fetchVariable();
+			} else if (strcmp(s, "mc") == 0)
+				clearMemory();
+			else if (!mathfunction(s))
 				printf("error: unknown command %s\n", s);
 			break;
 		default:

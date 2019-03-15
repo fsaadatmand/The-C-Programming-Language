@@ -25,7 +25,6 @@ int    sp = 0;               /* next free stack position */
 double val[MAXVAL];          /* value stack */
 char   buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp = 0;             /* next free position in buf */
-int    sign = 1;
 
 /* push: push f onto value stack */
 void push(double f)
@@ -56,19 +55,16 @@ int getop(char s[])
 		;
 	s[1] = '\0';
 
-	if (!isdigit(c) && c != '.' && c != '-')
+	i = 0;
+	if (c == '-')            /* check sign */
+		if (!isdigit(s[++i] = c = getch())) {
+			ungetch(c);                    
+			c = s[0];        /* not a sign */
+		}
+
+	if (!isdigit(c) && c != '.')
 		return c;            /* not a number */
 
-	if (c == '-') {                        /* negative numbers provision */
-		if (isdigit(s[0] = c = getch()))   /* peak at the next character */
-			sign = -1;
-		else {
-			ungetch(c);                    /* push char back for next cycle */
-			return '-';
-		}
-	}
-
-	i = 0;
 	if (isdigit(c))
 		while (isdigit(s[++i] = c = getch()))
 			;
@@ -81,12 +77,14 @@ int getop(char s[])
 	return NUMBER;
 }
 
-int getch(void)              /* get a (possibly pushed back) character */
+/* getch: get a (possibly pushed back) character */
+int getch(void)
 {
 	return (bufp > 0) ? buf[--bufp] : getchar();
 }
 
-void ungetch(int c)          /* push character back on input */
+/* ungetch: push character back on input */
+void ungetch(int c)
 {
 	if (bufp >= BUFSIZE)
 		printf("ungetch: too many characters\n");
@@ -104,8 +102,7 @@ int main(void)
 	while ((type = getop(s)) != EOF) {
 		switch (type) {
 		case NUMBER:
-			push(sign * atof(s));
-			sign = 1;
+			push(atof(s));
 			break;
 		case '+':
 			push(pop() + pop());
