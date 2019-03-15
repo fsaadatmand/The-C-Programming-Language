@@ -20,7 +20,7 @@
 void push(double);
 double pop(void);
 int getop(double *);
-void ungetns(char *, int );
+void ungets(char *);
 
 /* globals */
 int sp = 0;                            /* next free stack position */
@@ -50,8 +50,9 @@ double pop(void)
 int getop(double *number)
 {
 	char c;
-	int n;                     /* number of reaf characters */
-	static char s[MAXOP];
+	int  n;                    /* number of consumed characters */
+	int match;
+	char s[MAXOP];
 
 	if (scanf("%c", &c) < 0)
 		return EOF;
@@ -61,26 +62,27 @@ int getop(double *number)
 
 	ungetc(c, stdin);
 	scanf("%s", s);            /* parse string from input stream */
-	if (!sscanf(s, "%lf %n", number, &n)) { /* match number from string */
-		sscanf(s, "%c", &c);   /* not a number */
+	match = sscanf(s, "%lf %n", number, &n); /* scan number, consume trailing witespace */
+	if (!match) {              /* not a number */
+		sscanf(s, "%c", &c);
 		if (strlen(s) > 1)     /* check for unread characters */
-			ungetns(s, 1);
+			ungets(s + 1);
 		return c;
 	}
 	
 	if (n != (int) strlen(s))  /* check unread char from match */
-		ungetns(s, n);
+		ungets(s + n);
 
 	return NUMBER;
 }
 
-/* ungetns: push back a string starting at position n onto input stream */
-void ungetns(char *s, int n)
+/* ungets: push back s on input */
+void ungets(char *s)
 {
-	int i;
+	int len;
 
-	for (i = strlen(s) - 1 ; i >= n; --i)
-		ungetc(s[i], stdin);
+	for (len = strlen(s); len >= 0; --len)
+		ungetc(s[len], stdin);
 }
 
 /* reverse polish calculator - scanf/sscanf version */

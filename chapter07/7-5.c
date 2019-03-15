@@ -9,7 +9,7 @@
  */
 
 #include <stdio.h>
-#include <ctype.h>
+#include <string.h>
 
 #define MAXOP    100                   /* max size of operand or operator */
 #define NUMBER   '0'                   /* signal that a number was found */
@@ -49,20 +49,20 @@ double pop(void)
 int getop(double *number)
 {
 	char c;
+	int match;
 
-	if (scanf("%c", &c) != 1)
+	if (scanf("%c", &c) < 0)
 		return EOF;
-
-	while (isblank(c))
-		scanf("%c", &c);
-
-	if (!isdigit(c) && c != '.')
-		return c;                      /* not a number */
-
-	if (isdigit(c) || c == '.') {
-		ungetc(c, stdin);              /* push back */
-		scanf("%lf", number);
-	}
+	if (c == '\n')
+		return c;
+	ungetc(c, stdin);
+	match = scanf("%lf ", number);  /* scan number, consumed trailing whitespace */
+	if (!match) {                         /* not a number */
+		if (c == '+' || c == '-')   /* check for consumed leading op on failed match */
+			ungetc(c, stdin);
+		scanf("%c", &c);                  /* scan op */ 
+		return c;
+	}	
 	return NUMBER;
 }
 
