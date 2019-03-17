@@ -3,6 +3,29 @@
  * and long variables, both signed and unsigned, by printing appropriate values
  * from standard headers and by direct computation. Harder if you compute them:
  * determine the ranges of the various floating-point types.
+ *
+ * For signed variables:
+ * largest negative number is -(2^nbits-1)
+ * largest positive number is (2^nbits-1)-1
+ *
+ * The loop iterates until the variable overflows the positive limit by 1. In
+ * binary (two's complement), this results in achieving the largest negative
+ * number with the loop's index and the max number with the result of the
+ * calculation inside the loop minus 1. Note: we can also achieve the largest
+ * positive number by negating the loop index and subtract one from it.
+ * However; the cost of one extra variable (long long max), we gain in code
+ * clarity.
+ *
+ * For unsigned variables:
+ * min is 0
+ * max (2^nbits)-1
+ *
+ * We do the same for the loop but we iterate the other way: we start from -1 all
+ * the way up to 0.
+ *
+ * for floating point types:
+ * refer to IEEE 754 standards
+ *
  * By Faisal Saadatmand
 */
 
@@ -17,62 +40,68 @@ void stdLibraryMacros(void);
 
 void computeRanges(void)
 {
+	long long unsigned int max;
+
 	/* characters */
-	signed char c; 
-	int maxC = 1;
-	for (c = 1; c > 0; c *= 2)
-		maxC *= 2;
-	printf("signed char\t\t%i\t\t\t%i\n", c, maxC - 1);
+	signed char c;
+
+	for (c = max = 1; c > 0; c *= 2)
+		max *= 2;
+	printf("signed char\t\t%i\t\t\t%llu\n", c, max - 1);
 
 	unsigned char uc;
+
 	for (uc = -1; uc < 0; uc *= 2)
-		;
-	printf("unsigned char\t\t%2i\t\t\t%i\n", 0, uc);
+		max *= 2; 
+	printf("unsigned char\t\t%2i\t\t\t%u\n", 0, uc);
 
 	/* Integers */
 	signed short  shrt;
-	int maxShrt = 1;
-	for (shrt = 1; shrt > 0; shrt *= 2)
-		maxShrt *= 2;
-	printf("signed short\t\t%i\t\t\t%i\n", shrt, maxShrt - 1);
+
+	for (shrt = max = 1; shrt > 0; shrt *= 2)
+		max *= 2;
+	printf("signed short\t\t%i\t\t\t%llu\n", shrt, max - 1);
 
 	unsigned short uShrt;
+
 	for (uShrt = -1; uShrt < 0; uShrt *= 2)
+		max += uShrt;
+	printf("unsigned short\t\t%2i\t\t\t%u\n", 0, uShrt);
+
+	signed int i;
+
+	for (i = max = 1; i > 0; i *= 2)
+		max *= 2;
+	printf("signed int\t\t%i\t\t%llu\n", i, max - 1);
+
+	unsigned int ui;
+
+	for (ui = -1; ui < 0; ui *= 2)
 		;
-	printf("unsigned short\t\t%2i\t\t\t%i\n", 0, uShrt);
+	printf("unsigned int\t\t%2u\t\t\t%u\n", 0, ui);
 
-	signed int sInt;
-	int max_sInt = 1;
-	for (sInt = 1; sInt > 0; sInt *= 2)
-		max_sInt *= 2;
-	printf("signed int\t\t%i\t\t%i\n", sInt, max_sInt - 1);
+	signed long int li;
 
-	unsigned int uInt;
-	for (uInt = -1; uInt < 0; uInt *= 2)
+	for (li = max = 1; li > 0; li *= 2)
+		max *= 2;
+	printf("signed long\t\t%li\t%llu\n", li, max - 1);
+
+	unsigned long int uli;
+
+	for (uli = -1; uli < 0; uli *= 2)
 		;
-	printf("unsigned int\t\t%2i\t\t\t%u\n", 0, uInt);
+	printf("unsigned long\t\t%2u\t\t\t%lu\n", 0, uli);
 
-	signed long int lInt;
-	signed long int max_lInt = 1;
-	for (lInt = 1; lInt > 0; lInt *= 2)
-		max_lInt *= 2;
-	printf("signed long\t\t%li\t%li\n", lInt, max_lInt - 1);
+	signed long long lli;
 
-	unsigned long int ulInt;
-	for (ulInt = -1; ulInt < 0; ulInt *= 2)
+	for (lli = max = 1; lli > 0; lli *= 2)
+		max *= 2;
+	printf("signed long long\t%lli\t%llu\n", lli, max - 1);
+
+	unsigned long long   ulli;
+	for (ulli =  -1; ulli < 0; ulli *= 2)
 		;
-	printf("unsigned long\t\t%2i\t\t\t%lu\n", 0, ulInt);
-
-	signed long long llInt;
-	signed long long max_llInt = 1;
-	for (llInt = 1; llInt > 0; llInt *= 2)
-		max_llInt *= 2;
-	printf("signed long long\t%lli\t%lli\n", llInt, max_llInt - 1);
-
-	unsigned long long   ullInt;
-	for (ullInt = -1; ullInt < 0; ullInt *= 2)
-		;
-	printf("unsigned long long\t%2i\t\t\t%llu\n", 0, ullInt);
+	printf("unsigned long long\t%2i\t\t\t%llu\n", 0, ulli);
 
 	printf("\n");
 
@@ -80,7 +109,6 @@ void computeRanges(void)
 	/* see IEEE 754 standards */
 	float fltMin, fltMax;
 	double dblMin, dblMax, mantissa, exponent;
-	int i;
 	
 	mantissa = 1.0;
 	exponent = 1.0;
