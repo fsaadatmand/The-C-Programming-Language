@@ -7,77 +7,52 @@
  */
 
 #include <stdio.h>
-#include <ctype.h>       /* for htoi() */ 
-#include <math.h>        /* for pow() */
-#include <string.h>     
 
-#define MAXLINE 1000
+#define MAXCHAR 100
 
 /* functions */
-long unsigned htoi(char []);
+int htoi(char []);
 
-long unsigned htoi(char s[])
+int htoi(char s[])
 {
-	int i, len;
-	long unsigned intValue = 0;
-	int base10;
-
-	len = strlen(s);
+	int i, isValid, hexDigit, intValue;
 
 	i = 0;
-	if (s[i] == '0' && (s[i + 1] == 'x' || s[i + 1] == 'X')) {
-		i += 2;
-		len -= 2;
+	if (s[i] == '0') {
+		++i;
+		if (s[i] == 'x' || s[i] == 'X') 
+			++i;
 	}
 
-	for ( ; s[i] != '\0'; i++, len--) {
+	intValue = 0;
+	isValid = 1;
 
-		if (!isxdigit(s[i]))
-			return -1;
+	for ( ; isValid; ++i) {
+		if (s[i] >= '0' && s[i] <= '9')
+			hexDigit = s[i] - '0';
+		else if (s[i] >= 'a' && s[i] <= 'f')
+			hexDigit = s[i] - 'a' + 10;
+		else if (s[i] >= 'A' && s[i] <= 'F')
+			hexDigit = s[i] - 'A' + 10;
+		else 
+			isValid = 0;
 
-		if (isdigit(s[i])) 
-			base10 = s[i] - '0';
-		else if (s[i] == 'a')
-			base10 = 10;
-		else if (s[i] == 'b')
-			base10 = 11;
-		else if (s[i] == 'c')
-			base10 = 12;
-		else if (s[i] == 'd')
-			base10 = 13;
-		else if (s[i] == 'e')
-			base10 = 14;
-		else if (s[i] == 'f')
-			base10 = 15;
-		else if (s[i] == 'A')
-			base10 = 10;
-		else if (s[i] == 'B')
-			base10 = 11;
-		else if (s[i] == 'C')
-			base10 = 12;
-		else if (s[i] == 'D')
-			base10 = 13;
-		else if (s[i] == 'E')
-			base10 = 14;
-		else if (s[i] == 'F')
-			base10 = 15;
-
-	intValue += pow(16, len - 1) * base10;	
+		if (isValid)
+			intValue = 16 * intValue + hexDigit;
 	}
 	return intValue;
 }
 
 int main(void)
 {
-	unsigned long intValue;
-	char xString[MAXLINE];
+	int value;
+	char hexString[MAXCHAR];
 
 	printf("Enter a hexadecimal string: ");
-	scanf("%s", xString);
+	scanf("%s", hexString);
 
-	if ((intValue = htoi(xString)) < 0)
-		printf("Invalid hexadecimal number\n");
-	else
-		printf("%lu\n", intValue);
+	value = htoi(hexString);
+	printf("%i\n", value);
+
 	return 0;
 }
