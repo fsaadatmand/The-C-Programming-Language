@@ -26,7 +26,6 @@ void   ungets(char []);
 /* globals */
 char   buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp = 0;             /* next free position in buf */
-char   s[MAXLEN];
 
 /* getch: get a (possibly pushed back) character */
 int getch(void)
@@ -48,20 +47,20 @@ void ungets(char s[])
 {
 	int len;
 
-	for (len = strlen(s); len >= 0 ; --len)
-		ungetch(s[len]);
+	for (len = strlen(s) - 1; len >= 0 ; --len)
+			ungetch(s[len]);
 }
 
 /* test ungets */
 int main(void)
 {
 	int c, i;
+	char   s[MAXLEN];
 
-	i = 0;
-	while ((s[i++] = getch()) != '\n')
+	printf("Enter string to test ungets function: ");
+	for (i = 0; (s[i] = getch()) != '\n'; i++)
 		;
-
-	s[i] = '\0';
+	s[i++] ='\n';
 	ungets(s);
 
 	while ((c = getch()) != EOF)
