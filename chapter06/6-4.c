@@ -30,7 +30,7 @@ struct tnode *sortTree(struct tnode *, struct tnode *);
 struct tnode *freetree(struct tnode *);
 
 /* globals */
-char   buf[BUFSIZE];                   /* buffer from ungetch */
+int    buf[BUFSIZE];                   /* buffer from ungetch */
 int    bufp = 0;                       /* next free position in buf */
 
 int getch(void)              /* get a (possibly pushed back) character */
