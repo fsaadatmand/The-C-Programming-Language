@@ -45,7 +45,7 @@ char name[MAXTOKEN];                   /* identifier name */
 char datatype[MAXTOKEN];               /* data type = char, int, etc. */
 char paramDataType[1000];              /* parameter data type */
 char out[1000];
-char buf[BUFSIZE];                     /* buffer from ungetch */
+int  buf[BUFSIZE];                     /* buffer from ungetch */
 int  bufp;                             /* next free position in buf */
 int  pushedEOF;                        /* signals EOF has been pushed-back */
 
@@ -86,17 +86,12 @@ int gettoken(void)
 /* getch: get a (possibly pushed back) character */
 int getch(void)
 {
-	return (bufp > 0) ? buf[--bufp] : (pushedEOF) ? EOF : getchar();
+	return (bufp > 0) ? buf[--bufp] : getchar();
 }
 
 /* ungerch: push character back on input */
 void ungetch(int c)
 {
-	if (c == EOF) {
-		pushedEOF = 1;
-		return;
-	}
-
 	if (bufp >= BUFSIZE)
 		printf("ungetch: too many characters\n");
 	else

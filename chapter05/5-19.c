@@ -25,7 +25,7 @@ char token[MAXTOKEN];                  /* last token string */
 int  tokentype;                        /* type of last token */
 char name[MAXTOKEN];                   /* identifier name */
 char out[1000];
-char buf[BUFSIZE];                     /* buffer from ungetch */
+int  buf[BUFSIZE];                     /* buffer from ungetch */
 int  bufp;                             /* next free position in buf */
 int  pushedEOF;                        /* signals EOF has been pushed-back */
 
