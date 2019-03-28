@@ -2,28 +2,22 @@
  * Exercise 4-6. Add commands for handling variables. (it's easy to provide
  * twenty-six variables with single-letter names). Add a variable for most
  * recently printed value.
- * Issues: 
- * 	1.	Variables are initialized to zero by default. Therefore, if a user
- * 		calls an unset variable, it will return a value 0. For example, the
- * 		result of "2 x$ *" is 0, if x is unset.  
- * 	2.	If a variable is entered without the fetch operator "$", it will be
- * 		ignored. For example, "2 x *" is be evaluated as "2 *".
- * 	3.	If the call operator is used on an invalid variable, it will be ignored.
- * 	4.	Ambiguity, 4 x = and x 4 = will assign 4 to x. This makes 4 x 5 y = will
- *		ambiguous becasue it assigns 5 to x and y.
+ *
+ * Issues:  variables are initialized to zero by default. Therefore, if a user
+ * 			calls an unset variable, it will return a value 0. For example, the
+ * 			result of "2 x *" is 0, if x is unset.
  * Faisal Saadatmand
  */
 
 #include <stdio.h>
-#include <stdlib.h>          /* for atof() */
+#include <stdlib.h>           /* for atof() */
 #include <ctype.h>
-#include <string.h>          /* for strcmp() */
-#include <math.h>            /* for math commands */
+#include <string.h>           /* for strcmp() */
+#include <math.h>             /* for math commands */
 
 #define MAXOP    100          /* max size of operand or operator */
 #define NUMBER   '0'          /* signal that a number was found */
-#define COMMAND  '1'          /* signal that a string command was found */
-#define VARIABLE '2'          /* signal that variable was found */
+#define NAME     '1'          /* signal that a string command was found */
 #define MAXVAL   100          /* maximum depth of val stack */
 #define BUFSIZE  100
 #define MAXVAR   26
@@ -40,8 +34,8 @@ void   duplicateTop(void);
 void   swapTopTwo(void);
 void   clearStack(void);
 int    mathfunction(char []);
-void   storeValue(char);
-void   fetchValue(char);
+void   storeVariable(void);
+void   fetchVariable(int var);
 void   clearMemory(void);
 
 /* globals */
@@ -95,7 +89,7 @@ int getop(char s[])
 			;
 		s[i] = '\0';
 		ungetch(c);
-		return (strlen(s) == 1) ? VARIABLE : COMMAND;
+		return (strlen(s) == 1) ? s[0] : NAME;
 	}
 
 	if (!isdigit(c) && c != '.')
@@ -130,7 +124,7 @@ void ungetch(int c)
 }
 
 /* printTOP: print top of the stack without pop */
-void printTOP()
+void printTOP(void)
 {
 	if (sp < 1)
 		printf("stack empty\n");
@@ -193,15 +187,20 @@ int mathfunction(char s[])
 	return 1;
 }
 
-/* storeValue: store value of a var (a to z) to the corresponding
+/* storeVariable: store variable value (a to z) to the corresponding
  * location in mem and push back to top of stack */
-void storeValue(char var)
+void storeVariable(void)
 {
-	push(mem[var - 'a'] = pop());
+//	if (isalpha(variable) && islower(variable)) {
+	if (variable >= 'a' && variable <= 'z') {
+		pop();
+		push(mem[variable - 'a'] = pop());
+	} else
+		printf("error: no variable name\n");
 }
 
-/* fetchValue: fetch value var from mem and push on to value stack */
-void fetchValue(char var)
+/* fetchVariable: fetch var value from mem and push on to value stack */
+void fetchVariable(int var)
 {
 	push(mem[var - 'a']);
 }
@@ -222,11 +221,20 @@ int main(void)
 	int type;
 	double op2;
 	char s[MAXOP];
-	
+
 	while ((type = getop(s)) != EOF) {
 		switch (type) {
 		case NUMBER:
 			push(atof(s));
+			break;
+		case NAME:
+			if (!strcmp(s, "lp")) {
+				push(printed);
+			} else if (!strcmp(s, "mc")) {
+				clearMemory();
+				peak = 1;
+			} else if (!mathfunction(s))
+				printf("error: unknown command %s\n", s);
 			break;
 		case '+':
 			push(pop() + pop());
@@ -265,14 +273,7 @@ int main(void)
 			clearStack();
 			break;
 		case '=':
-			if (isalpha(variable))     /* check if variable is valid */
-				storeValue(variable);
-			variable = 0;
-			break;
-		case '$':
-			if (isalpha(variable))     /* check if variable is valid */
-				fetchValue(variable);
-			variable = 0;
+			storeVariable();
 			break;
 		case '\n':
 			if (peak) {
@@ -280,32 +281,15 @@ int main(void)
 				peak = 0;
 			} else
 				printf("\t%.8g\n", printed = pop());
-
-			if (variable) {
-				printf("usage: %c$\n", variable);
-				variable = 0;
-			}
 			break;
-		case VARIABLE:
-			variable = tolower(s[0]);
-			break;
-		case COMMAND:
-			if (!strcmp(s, "lp")) {
-				push(printed);
-				break;
-			}
-			if (!strcmp(s, "mc")) {
-				clearMemory();
-				peak = 1;
-				break;
-			}
-			if (mathfunction(s))
-				break;
-			/* fall through */
 		default:
-			printf("error: unknown command %s\n", s);
+			if (islower(type))
+				fetchVariable(type);
+			else
+				printf("error: unknown command %s\n", s);
 			break;
 		}
+		variable = type;               /* remember variable */
 	}
 	return 0;
 }

@@ -21,10 +21,10 @@ int    getch(void);
 void   ungetch(int);
 
 /* globals */
-int    sp = 0;               /* next free stack position */
+int    sp;                   /* next free stack position */
 double val[MAXVAL];          /* value stack */
 char   buf[BUFSIZE];         /* buffer from ungetch */
-int    bufp = 0;             /* next free position in buf */
+int    bufp;                 /* next free position in buf */
 
 /* push: push f onto value stack */
 void push(double f)
@@ -56,19 +56,19 @@ int getop(char s[])
 	s[1] = '\0';
 
 	i = 0;
-	if (c == '-')            /* check sign */
+	if (c == '-')                      /* check sign */
 		if (!isdigit(s[++i] = c = getch())) {
 			ungetch(c);                    
-			c = s[0];        /* not a sign */
+			c = s[0];                  /* not a sign */
 		}
 
 	if (!isdigit(c) && c != '.')
-		return c;            /* not a number */
+		return c;                      /* not a number */
 
 	if (isdigit(c))
 		while (isdigit(s[++i] = c = getch()))
 			;
-	if( c == '.')            /* collect fraction part */
+	if( c == '.')                      /* collect fraction part */
 		while (isdigit(s[++i] = c = getch()))
 			;
 	s[i] = '\0';

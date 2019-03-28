@@ -11,7 +11,7 @@
 
 #define MAXOP   100          /* max size of operand or operator */
 #define NUMBER  '0'          /* signal that a number was found */
-#define MAXVAL  100
+#define MAXVAL  100          /* max depth of val stack */
 #define BUFSIZE 100
 #define TOP     val[sp - 1]  /* top element in stack */
 
@@ -21,7 +21,7 @@ void   push(double);
 double pop(void);
 int    getch(void);
 void   ungetch(int);
-void   printTop(void);
+void   printTOP(void);
 void   duplicateTop(void);
 void   swapTopTwo(void);
 void   clearStack(void);
@@ -31,7 +31,7 @@ int    sp;                   /* next free stack position */
 double val[MAXVAL];          /* value stack */
 char   buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp;                 /* next free position in buf */
-int    stackcmd;             /* stack commands flag */
+int    peak;                 /* flag to peak at top of the stack */
 
 /* push: push f onto value stack */
 void push(double f)
@@ -63,19 +63,19 @@ int getop(char s[])
 	s[1] = '\0';
 
 	i = 0;
-	if (c == '-')            /* check sign */
+	if (c == '-')                      /* check sign */
 		if (!isdigit(s[++i] = c = getch())) {
 			ungetch(c);                    
-			c = s[0];        /* not a sign */
+			c = s[0];                  /* not a sign */
 		}
 
 	if (!isdigit(c) && c != '.')
-		return c;            /* not a number */
+		return c;                      /* not a number */
 
 	if (isdigit(c))
 		while (isdigit(s[++i] = c = getch()))
 			;
-	if( c == '.')            /* collect fraction part */
+	if( c == '.')                      /* collect fraction part */
 		while (isdigit(s[++i] = c = getch()))
 			;
 	s[i] = '\0';
@@ -100,22 +100,24 @@ void ungetch(int c)
 		buf[bufp++] = c;
 }
 
-/* printTop: prints the top element in the stack */
-void printTop(void)
+/* printTOP: print top of the stack without pop */
+void printTOP(void)
 {
-	if (sp > 0) {
-		printf("\t%.8g\n", TOP);
-		stackcmd = 1;
-	}
+	if (sp < 1)
+		printf("stack empty\n");
+	printf("\t%.8g\n", TOP);
 }
 
-/* deleteTop: deletes the top element in the stack */
+/* duplicateTop: duplicate the top element in the stack */
 void duplicateTop(void)
 {
-	if (sp > 0) {
-		push(TOP);
-		printTop();
-	}
+	double top;
+
+	if (sp < 1)
+		return;
+
+	push(top = pop());
+	push(top);
 }
 
 /* swapTopTwo: swaps top two elements */
@@ -123,21 +125,22 @@ void duplicateTop(void)
  {
 	 double top1, top2;
 
-	 if (sp > 1) {
-		 top1 = pop();
-		 top2 = pop();
-		 push(top1);
-		 push(top2);
-		 printTop();
+	 if (sp < 2) {
+		 if (sp == 1)
+			 printf("error: 1 element in stack\n");
+		 return;
 	 }
+	 top1 = pop();
+	 top2 = pop();
+	 push(top1);
+	 push(top2);
 }
 
 /* clear: clears the entire stack */
 void clearStack(void)
 {
-	while (sp > 0)
+	while (sp > 1)
 		pop();
-	printTop();
 }
 
 /* reverse Polish Calculator */
@@ -177,7 +180,7 @@ int main(void)
 				printf("error: zero divisor\n");
 			break;
 		case '!':
-			printTop();
+			peak = 1;
 			break;
 		case '#':
 			duplicateTop();
@@ -189,9 +192,11 @@ int main(void)
 			clearStack();
 			break;
 		case '\n':
-			if (!stackcmd)
+			if (peak) {
+				printTOP();
+				peak = 0;
+			} else
 				printf("\t%.8g\n", pop());
-			stackcmd = 0;
 			break;
 		default:
 			printf("error: unknown command %s\n", s);
