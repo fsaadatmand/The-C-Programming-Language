@@ -5,9 +5,9 @@
  * time.
  *
  * Note: The header is inserted into the freed block, which occupies 1 unit.
- * Moreover,  Bfree rounds down the freed stack memory if n is not a multiple
+ * Moreover,  bfree rounds down the freed stack memory if n is not a multiple
  * of Header. This means some bytes are unmanaged by the free list--they are
- * practically lost.
+ * practically wasted.
  *
  * By Faisal Saadatmand
  */
