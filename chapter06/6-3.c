@@ -193,7 +193,7 @@ struct key *binsearch(char *word, struct key *tab, int n)
 /* freellist: frees allocated heap memory of linked list */
 struct list *freelist(struct list *node)
 {
-	if (node->next != NULL) {
+	if (node != NULL) {
 		freelist(node->next);
 		free(node);
 	}
@@ -208,7 +208,6 @@ struct tnode *freetree(struct tnode *node)
 		freetree(node->right);
 		free(node->word);
 		freelist(node->line);          /* delete linked list nodes */
-		free(node->line);              /* delete linked list */
 		free(node);
 	}
 	return node;
