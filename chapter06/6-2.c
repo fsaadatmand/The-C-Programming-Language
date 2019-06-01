@@ -1,10 +1,10 @@
 /* 
  * Exercise 6-2. Write a program that reads a C program and prints in
  * alphabetical order each group variable names that are identical in the first
- * 6 characters, but different  somewhere thereafter. Don't count words within
+ * 6 characters, but different somewhere thereafter. Don't count words within
  * string and comments. Make 6 a parameter that can be set from the command
  * line.
- * Note: getword comment detection could nbe improved 
+ * Note: getword comment detection could be improved.
  * By Faisal Saadatmand
  */
 
@@ -271,11 +271,17 @@ int main(int argc, char *argv[])
 	root = NULL;                       /* initialize root node */
 	while (getword(word, MAXWORD) != EOF)
 		if ((isalpha(word[0]) || word[0] == '_' || word[0] == '*')
-				&& (int) strlen(word) > nChar)
+				&& (int) strlen(word) > nChar) {
 			if ((p = binsearch(word, keytab, NKEYS)) == NULL) /* skip C */
 				root = addtree(root, word);                   /* reserved words */
+			else
+				++p->count;            /* not necessary */
+		}
 	findVariables(root, nChar);
 	treeprint(root);
 	root = freetree(root);             /* clean up */
+
+	for (size_t i = 0; i < sizeof(keytab) / sizeof(keytab[0]); ++i)
+		printf("%s %i\n", keytab[i].word, keytab[i].count);
 	return 0;
 }
