@@ -37,17 +37,20 @@ int main(int argc, char *argv[])
 
 	f1ln = f2ln = 0;
 	while (!feof(file[1]) && !feof(file[2])) { 
+		/* read lines and count successfully read lines */
 		if (fgets(f1line, MAXLEN, file[1]))
-			f1ln++;                        /* count successfully read lines */
+			f1ln++;
 		if (fgets(f2line, MAXLEN, file[2]))
-			f2ln++;                        /* count successfully read lines */
+			f2ln++;
+		/* compare lines */
 		if (f1ln > f2ln)                   /* file 1 is longer */
 			fprintf(stdout, "\n%s: %i: %s", f1name, f1ln, f1line);
 		else if (f1ln < f2ln)              /* file 2 is longer */
 			fprintf(stdout, "\n%s: %i: %s", f2name, f2ln, f2line);
 		else if (strcmp(f1line, f2line)) {
-			fprintf(stdout, "\n%s: %i: %s", f1name, f1ln, f1line);
-			fprintf(stdout, "\n%s: %i: %s", f2name, f2ln, f2line);
+			fprintf(stdout, "\n%s: %i: %s\n", f1name, f1ln, f1line);
+			fprintf(stdout, "\n%s: %i: %s\n", f2name, f2ln, f2line);
+			break;                         /* break at first difference */
 		}
 	}
 
