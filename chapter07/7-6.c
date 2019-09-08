@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 	char *f1name = argv[1];                /* file 1 name for printing line */
 	char *f2name = argv[2];                /* file 2 name for printing line */
 	char f1line[MAXLEN], f2line[MAXLEN];   /* currently read line */
-	int  f1ln, f2ln;                       /* currently read line number */
+	int  f1lnum, f2lnum;                   /* currently read line number */
 	int i;
 	
 	/* check cli argument */
@@ -35,21 +35,21 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 
-	f1ln = f2ln = 0;
+	f1lnum = f2lnum = 0;
 	while (!feof(file[1]) && !feof(file[2])) { 
 		/* read lines and count successfully read lines */
 		if (fgets(f1line, MAXLEN, file[1]))
-			f1ln++;
+			f1lnum++;
 		if (fgets(f2line, MAXLEN, file[2]))
-			f2ln++;
+			f2lnum++;
 		/* compare lines */
-		if (f1ln > f2ln)                   /* file 1 is longer */
-			fprintf(stdout, "\n%s: %i: %s", f1name, f1ln, f1line);
-		else if (f1ln < f2ln)              /* file 2 is longer */
-			fprintf(stdout, "\n%s: %i: %s", f2name, f2ln, f2line);
+		if (f1lnum > f2lnum)                   /* file 1 is longer */
+			fprintf(stdout, "\n%s: %i: %s", f1name, f1lnum, f1line);
+		else if (f1lnum < f2lnum)              /* file 2 is longer */
+			fprintf(stdout, "\n%s: %i: %s", f2name, f2lnum, f2line);
 		else if (strcmp(f1line, f2line)) {
-			fprintf(stdout, "\n%s: %i: %s\n", f1name, f1ln, f1line);
-			fprintf(stdout, "\n%s: %i: %s\n", f2name, f2ln, f2line);
+			fprintf(stdout, "\n%s: %i: %s\n", f1name, f1lnum, f1line);
+			fprintf(stdout, "\n%s: %i: %s\n", f2name, f2lnum, f2line);
 			break;                         /* break at first difference */
 		}
 	}
