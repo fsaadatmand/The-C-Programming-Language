@@ -3,6 +3,7 @@
  * input from a set named files or, if no files are named as arguments, from
  * the standard input. Should the file name be printed when a matching line is
  * found?
+ *
  * Answer: of course!
  *
  * By Faisal Saadatmand
@@ -14,42 +15,57 @@
 
 #define MAXLINE 1000
 
-/* fucntions */
-int getLine(char *, int);
+/* globals */
+char *progName;
 
-/* getLine: get line into s, return length */
-int getLine(char *line, int max)
-{
-	int c, i;
+/* functions */
+int getLine(char *, size_t, FILE *);
+FILE* loadFile(char *);
+int findPattern(FILE *, char *, char *, int, int);
 
-	i = 0;
-	while (--max > 0 && (c = getchar()) != EOF && c != '\n')
-		line[i++] = c;
-	if (c == '\n')
-		line[i++] = c;
-	line[i] = '\0';
-	return i;
-}
-
-/* fgetLine: read line, return length - fgets version */
-int fgetLine(FILE *fp, char *line, int max)
+/* getLine: read line, return length - file pointer version */
+int getLine(char *line, size_t max, FILE *fp)
 {
 	if (fgets(line, max, fp) == NULL)
 		return 0;
-	else
-		return strlen(line);
+	return strlen(line);
+}
+
+FILE* loadFile(char *fileName)
+{
+	FILE* fp;
+	if (!(fp = fopen(fileName, "r"))) {
+		fprintf(stderr, "%s: can't open %s\n", progName, fileName);
+		exit(EXIT_FAILURE);
+	}
+	return fp;
+}
+
+int findPattern(FILE *fp, char *fileName, char *pattern, int except, int number)
+{
+	char line[MAXLINE];
+	long int lineno, found = 0;
+
+	for (lineno = 1; getLine(line, MAXLINE, fp) > 0; lineno++)
+		if ((strstr(line, pattern) != NULL) != except) {
+			if (fileName)
+				printf("%s:", fileName);
+			if (number)
+				printf ("%ld:", lineno);
+			printf("%s", line);
+			found++;
+		}
+	return found;
 }
 
 /* find: print lines that match pattern from 1s arg */
 int main(int argc, char *argv[])
 {
-	char line[MAXLINE];
-	long lineno;
 	int c, except = 0, number = 0, found = 0;
-	char *prog = argv[0];
-	char *pattern;
-	FILE *fp;
+	char *pattern = NULL;
+	FILE *file = NULL;
 
+	progName = argv[0];
 	while (--argc > 0 && (*++argv)[0] == '-')    /* check for flags */
 		while ((c = *++argv[0]))
 			switch (c) {
@@ -60,40 +76,22 @@ int main(int argc, char *argv[])
 				number = 1;
 				break;
 			default:
-				printf("find: illegal option %c\n", c);
+				printf("%s: illegal option %c\n", progName, c);
 				argc = 0;
 				found = -1;
 				break;
 			}
 
+	pattern = *argv;                   /* save a pointer to the pattern */
 	if (argc < 1)
-		printf("Usage: find -x -n pattern\n");
-	else if (argc == 1) {              /* input from stdin */
-		for (lineno = 1; getLine(line, MAXLINE) > 0; lineno++)
-			if ((strstr(line, *argv) != NULL) != except) {
-				if (number)
-					printf ("%ld:", lineno);
-				printf("%s", line);
-				found++;
-			}
-	} else {                           /* input from file or set of files */
-		pattern = *argv;               /* save a pointer to the pattern */
+		printf("Usage: %s -x -n pattern\n", progName);
+	else if (argc == 1)                /* input from stdin */
+		found += findPattern(stdin, NULL, pattern, except, number);
+	else                               /* input from file or set of files */
 		while (argc-- > 1) {
-			if ((fp = fopen(*++argv, "r")) == NULL) {
-				fprintf(stderr, "%s: can't open %s\n", prog, *argv);
-				exit(EXIT_FAILURE);
-			}
-			while (!feof(fp))
-				for (lineno = 1; fgetLine(fp, line, MAXLINE) > 0; lineno++)
-					if ((strstr(line, pattern) != NULL) != except) {
-						printf("%s:", *argv);    /* print file name */
-						if (number)
-							printf ("%ld:", lineno);
-						printf("%s", line);
-						found++;
-					}
-			fclose(fp);
+			file = loadFile(*++argv);
+			found += findPattern(file, *argv, pattern, except, number);
+			fclose(file);
 		}
-	}
 	return found;
 }
