@@ -2,6 +2,7 @@
  * Exercise 5-1. As written, getint treats a + or - followed by a digit as a
  * valid representation of zero. Fix it to push such a character back on the
  * input.
+ *
  * By Faisal Saadatmand
  */
 
@@ -36,49 +37,40 @@ void ungetch(int c)          /* push character back on input */
 /* getint: get next integer from input into *pn */
 int getint(int *pn)
 {
-	int c, sign;
+	int c, sign, signChar;
 
 	while (isspace(c = getch()))    /* skip white space */
 		;
-
 	if (!isdigit(c) && c != EOF && c != '+' && c != '-')
 		return 0;            /* it is not a number */
-
 	sign = (c == '-') ? -1 : 1;
-
-	if (c == '+' || c == '-')
+	if (c == '+' || c == '-') {
+		signChar = c;
 		if (!isdigit(c = getch())) {
-			ungetch(c);
-			return 0;        /* it is not a number */
+			if (c != EOF)
+				ungetch(c);
+			ungetch(signChar);
+			return signChar;
 		}
-
+	}
 	for (*pn = 0; isdigit(c); c = getch())
 		*pn = 10 * *pn + (c - '0');
-
 	*pn *= sign;
-
 	if (c != EOF)
-		ungetch(c);
-
+	ungetch(c);
 	return c;
 }
 
 int main(void)
 {
-	int n, i, array[SIZE], input;
+	int array[SIZE], input;
+	size_t n;
 
-	n = 0;
-	input = getint(&array[n++]);
-	while (n < SIZE && input != EOF) {
-		if (input == 0)      /* do not store non-numbers */
-			--n;
-		input = getint(&array[n++]);
+	for (n = 0; n < SIZE && (input = getint(&array[n])) != EOF; ++n) {
+		if (input == '-' || input == '+')
+			break;
+		printf(" %i", array[n]);
 	}
-	
-	printf("%i\n", n);
- 	for (i = 0; i < n - 1; ++i)
-		printf("%i ", array[i]);
 	printf("\n");
-
 	return 0;
 }
