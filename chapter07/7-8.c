@@ -1,57 +1,78 @@
 /*
  * Exercise 7-8. Write a program to print a set of files, starting each new one
  * on a new page, with a title and a running page count for each file.
+ *
  * By Faisal Saadatmand
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#define LINE       81                  /* characters per line */
-#define PAGEBREAK  3840                /* characters per page ~ 500 word/page */
+#define MAXHEADER     6             /* maximum header size */
+#define MAXFOOTER     3             /* maximum footer size */
+#define MAXLINE      80             /* maximum characters per line */
+#define MAXPAGE      60             /* maximum lines per page */
+
+/* globals */
+const char *progName;
 
 /* functions */
-int  pagecount(FILE *);
-void printcover(char *, int);
+FILE* loadFile(char *);
+int printHeader(char *, int);
+void printFile(FILE *, char *);
 
-int pagecount(FILE *f)
+FILE* loadFile(char *fileName)
 {
-	int count = 0;
-
-	while (getc(f) != EOF) 
-		count++;
-	return (count < PAGEBREAK) ? 1 : count / PAGEBREAK;
+	FILE *fp;
+	if (!(fp = fopen(fileName, "r"))) {
+		fprintf(stderr, "%s: can't open %s\n", progName, fileName);
+		exit(EXIT_FAILURE);
+	}
+	return fp;
 }
 
-void printcover(char *s, int n)
+int printHeader(char *fileName, int pageNo)
 {
-	int i;
+	int ln = 5;     /* length of the lines bellow */
 
+	printf("\n************************\n");
+	printf("File name: %s\n", fileName);
+	printf("Page: %i\n", pageNo);
 	printf("************************\n");
-	printf("File name: %s\n", s);
-	printf("Page count: %i\n", n);
-	printf("************************\n");
+	while (ln++ < MAXHEADER)
+		fprintf(stdout, "\n");
+	return ln;
+}
 
-	for (i = 4; i <= (PAGEBREAK / LINE); ++i)   /* i = 4 to skip above lines */
-		printf("\n");
+void printFile(FILE *file, char *fileName)
+{
+	char line[MAXLINE];
+	int lineNo,pageNo;
+
+	lineNo = pageNo = 1;
+	while (fgets(line, MAXLINE, file)) {
+		if (lineNo == 1) {
+			fprintf(stdout, "\f");
+			lineNo = printHeader(fileName, pageNo++);
+		}
+		fputs(line, stdout);
+		if (++lineNo > MAXPAGE - MAXFOOTER)
+			lineNo = 1;
+	}
+	fprintf(stdout, "\f");
 }
 
 int main(int argc, char *argv[])
 {
 	FILE *fp;
-	char *prog = argv[0];
-	int pages, c;
 
-	while (--argc > 0)
-		if ((fp = fopen(*++argv, "r")) == NULL) {
-			fprintf(stderr, "%s: can't open %s\n", prog, *argv);
-			exit(EXIT_FAILURE);
-		} else {
-			pages = pagecount(fp);
-			rewind(fp);                   /* rewind input stream */
-			printcover(*argv, pages);
-			while ((c = getc(fp)) != EOF) /* print file */
-				fprintf(stdout, "%c", c);
+	progName = *argv;
+	if (argc == 1)               /* standard input */
+		printFile(stdin, "standard input");
+	else
+		while (--argc > 0) {
+			fp = loadFile(*++argv);
+			printFile(fp, *argv);
 			fclose(fp);
 		}
 	exit(EXIT_SUCCESS);
