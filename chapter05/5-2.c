@@ -1,6 +1,7 @@
 /*
  * Exercise 5-2. Write getfloat, the floating-point anolog of getint. What type
- * does getfloat return as its function value? Integer
+ * does getfloat return as its function value? int
+ *
  * By Faisal Saadatmand
  */
 
@@ -35,22 +36,22 @@ void ungetch(int c)          /* push character back on input */
 /* getfloat: get next float from input into *pn */
 int getfloat(double *pn)
 {
-	int c, sign, decimalPoint = 1;
+	int c, sign, signChar, decimalPoint = 1;
 
 	while (isspace(c = getch()))    /* skip white space */
 		;
-
 	if (!isdigit(c) && c != EOF && c != '+' && c != '-' && c != '.')
 		return 0;            /* it is not a number */
-
 	sign = (c == '-') ? -1 : 1;
-
-	if (c == '+' || c == '-')
+	if (c == '+' || c == '-') {
+		signChar = c;
 		if (!isdigit(c = getch())) {
-			ungetch(c);
-			return 0;        /* it is not a number */
+			if (c != EOF)
+				ungetch(c);
+			ungetch(signChar);
+			return signChar;
 		}
-
+	}
 	for (*pn = 0; isdigit(c); c = getch())
 		*pn = 10 * *pn + (c - '0');
 	if (c == '.')
@@ -58,31 +59,22 @@ int getfloat(double *pn)
 			decimalPoint *= 10; 
 			*pn += (double) (c - '0') / decimalPoint;
 		}
-
 	*pn *= sign;
-
 	if (c != EOF)
 		ungetch(c);
-
 	return c;
 }
 
 int main(void)
 {
-	int n, i, input;
+	int n, input;
 	double array[SIZE];
 
-	n = 0;
-	input = getfloat(&array[n++]);
-	while (n < SIZE && input != EOF) {
-		if (input == 0)      /* do not store non-numbers */
-			--n;
-		input = getfloat(&array[n++]);
+	for (n = 0; n < SIZE && (input = getfloat(&array[n])) != EOF; ++n) {
+		if (input == 0 || input == '-' || input == '+')
+			break;
+		printf(" %g", array[n]);
 	}
-	
-	for (i = 0; i < n - 1; ++i)
-		printf("%g ", array[i]);
 	printf("\n");
-
 	return 0;
 }
