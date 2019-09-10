@@ -13,8 +13,7 @@ void strCat(char *, char *);
 void strCat(char *s, char *t)
 {
   while (*s)             /* find end of s */
-    ++s;
-
+	  ++s;
   while ((*s++ = *t++))  /* copy t */
     ;
 }
