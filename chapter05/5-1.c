@@ -67,7 +67,7 @@ int main(void)
 	size_t n;
 
 	for (n = 0; n < SIZE && (input = getint(&array[n])) != EOF; ++n) {
-		if (input == '-' || input == '+')
+		if (input == 0 || input == '-' || input == '+')
 			break;
 		printf(" %i", array[n]);
 	}
