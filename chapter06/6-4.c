@@ -1,6 +1,7 @@
 /*
  * Write a program that prints the distinct words in its input sorted into
  * decreasing order of frequency of occurrence. Precede each word by its count.
+ *
  * By Faisal Saadatmand
  */
 
@@ -21,8 +22,8 @@ struct tnode {
 
 /* functions */
 int getword(char *, int);
-struct tnode *talloc(void);            /* allocate memory to new tree node */
-char   *strDup(char *);                /* copy string into safe place */
+struct tnode *talloc(void);         /* allocate memory to new tree node */
+char  *strDup(char *);              /* copy string into safe place */
 struct tnode *addtree(struct tnode *, char *);
 void treeprint(struct tnode *);
 struct tnode *copyTree(struct tnode *, struct tnode *);
@@ -30,8 +31,8 @@ struct tnode *sortTree(struct tnode *, struct tnode *);
 struct tnode *freetree(struct tnode *);
 
 /* globals */
-int    buf[BUFSIZE];                   /* buffer from ungetch */
-int    bufp = 0;                       /* next free position in buf */
+int    buf[BUFSIZE];         /* buffer from ungetch */
+int    bufp = 0;             /* next free position in buf */
 
 int getch(void)              /* get a (possibly pushed back) character */
 {
@@ -45,6 +46,7 @@ void ungetch(int c)          /* push character back on input */
 	else
 		buf[bufp++] = c;
 }
+
 /* getword: get next word or character from input */
 int getword(char *word, int lim)
 {
@@ -72,7 +74,7 @@ int getword(char *word, int lim)
 /* talloc: make a tnode */
 struct tnode *talloc(void)
 {
-	return (struct tnode *) malloc(sizeof(struct tnode));
+	return malloc(sizeof(struct tnode));
 }
 
 /*strDup: make a duplicate of s */
@@ -80,8 +82,8 @@ char *strDup(char *s)
 {
 	char *p;
 
-	p = (char *) malloc(strlen(s) + 1); /* +1 for '\0' */
-	if (p != NULL)
+	p = malloc(strlen(s) + 1); /* +1 for '\0' */
+	if (p)
 		strcpy(p, s);
 	return p;
 }
@@ -91,7 +93,7 @@ struct tnode *addtree(struct tnode *p, char *w)
 {
 	int cond;
 
-	if (p == NULL) {                   /* a new word has arrived */
+	if (!p) {                   /* a new word has arrived */
 		p = talloc();                  /* make a new node */
 		p->word = strDup(w);           /* copy data to it */
 		p->count = 1;
@@ -108,7 +110,7 @@ struct tnode *addtree(struct tnode *p, char *w)
 /* print: in-order print of tree p */
 void treeprint(struct tnode *p)
 {
-	if (p != NULL) {
+	if (p) {
 		treeprint(p->right);
 		printf("%4d %s\n", p->count, p->word);
 		treeprint(p->left);
@@ -118,7 +120,7 @@ void treeprint(struct tnode *p)
 /* copyTree: copy nodes in root into p according to frequency of occurrence. */
 struct tnode *copyTree(struct tnode *p, struct tnode *root)
 {
-	if (p == NULL) {
+	if (!p) {
 		p = talloc();
 		p->word = strDup(root->word);
 		p->count = root->count;
@@ -134,7 +136,7 @@ struct tnode *copyTree(struct tnode *p, struct tnode *root)
  * to frequency of occurrence */
 struct tnode *sortTree(struct tnode *p, struct tnode *root)
 {
-	if (root != NULL) {
+	if (root) {
 		p = sortTree(p, root->left);
 		p = copyTree(p, root);
 		p = sortTree(p, root->right);
@@ -145,7 +147,7 @@ struct tnode *sortTree(struct tnode *p, struct tnode *root)
 /* freetree: free allocated heap memory of node tree */
 struct tnode *freetree(struct tnode *node)
 {
-	if (node != NULL) {
+	if (node) {
 		freetree(node->left);
 		freetree(node->right);
 		free(node->word);
@@ -153,20 +155,22 @@ struct tnode *freetree(struct tnode *node)
 	}
 	return node;
 }
+
 int main(void)
 {
 	struct tnode *root;                /* root node */
-	struct tnode *sRoot;               /* root node to sorted tree */
+	struct tnode *sorted;              /* root node to sorted tree */
 	char word[MAXWORD];                /* currently read word */
 
-	root = sRoot =  NULL;
-
+	root = sorted =  NULL;
 	while (getword(word, MAXWORD) != EOF)
 		if (isalpha(word[0]))
-			root = (addtree(root, word));
-	sRoot = sortTree(sRoot, root);
-	treeprint(sRoot);
-	root = freetree(root);             /* clean up */
-	sRoot = freetree(sRoot);           /* clean up */
+			root = (addtree(root, word)); /* build tree */
+	sorted = sortTree(sorted, root);
+	treeprint(sorted);
+	/* clean up */
+	root = freetree(root);
+	sorted = freetree(sorted);
+	root = sorted = NULL;
 	return 0;
 }

@@ -1,6 +1,8 @@
-/* Exercise 6-3. Write a cross-referencer that prints a list of all words in a
+/*
+ * Exercise 6-3. Write a cross-referencer that prints a list of all words in a
  * document, and, for each word, a list of the line numbers on which it occurs.
  * Remove noise words like "the," "and," and so on.
+ *
  * By Faisal Saadatmand
  */
 
@@ -100,7 +102,7 @@ void ungetch(int c)          /* push character back on input */
 /* talloc: make a tnode */
 struct tnode *talloc(void)
 {
-	return (struct tnode *) malloc(sizeof(struct tnode));
+	return malloc(sizeof(struct tnode));
 }
 
 /*strDup: make a duplicate of s */
@@ -108,7 +110,7 @@ char *strDup(char *s)
 {
 	char *p;
 
-	p = (char *) malloc(strlen(s) + 1); /* +1 for '\0' */
+	p = malloc(strlen(s) + 1); /* +1 for '\0' */
 	if (p != NULL)
 		strcpy(p, s);
 	return p;
@@ -118,7 +120,7 @@ char *strDup(char *s)
 struct list *addlist(struct list *p, int ln)
 {
 	if (p == NULL) {
-		p = (struct list *) malloc(sizeof(struct list));
+		p = malloc(sizeof(struct list));
 		p->number = ln;
 		p->next = NULL;
 	} else if (p->number != ln)        /* skip multi-occurrence on same line */  
@@ -207,7 +209,7 @@ struct tnode *freetree(struct tnode *node)
 		freetree(node->left);
 		freetree(node->right);
 		free(node->word);
-		freelist(node->line);          /* delete linked list nodes */
+		freelist(node->line);          /* delete linked list in nodes */
 		free(node);
 	}
 	return node;
@@ -216,21 +218,18 @@ struct tnode *freetree(struct tnode *node)
 int main(void)
 {
 	struct tnode *root;                /* root node */
-	struct key *p;                     /* currently searched word */
+	struct key *sought;                /* currently sought after word */
 	char word[MAXWORD];                /* currently read word */
-	int lineNumb;                      /* currently searched line */
-	int *pLineNumb;                    /* pointer to change value of lineNumb */
+	int lineNo = 1;                    /* currently searched line */
 
 	root = NULL;
-	pLineNumb = &lineNumb;
-	*pLineNumb = 1;                    /* start at line 1 */
-
-	while (getword(word, MAXWORD, pLineNumb) != EOF) {
-		p = binsearch(word, noisetab, NKEYS);    /* skip noise words */
-		if (isalpha(word[0]) && p == NULL)
-			root = addtree(root, word, lineNumb);
+	while (getword(word, MAXWORD, &lineNo) != EOF) {
+		sought = binsearch(word, noisetab, NKEYS);    /* skip noise words */
+		if (isalpha(word[0]) && !sought)
+			root = addtree(root, word, lineNo);
 	}
 	treeprint(root);
 	root = freetree(root);             /* clean up */
+	root = NULL;
 	return 0;
 }
