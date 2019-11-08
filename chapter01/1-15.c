@@ -1,25 +1,22 @@
 /* 
  * Exercise 1.15. Rewrite the temperature conversion program of Section 1.2 to
  * use a function for conversion.
+ *
  * By Faisal Saadatmand
  */
 
 #include <stdio.h>
 
 /* functions */
-float fahrToCelsius(float);
+float toCelsius(float);
 
-float fahrToCelsius(float fahr)
+float toCelsius(float f)
 {
-	float celsius;
-	celsius = (5.0 / 9.0) * (fahr-32.0);
-	return celsius;
+	return (5.0 / 9.0) * (f - 32.0);
 }
 
 int main(void)
 {
-	float fahrToCelsius(float);
-
 	float fahr, celsius;
 	float lower, upper, step;
 
@@ -30,9 +27,10 @@ int main(void)
 	fahr = lower;
 	printf("Fahrenheit\tCelsius\n");
 	while (fahr <= upper) {
-		celsius = fahrToCelsius(fahr);
+		celsius = toCelsius(fahr);
 		printf("%10.0f\t%7.1f\n", fahr, celsius);
 		fahr = fahr + step;
 	}
+
 	return 0;
 }
