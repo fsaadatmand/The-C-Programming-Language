@@ -6,17 +6,15 @@
 
 #include <stdio.h>
 
-#define OUT 0
-
 int main(void)
 {
-	int c, state;
+	int c;
 
-	state = OUT;
 	while ((c = getchar()) != EOF)
 		if (c == ' ' || c == '\n' || c == '\t')
 			putchar('\n');
 		else
 			putchar(c);
+
 	return 0;
 }
