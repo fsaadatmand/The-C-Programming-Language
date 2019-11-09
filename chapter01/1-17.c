@@ -1,14 +1,15 @@
 /*
  * Exercise 1-17. Write a program to print all input lines that are longer than
  * 80 characters.
+ *
  * By Faisal Saadatmand
  */
 
 #include <stdio.h>
 
-#define MAXLINE       1000         /* maximum input line length */
-#define NCHARS        82           /* number of chars per line, including
-									  the newline and null characters */
+#define MAXLEN 1000    /* maximum input line length */
+#define NCHARS 80       /* number of characters per line,
+						   including the newline character */
 
 /* functions */
 int getLine(char [], int);
@@ -33,10 +34,10 @@ int getLine(char s[], int lim)
 
 int main(void)
 {
-	int  len;                 /* current line length */
-	char line[MAXLINE];       /* current input line */
+	int  len;                /* current line length */
+	char line[MAXLEN];       /* current input line */
 
-	while ((len = getLine(line, MAXLINE)) > 0)
+	while ((len = getLine(line, MAXLEN)) > 0)
 		if (len > NCHARS)
 			printf("%s", line);
 	return 0;
