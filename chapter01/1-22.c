@@ -3,17 +3,19 @@
  * shorter lines after the last non-blank character that occurs before the n-th
  * column of input. Make sure your program does something intelligent with very
  * long lines, and if there are no blanks or tabs before the specified column.
+ *
  * By Faisal Saadatmand
  */
 
 #include <stdio.h>
 
-#define MAXLINE        1000        /* maximum input line length */
-#define LINE_LENGTH    81          /* maximum output line length */
+#define MAXLEN         1000        /* maximum input line length */
+#define LIMIT          79          /* maximum output line length */
 
 /* functions */
-int    getLine(char [], int);
-void   foldLine(char [], char [], int);
+int getLine(char [], int);
+int skipBlanks(char [], int);
+void foldLine(char [], char [], int);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)
@@ -33,51 +35,56 @@ int getLine(char s[], int lim)
 	return i;
 }
 
-/* foldLine function: breaks line[] to a specified length lineLen and stores
- * results in fldLine[] */
-void foldLine(char line[], char fldLine[], int lineLen)
+int skip_blanks(char str[], int pos)
 {
-	int i;                             /* position of currently read char */
-	int nuChars = 0;                   /* line length counter */
-	int wsPos = 0;                     /* position of the last whitespace */
+	while (str[pos] == ' ' || str[pos] == '\t')
+		++pos;
+	return --pos;
+}
+
+/* foldLine function: breaks line to a specified length limit and stores
+ * results in output */
+void fold_line(char line[], char output[], int limit)
+{
+	int i;               /* position of currently read char */
+	int nChar;           /* number of chars read from each fold point */
+	int lastBlank;       /* position of the last whitespace */
+	int inBlank;
 	
+	nChar = lastBlank = inBlank = 0;
 	for (i = 0; line[i] != '\0'; ++i) {
-		fldLine[i] = line[i];
-		++nuChars;
+		output[i] = line[i];
+		++nChar;
 
-		if (line[i] == ' ' || line[i] == '\t')
-			wsPos = i;                 /* keep track of the prev ws position */
+		if (line[i] == ' ' || line[i] == '\t') {
+			if (!inBlank)
+				lastBlank = i;   /* keep track of the blank position */
+			inBlank = 1;
+		} else
+			inBlank = 0;
 
-		if (nuChars == lineLen - 1) {
-			/* check the end of line: */
-			/* line is outside of a word or if is made up of one word. */
-			if (line[i] == ' ' || line[i] == '\t' || wsPos == 0)
-				fldLine[i] = '\n';     /* break line at current position */
-			/* line is inside of a word */
-			else {
-				fldLine[wsPos] = '\n'; /* break line at the previous ws */
-				i = wsPos;             /* read from break point */
-			}
-			nuChars = 0;               /* reset line length counter */
+		if (nChar >= limit && lastBlank != 0) { /* slip if no lastBank */
+			output[lastBlank] = '\n'; /* break line (foldpoint) */
+			i = lastBlank; /* read next charchter from foldpoint */
+			i = skip_blanks(line, i); /* consume leading blanks after foldpoint */
+			nChar = lastBlank = inBlank = 0; /* rest */
 		}
 	}
-	fldLine[i] = '\0';
+	output[i] = '\0';
 }
 
 int main(void)
 {
 	int  len;                 /* current line length */
-	char line[MAXLINE];       /* current input line */
-	char fldLine[MAXLINE];    /* folded input line */
+	char line[MAXLEN];        /* current input line */
+	char foldedLine[MAXLEN];  /* folded input line */
 
-	len = getLine(line, MAXLINE);
-	while (len > 0) {
-		if (len >= LINE_LENGTH) {
-			foldLine(line, fldLine, LINE_LENGTH);
-			printf("%s", fldLine);     /* print folded lines */
+	while ((len = getLine(line, MAXLEN)) > 0) {
+		if (len > LIMIT) {
+			fold_line(line, foldedLine, LIMIT);
+			printf("%s", foldedLine);
 		} else	
-			printf("%s", line);        /* print unfolded lines */
-		len = getLine(line,MAXLINE);
+			printf("%s", line);
 	}
 	return 0;
 }
