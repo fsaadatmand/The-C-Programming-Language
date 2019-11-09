@@ -3,56 +3,53 @@
  * hexadecimal digits (including an optional 0x or 0X) into its equivalent
  * integer value. The allowable digits are 0 through 9, a through f, and A
  * through F.
+ *
  * By Faisal Saadatmand
  */
 
 #include <stdio.h>
+#include <ctype.h>
 
-#define MAXCHAR 100
+#define MAXLEN 1000
 
 /* functions */
 int htoi(char []);
 
 int htoi(char s[])
 {
-	int i, isValid, hexDigit, intValue;
+	int i, hexDigit, intValue;
 
+	/* detect optional 0x or 0X prefix */
 	i = 0;
-	if (s[i] == '0') {
-		++i;
-		if (s[i] == 'x' || s[i] == 'X') 
-			++i;
+	if (s[0] == '0' && tolower(s[1]) == 'x' && s[2] != '\0')
+		i = 2;
+
+	hexDigit = intValue = 0;
+	for ( ; s[i] != '\0'; ++i) {
+		if (!isdigit(s[i]) && (tolower(s[i]) < 'a' || tolower(s[i]) > 'f'))
+			return -1; /* invalid input, exit early */
+		if (isdigit(s[i]))
+			hexDigit = s[i] - '0'; /* convert digits to hexadecimal*/
+		else
+			hexDigit = tolower(s[i]) - 'a' + 10; /* convert letters hexadecimal */
+		intValue = 16 * intValue + hexDigit; /* convert hexadecimal to decimal*/
 	}
 
-	intValue = 0;
-	isValid = 1;
-
-	for ( ; isValid; ++i) {
-		if (s[i] >= '0' && s[i] <= '9')
-			hexDigit = s[i] - '0';
-		else if (s[i] >= 'a' && s[i] <= 'f')
-			hexDigit = s[i] - 'a' + 10;
-		else if (s[i] >= 'A' && s[i] <= 'F')
-			hexDigit = s[i] - 'A' + 10;
-		else 
-			isValid = 0;
-
-		if (isValid)
-			intValue = 16 * intValue + hexDigit;
-	}
 	return intValue;
 }
 
 int main(void)
 {
-	int value;
-	char hexString[MAXCHAR];
+	int result;
+	char s[MAXLEN];
 
 	printf("Enter a hexadecimal string: ");
-	scanf("%s", hexString);
+	scanf("%s", s);
 
-	value = htoi(hexString);
-	printf("%i\n", value);
+	if ((result = htoi(s)) < 0)
+		return -1; /* not a hexadecimal number */
+
+	printf("%i\n", result);
 
 	return 0;
 }
