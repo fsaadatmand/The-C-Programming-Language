@@ -3,12 +3,13 @@
  * location in a string s1 where any character from the string s2 occurs, or -1
  * if s1 contains no characters from s2. (The standard library function strpbrk
  * does the same job but returns a pointer to the location.)
+ *
  * By Faisal Saadatmand
  */
 
 #include <stdio.h>
 
-#define MAXCHAR 100
+#define MAXCHAR 1000
 
 /* functions */
 int any(char [], char []);
