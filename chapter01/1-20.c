@@ -3,15 +3,14 @@
  * input with the proper number of blanks to space to the next tab stop. Assume
  * a fixed set of tab stops, say every n columns. Should n be a variable or a
  * symbolic parameter.
+ *
  * By Faisal Saadatmand
  */
 
 /*
- * Answer: it is wiser to use a symbolic parameter for the value n rather than
- * a global variable. The value of n should remain constant throughout the
- * program, for a change in n would break algorithm in functions that depend on
- * a specific value of n. If need be, it is better to change the value of n in
- * a function through a local variable instead.
+ * Answer: n should be a symbolic parameter, for the value of n should remain
+ * constant throughout the duration of the program. A change in n would break
+ * the algorithm.
  */
 
 #include <stdio.h>
@@ -21,10 +20,6 @@
 
 /* functions */
 int getLine(char [], int);
-void detab(void);
-
-char line[MAXLINE];        /* currently read line */
-char modLine[MAXLINE];     /* modified line */
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)
@@ -42,31 +37,29 @@ int getLine(char s[], int lim)
 }
 
 /* detab function: replaces tabs with the proper number of blanks */
-void detab(void)
+void detab(char line[], char modLine[])
 {
 	int i;                    /* index for read line */
-	int j = 0;                /* index for modified (written) line */
-	int toTabStop;            /* number of blanks to the next tab stop */
+	int j;                    /* index for modified (written) line */
+	int blanksToTabStop;      /* number of blanks to the next tab stop */
 
-	for (i = 0; line[i] != '\0'; ++i)
+	for (i = j = 0; line[i] != '\0'; ++i)
 		if (line[i] == '\t') {
-			toTabStop = N - (j % N);
-			while (toTabStop > 0) {
-				modLine[j] = ' ';
-				++j;
-				--toTabStop;
-			}
-		} else {
-			modLine[j] = line[i];
-			++j;
-			}
+			blanksToTabStop = N - (j % N);
+			while (blanksToTabStop-- > 0)
+				modLine[j++] = ' ';
+		} else 
+			modLine[j++] = line[i];
 	modLine[j] = '\0';
 }
 
 int main(void)
 {
+	char line[MAXLINE];        /* currently read line */
+	char modLine[MAXLINE];     /* modified line */
+
 	while (getLine(line, MAXLINE) > 0) {
-		detab();
+		detab(line, modLine);
 		printf("%s", modLine);
 	}
 	return 0;
