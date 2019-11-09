@@ -12,8 +12,7 @@
 
 /* functions */
 int  getLine(char [], int);
-void reverse(char [], char [], int);
-void emplace_reverse(char [], int);
+void reverse(char []);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)
@@ -33,22 +32,14 @@ int getLine(char s[], int lim)
 	return i;
 }
 
-/* reverse function: copy the charaters of  s1 into s2 in reverse order */
-void reverse(char s1[], char s2[], int len)
+/* reverse: reverses s's charaters in-place. */
+void reverse(char s[])
 {
-	int i;
+	int i, j, len, temp;
 
-	--len; /* skip the null character '\0' */
-	for (i = 0; s1[i] != '\0'; ++i, --len)
-		s2[len] = s1[i];
-
-	s2[i] = '\0';
-}
-
-/* emplace_reverse: reverses s's charaters in-place. */
-void emplace_reverse(char s[], int len)
-{
-	int i, j, temp;
+	len = 0;
+	for (i = 0; s[i] != '\0'; ++i)
+		++len;
 
 	for (i = 0, j = len - 1; i < len / 2; ++i, --j) {
 		temp = s[i];
@@ -64,7 +55,7 @@ int main(void)
 
 	while ((len = getLine(line, MAXLINE)) > 0) {
 		line[--len] = '\0';     /* remove newline character at the end */
-		emplace_reverse(line, len);
+		reverse(line);
 		printf("%s\n", line);
 	}
 	return 0;
