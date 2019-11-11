@@ -4,17 +4,17 @@
  * equal to -(2^wordsize-1). Explain why not. Modify it to print that value
  * correctly, regardless of the machine on which it runs. 
  *
- * Answer: In two's complement number representation, the limit ranges from
- * -(2^wordsize-1) to (2^wordsize-1)-1. The most significant bit is the sign
- *  bit; however, it also holds a value for negative numbers; thus, making the
- *  negative limit larger than the positive limit by a value of 1. This makes a
- *  binary value of -(2^wordsize-1) equal to 2^wordsize-1, which is larger than
- *  (2^wordsize-1)-1. For example, in a 8-bit wordsize, -128 and 128 are
- *  represented as 0x80, which is larger than what the largest positive number
- *  an 8-bit word can hold, 127 or 0x8f.  The itoa function's first assignment
- *  instruction is to negate n. In the case n is
- * -(2^worldsize-1), the negation will produce the same binary number, and
- *  therefore, the algorithm will fails at the do/while loop.  
+ * ANSWER:
+ * In two's complement number representation, the limit for a signed int ranges
+ * from -(2^wordsize-1) to (2^wordsize-1)-1. The most significant bit is the
+ * sign bit; however, it also holds a value for negative numbers; thus, making
+ * the negative limit larger than the positive limit by a value of 1. When we
+ * negate the largest negative number, -(2^wordsize-1), we get a number that is
+ * equal to 2^wordsize-1, which is larger than the largest positive number,
+ * (2^wordsize-1)-1. This will overflow the signed int and cause unexpected
+ * results. To overcome this, we can use an unsigned int for n. The check for
+ * whether n is negative or not is taking care of with the assigned of n to the
+ * int variable sign, in which n is convert to a signed int. 
  *
  *  By Faisal Saadatmand
  */
@@ -23,29 +23,25 @@
 #include <string.h>
 #include <limits.h>
 
-#define MAXLEN 100
+#define MAXLEN 1000
 
-void itoa(int, char []);
+void itoa(unsigned, char []);
 void reverse(char []);
 
 /* itoa: convert n to characters in s */
-void itoa(int n, char s[])
+void itoa(unsigned n, char s[])
 {
 	int i, sign;
 
-	i = 0;
-	if ((sign = n) < 0) {
-		s[i++] = -(n % 10) + '0';   /* extract last digit */
-		n /= 10;                    /* reduce value to fit signed int */
-		n = -n;                     /* negate value */ 
-	}
+	if ((sign = n) < 0) /* record sign */
+		n = -n;         /* make n positive */
 
-	do {
-		s[i++] = n % 10 + '0';
-	} while ((n /= 10) > 0);
+	i = 0;
+	do {           /* generate digits in revered order */
+		s[i++] = n % 10 + '0'; /* get next digit */
+	} while ((n /= 10) > 0);   /* delete it */
 	if (sign < 0)
 		s[i++] = '-';
-
 	s[i] = '\0';
 	reverse(s);
 }
@@ -63,14 +59,12 @@ void reverse(char s[])
 
 int main(void)
 {
-	char string[MAXLEN];
-	int intValue;
+	char str[MAXLEN];
 
-	printf("Enter an integer to convert in a string (range: %i to %i):\n",
-			INT_MIN, INT_MAX);
-	scanf("%i", &intValue);
-	itoa(intValue, string);
-	printf("%s\n", string);
+	itoa(INT_MAX, str);
+	printf("%i -> %s\n", INT_MAX, str);
+	itoa(INT_MIN, str);
+	printf("%i -> %s\n", INT_MIN, str);
 
 	return 0;
 }
