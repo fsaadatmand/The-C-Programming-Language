@@ -1,20 +1,18 @@
 /*
  * Exercise 4-1. Write the function strindex(s,t) which returns the position of
- * the rightmost occurrence of s in t, or -1 if there is none.
+ * the rightmost occurrence of t in s, or -1 if there is none.
+ *
  * By Faisal Saadatmand
  */
 
 #include <stdio.h>
 #include <string.h>
 
-#define MAXLINE 1000          /* maximum input line length */
+#define MAXLEN 1000          /* maximum input line length */
 
 /* functions */
 int getLine(char [], int);
-int strindex(char [], char []);
-
-/* globals */
-char pattern[] = "ould";      /* pattern to search for */
+int strindex(char [], const char []);
 
 /* getLine: get line into s, return */
 int getLine(char s[], int lim)
@@ -34,32 +32,30 @@ int getLine(char s[], int lim)
 }
 
 /* strindex: return index of t in s, -1 if none */
-int strindex(char s[], char t[])
+int strindex(char s[], const char t[])
 {
 	int i, j, k;
 	
-	for (i = strlen(s); i >= 0; i--) {  /* read the string backwards */
-		for (j = i, k = 0; t[k] != '\0' && s[j] == t[k]; j++, k++)
+	for (i = strlen(s) - strlen(t); i >= 0; --i) {
+		for (j = i, k = 0; t[k] != '\0' && s[j] == t[k]; ++j, ++k)
 			;
 		if (k > 0 && t[k] == '\0')
 			return i;
 	}
-
 	return -1;
 }
 
-/* find all lines matching pattern */
 int main(void)
 {
-	char line[MAXLINE];
-	int found = 0;
-	int position; 
+	char line[MAXLEN];
+	const char pattern[] = "ould"; 
+	int pos; 
 
-	while (getLine(line, MAXLINE) > 0)
-		if ((position = strindex(line, pattern)) >= 0) {
-			printf("%s", line);
-			printf("%i\n", position);
-			found++;
-		}
-	return found;
+	while (getLine(line, MAXLEN) > 0)
+		if ((pos = strindex(line, pattern)) < 0)
+			printf("Not found\n");
+		else
+			printf("%i\n", pos);
+
+	return 0;
 }
