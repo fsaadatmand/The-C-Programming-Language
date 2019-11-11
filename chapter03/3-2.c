@@ -1,19 +1,20 @@
 /*
- *Exercise 3-2. Write a function escape(s,t) that converts characters like
- newline and tab into visible escape sequences like \n and \t as it copies the
- string t to s. Use a switch. Write a function for the other direction as well,
- converting escape sequences into the real characters. 
+ * Exercise 3-2. Write a function escape(s,t) that converts characters like
+ * newline and tab into visible escape sequences like \n and \t as it copies
+ * the string t to s. Use a switch. Write a function for the other direction as
+ * well, converting escape sequences into the real characters. 
+ *
  * By Faisal Saadatmand
  */
 
 #include <stdio.h>
 
-#define MAXLINE       10000         /* maximum input line length */
+#define MAXLEN 1000 /* maximum input line length */
 
 /* functions */
 int  getLine(char [], int);
 void escape(char [], char []);
-void escapeRev(char [], char []);
+void escapeToChar(char [], char []);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)
@@ -37,12 +38,12 @@ void escape(char s[], char t[])
 	for (i = j = 0; t[i] != '\0'; ++i, ++j)
 		switch (t[i]) {
 		case '\t':
-			s[j++] = '\\';
-			s[j] = 't';
+			s[j] = '\\';
+			s[++j] = 't';
 			break;
 		case '\n':
-			s[j++] = '\\';
-			s[j] = 'n';
+			s[j] = '\\';
+			s[++j] = 'n';
 			break;
 		default:
 			s[j] = t[i];
@@ -53,7 +54,7 @@ void escape(char s[], char t[])
 
 /* escapeRev: copy string t to s and convert escape sequences like \n and \t
  * into newline and tab characters. */
-void escapeRev(char s[], char t[])
+void escapeToChar(char s[], char t[])
 {
 	int i, j;
 
@@ -81,13 +82,12 @@ void escapeRev(char s[], char t[])
 
 int main(void)
 {
-	char line[MAXLINE];
-	char modLine[MAXLINE];
+	char line[MAXLEN], modLine[MAXLEN];
 
-	while (getLine(line, MAXLINE) > 0) {
+	while (getLine(line, MAXLEN) > 0) {
 		escape(modLine, line);
 		printf("%s", modLine);
-//		escapeRev(modLine, line);
+//		escapeToChar(modLine, line);
 //		printf("%s", modLine);
 	}
 	return 0;
