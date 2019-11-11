@@ -1,24 +1,23 @@
 /*
- * Exercise 3-3. Write a function expand(s1,s2) that expands shorthand
+ * Exercise 3-3. Write a function expand(s1, s2) that expands shorthand
  * notations like a-z in the string s1 into the equivalent complete list
  * abc...xyz in s2. Allow for letters of either case and digits, and be
  * prepared to handle cases like a-b-c and a-z0-9 and -a-z. Arrange that a
- * leading or trailing  - is taking literally.
+ * leading or trailing - is taking literally.
+ *
  * By Faisal Saadatmand
  */
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 
-#define MAXLINE 1000
-#define MINUS '-'
-
-#define YES 1
-#define NO  0
+#define MAXLEN 1000
 
 /* funstions */
 int getLine(char [], int);
-int expand(char [], char []);
+int isValidRange(char, char);
+void expand(char [], char []);
 
 /* getLine function: read a line into s, return length */
 int getLine(char s[], int lim)
@@ -38,46 +37,41 @@ int getLine(char s[], int lim)
 	return i;
 }
 
-int expand(char s1[], char s2[])
+/* isValidRange: check if begin and end make a valid range */
+int isValidRange(char begin, char end)
 {
-	int i;                     /* read from s1 index */
-	int j;                     /* write to s2 index */
-	int expChar;               /* expanded character */
-	int shorthand;             /* shorthand match flag */
-	int modified;              /* return value flag */
+	return begin < end && ((isdigit(begin) && isdigit(end))
+			|| (isalpha(begin) && isalpha(end)
+			&& ((islower(begin) && islower(end))
+			|| (isupper(begin) && isupper(end)))));
+}
 
-	modified = NO;
-	for (i = 0, j = 0; s1[i] != '\0'; ++i) {
-	shorthand = NO;
-		if (s1[i] == MINUS)
-			if (s1[i - 2] != MINUS && s1[i + 2] != MINUS) /* no leading/trailing - */
-				if (isalnum(s1[i - 1]) && isalnum(s1[i + 1]))
-					if (!isalnum(s1[i - 2]) && !isalnum(s1[i + 2])) {
-						shorthand = YES;
-						for (--j, expChar = s1[i - 1]; expChar <= s1[i + 1]; ++expChar) {
-							s2[j++] = expChar;
-							modified = YES;   /* optional */
-						}
-					}
-	if (!shorthand)
-		s2[j++] = s1[i];
+void expand(char s1[], char s2[])
+{
+	int i, j, prevCh, nextCh, len;
+
+	len = strlen(s1);
+	for (i = 1, j = 0; s1[i] != '\0' ; ++i, ++j) { /* note that i starts at 1 */
+		prevCh = s2[j] = s1[i - 1];  /* copy previous character */
+		nextCh = s1[i + 1];
+		if (len > 2 && s1[i] == '-' && isValidRange(prevCh, nextCh)) {
+			while (++prevCh != nextCh)
+				s2[++j] = prevCh; /* expand '-' into characters in-between */
+			++i; /* skip '-' character */
+		}
 	}
-
-	s2[j] = '\0';
-
-	return modified;
+	s2[j] = s1[i - 1]; /* copy the character before '\0' */
+	s2[++j] = '\0';
 }
 
 int main(void)
 {
-	char line[MAXLINE];
-	char modLine[MAXLINE];
+	char line[MAXLEN];
+	char modLine[MAXLEN];
 
-	while (getLine(line, MAXLINE) > 0)
-		if (expand(line, modLine))
-			printf("%s", modLine);
-		else
-			printf("%s", line);
-
+	while (getLine(line, MAXLEN) > 0) {
+		expand(line, modLine);
+		printf("%s", modLine);
+	}
 	return 0;
 }
