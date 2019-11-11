@@ -1,7 +1,7 @@
 /*
  * Exercise 3-6. Write a version of itoa that accepts three arguments instead
  * of two. The third argument is a minimum field width; the converted number
- * must be padded with blanks on the left is necessary to make it wide enough.
+ * must be padded with blanks on the left if necessary to make it wide enough.
  * By Faisal Saadatmand
 */
 
@@ -9,9 +9,11 @@
 #include <string.h>
 #include <limits.h>
 
+#define MAXLEN 1000
+
 /* functions */
 void reverse(char []);
-void itoa(int, char [], int);
+void itoa(unsigned, char [], int);
 
 /* reverse function: reverse string s in place */
 void reverse(char s[])
@@ -26,38 +28,24 @@ void reverse(char s[])
 }
 
 /* itoa: convert n to characters in s */
-void itoa(int n, char s[], int w)
+void itoa(unsigned n, char s[], int w)
 {
-	int i, sign, lastDigit, padLeft;
+	int i, sign, nChar; 
 
-	sign = lastDigit = padLeft = 0;
+	if ((sign = n) < 0) /* record sign */
+		n = -n;         /* make n positive */
 
-	if (n == INT_MIN) {                   /* add check for size */
-		lastDigit = (n % 10 * -1) + '0';  /* extract and save the last digit */
-		n -= 1;                           /* reduce n to fit INT_MAX */
-	}
-
-	if ((sign = n) < 0)                   /* record sign */
-		n = -n;
-
-		i = 0;
-	do {                                  /* generate digits in reverse order */
-		s[i++] = n % 10 + '0';            /* get next digit */
-	} while ((n /= 10) > 0);
-
-	padLeft = w - i % w;                  /* pad n digits to the left */
-	if (padLeft != w)
-		while (padLeft > 0) {
-			s[i++] = '0';
-			--padLeft;
-		}
+	i = 0;
+	do {     /* generate digits in revered order */
+		s[i++] = n % 10 + '0'; /* get next digit */
+	} while ((n /= 10) > 0);   /* delete it */
 
 	if (sign < 0)
 		s[i++] = '-';
 
-	if (lastDigit > 0)
-		s[0] = lastDigit;                 /* put back saved last digit */
-
+	/* left padding */
+	for (nChar =  w - (i % w); nChar > 0; --nChar)
+		s[i++] = ' ';
 	s[i] = '\0';
 
 	reverse(s);
@@ -66,17 +54,17 @@ void itoa(int n, char s[], int w)
 int main(void)
 {
 	int intValue, width;
-	char stringNumber[64];
+	char str[MAXLEN];
 
 	printf("Enter integer to convert to a string: ");
 	scanf("%i", &intValue);
 
-	printf("Enter padding width: ");
+	printf("Enter minimum field width: ");
 	scanf("%i", &width);
 
-	itoa(intValue, stringNumber, width);
+	itoa(intValue, str, width);
 
-	printf("%s\n", stringNumber);
+	printf("%s\n", str);
 
 	return 0;
 }
