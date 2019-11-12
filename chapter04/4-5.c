@@ -1,6 +1,7 @@
 /* 
  * Exercise 4-5. Add access to library functions like sin, exp and pow. see
  * <math.h> in Appendix B, Section 4.
+ *
  Faisal Saadatmand
  */
 
@@ -15,7 +16,6 @@
 #define NAME     '1'          /* signal that a string command was found */
 #define MAXVAL   100          /* maximum depth of val stack */
 #define BUFSIZE  100
-#define TOP      val[sp - 1]  /* top element in stack */
 
 /* functions */
 int    getop(char []);
@@ -26,7 +26,6 @@ void   ungetch(int);
 void   printTOP(void);
 void   duplicateTop(void);
 void   swapTopTwo(void);
-void   clearStack(void);
 int    mathfunction(char []);
 
 /* globals */
@@ -34,7 +33,6 @@ int    sp;                   /* next free stack position */
 double val[MAXVAL];          /* value stack */
 char   buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp;                 /* next free position in buf */
-int    peak;                 /* flag: peak at top of the stack */
 
 /* push: push f onto value stack */
 void push(double f)
@@ -114,18 +112,17 @@ void ungetch(int c)
 /* printTOP: print top of the stack without pop */
 void printTOP(void)
 {
-	if (sp < 1)
-		printf("stack empty\n");
-	printf("\t%.8g\n", TOP);
+	double top;
+
+	top = pop();
+	printf("\t%.8g\n", top);
+	push(top);
 }
 
 /* duplicateTop: duplicate the top element in the stack */
 void duplicateTop(void)
 {
 	double top;
-
-	if (sp < 1)
-		return;
 
 	push(top = pop());
 	push(top);
@@ -136,22 +133,16 @@ void duplicateTop(void)
  {
 	 double top1, top2;
 
-	 if (sp < 2) {
-		 if (sp == 1)
-			 printf("error: 1 element in stack\n");
-		 return;
-	 }
 	 top1 = pop();
 	 top2 = pop();
 	 push(top1);
 	 push(top2);
 }
 
-/* clear: clears the entire stack */
+/* clearStack: clear the stack */
 void clearStack(void)
 {
-	while (sp > 1)
-		pop();
+	sp = 0;
 }
 
 /* mathfunction: call the appropriate math function according to value of s,
@@ -216,24 +207,20 @@ int main(void)
 			else
 				printf("error: zero divisor\n");
 			break;
-		case '!':
-			peak = 1;        /*  don't pop */
+		case '?':
+			printTOP();
 			break;
-		case '#':
+		case 'd':
 			duplicateTop();
 			break;
-		case '&':
+		case 's':
 			swapTopTwo();
 			break;
-		case '~':
+		case 'c':
 			clearStack();
 			break;
 		case '\n':
-			if (peak) {
-				printTOP();
-				peak = 0;
-			} else
-				printf("\t%.8g\n", pop());
+			printf("\t%.8g\n", pop());
 			break;
 		default:
 			printf("error: unknown command %s\n", s);

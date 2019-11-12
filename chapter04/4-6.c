@@ -21,7 +21,6 @@
 #define MAXVAL   100          /* maximum depth of val stack */
 #define BUFSIZE  100
 #define MAXVAR   26
-#define TOP      val[sp - 1]  /* top element in stack */
 
 /* functions */
 int    getop(char []);
@@ -44,7 +43,6 @@ double val[MAXVAL];          /* value stack */
 double mem[MAXVAR];          /* variables values */
 char   buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp;                 /* next free position in buf */
-int    peak;                 /* flag: peak at top of the stack */
 int    variable;             /* current input variable */ 
 double printed;              /* last printed value */
 
@@ -126,9 +124,11 @@ void ungetch(int c)
 /* printTOP: print top of the stack without pop */
 void printTOP(void)
 {
-	if (sp < 1)
-		printf("stack empty\n");
-	printf("\t%.8g\n", TOP);
+	double top;
+
+	top = pop();
+	printf("\t%.8g\n", top);
+	push(top);
 }
 
 /* duplicateTop: duplicate the top element in the stack */
@@ -136,8 +136,6 @@ void duplicateTop(void)
 {
 	double top;
 
-	if (sp < 1)
-		return;
 	push(top = pop());
 	push(top);
 }
@@ -147,22 +145,16 @@ void duplicateTop(void)
  {
 	 double top1, top2;
 
-	 if (sp < 2) {
-		 if (sp == 1)
-			 printf("error: 1 element in stack\n");
-		 return;
-	 }
 	 top1 = pop();
 	 top2 = pop();
 	 push(top1);
 	 push(top2);
 }
 
-/* clear: clears the entire stack */
+/* clear: clear the entire stack */
 void clearStack(void)
 {
-	while (sp > 1)
-		pop();
+	sp = 0;
 }
 
 /* mathfunction: call the appropriate math function according to value of s,
@@ -232,7 +224,6 @@ int main(void)
 				push(printed);
 			} else if (!strcmp(s, "mc")) {
 				clearMemory();
-				peak = 1;
 			} else if (!mathfunction(s))
 				printf("error: unknown command %s\n", s);
 			break;
@@ -260,8 +251,8 @@ int main(void)
 			else
 				printf("error: zero divisor\n");
 			break;
-		case '!':
-			peak = 1;
+		case '?':
+			printTOP();
 			break;
 		case '#':
 			duplicateTop();
@@ -276,11 +267,7 @@ int main(void)
 			storeVariable();
 			break;
 		case '\n':
-			if (peak) {
-				printTOP();
-				peak = 0;
-			} else
-				printf("\t%.8g\n", printed = pop());
+			printf("\t%.8g\n", printed = pop());
 			break;
 		default:
 			if (islower(type))
