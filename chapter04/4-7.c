@@ -15,8 +15,8 @@
 #include <stdio.h>
 #include <string.h>          /* for strlen() */
 
-#define BUFSIZE     100
-#define MAXLEN      10000
+#define BUFSIZE 100
+#define MAXLEN 10000
 
 /* functions */
 int    getch(void);
@@ -45,22 +45,23 @@ void ungetch(int c)
 /* ungets: push back s onto the input */
 void ungets(char s[])
 {
-	int len;
+	int i;
 
-	for (len = strlen(s) - 1; len >= 0 ; --len)
-			ungetch(s[len]);
+	for (i = strlen(s) - 1; i >= 0 ; --i)
+			ungetch(s[i]);
 }
 
 /* test ungets */
 int main(void)
 {
 	int c, i;
-	char   s[MAXLEN];
+	char s[MAXLEN];
 
-	printf("Enter string to test ungets function: ");
+	printf("Enter string to test ungets function:\n");
 	for (i = 0; (s[i] = getch()) != '\n'; i++)
 		;
 	s[i++] ='\n';
+	s[i] = '\0';
 	ungets(s);
 
 	while ((c = getch()) != EOF)
