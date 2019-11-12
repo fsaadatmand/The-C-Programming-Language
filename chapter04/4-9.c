@@ -23,7 +23,6 @@ void   ungets(char []);
 /* globals */
 int    buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp;                 /* next free position in buf */
-int    pushedEOF;            /* signals EOF has been pushed-back */
 
 /* getch: get a (possibly pushed back) character */
 int getch(void)
