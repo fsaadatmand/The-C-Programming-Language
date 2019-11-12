@@ -129,6 +129,12 @@ void duplicateTop(void)
 	 push(top2);
 }
 
+/* clearStacK: clear the stack */
+void clearStack(void)
+{
+	sp = 0;
+}
+
 /* reverse Polish Calculator */
 int main(void)
 {
@@ -173,6 +179,9 @@ int main(void)
 			break;
 		case 's':
 			swapTopTwo();
+			break;
+		case 'c':
+			clearStack();
 			break;
 		case '\n':
 			printf("\t%.8g\n", pop());
