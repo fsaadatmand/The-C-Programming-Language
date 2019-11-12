@@ -38,7 +38,7 @@ void   clearMemory(void);
 int    sp;                   /* next free stack position */
 double val[MAXVAL];          /* value stack */
 double mem[MAXVAR];          /* variables values */
-char   buf[BUFSIZE];         /* buffer from ungetch */
+int    buf[BUFSIZE];         /* buffer from ungetch */
 int    bufp;                 /* next free position in buf */
 int    variable;             /* current input variable */ 
 double printed;              /* last printed value */
