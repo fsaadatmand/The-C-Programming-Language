@@ -31,7 +31,7 @@ void reverse(char s[])
 /* itoa: convert n to characters in s */
 void itoa(unsigned n, char s[], int w)
 {
-	int i, sign, nChar; 
+	int i, sign;
 
 	if ((sign = n) < 0) /* record sign */
 		n = -n;         /* make n positive */
@@ -45,8 +45,9 @@ void itoa(unsigned n, char s[], int w)
 		s[i++] = '-';
 
 	/* left padding */
-	for (nChar =  w - (i % w); nChar > 0; --nChar)
+	while (i < w)
 		s[i++] = ' ';
+
 	s[i] = '\0';
 
 	reverse(s);
