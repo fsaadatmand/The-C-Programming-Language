@@ -1,62 +1,44 @@
 /*
  * Exercise 1-14. Write a program to print a histogram of the frequencies of
  * different characters in its input.
+ *
  * By Faisal Saadatmand
  */
 
+/* Horizontal Histogram. See 1-14a.c for a vertical histogram implementation */
+
 #include <stdio.h>
 
-#define MAXCHAR 128
-#define EMPTY 0
+#define SIZE 93 /* size of characters array */
+#define SCALE 1 /* adjust to accommodate large input */
 
 int main(void)
 {
-	int c, i, j, longestBar;
-	int characters[MAXCHAR];
+	int c, i, j, count;
+	int characters[SIZE];
 
-	for (i = 0; i <= MAXCHAR; i++)     /* initialize elements' values to 0 */
+	/* initialize elements' values to 0 */
+	for (i = 0; i < SIZE; ++i)
 		characters[i] = 0;
 
-	while ((c = getchar()) != EOF)
-		if (c >= 32 && c <= 126)       /* graphical characters only */
-			++characters[c - '0'];
+	count = 0;
+	while ((c = getchar()) != EOF) 
+		if (c >= '!' && c <= '~') { /* graphical characters only (ASCII table) */
+			++characters[c - '!'];
+			++count; /* number of matched characters */
+		}
 
-	for (i = 0; i <= MAXCHAR; i++)     /* print value of each element (bar) */
-		printf("%i ", characters[i]);
-	printf("\n");
+	if (!count)
+		return -1;
 
-	printf("\nHorizontal Histogram:\n");
-
-	for (i = 0; i <= MAXCHAR; i++) {
-		if (characters[i] != EMPTY)    /* skip label if no data */
-			printf("%c ", i + '0');    /* print histogram labels */
-		for (j = 1; j <= characters[i]; j++)
-			printf("* ");
-		if (characters[i] != EMPTY)    /* skip character */
+	printf("\nHorizontal Histogram: (scale 1:%i)\n", SCALE);
+	for (i = 0; i < SIZE; ++i)
+		if (characters[i] != 0) { /* skip if no data */
+			printf(" %c", i + '!'); /* labels */
+			for (j = 1; j <= characters[i] / SCALE; ++j)
+				printf(" *");
 			printf("\n");
-	}
+		}
 
-	printf("\nVertical Histogram:\n");
-
-	longestBar = characters[0];
-	for (i = 0; i <= MAXCHAR; i++)     /* find the longestBar */
-		if (longestBar < characters[i] )
-			longestBar = characters[i];
-
-	while (longestBar != 0) {          /* print vertical histogram  */
-		for (i = 0; i <= MAXCHAR; i++)
-			if (characters[i] != EMPTY) {
-				if (characters[i] - longestBar < 0)
-					printf("  ");
-				else
-					printf("* ");
-			}
-		--longestBar;
-		printf("\n");
-	}
-	for (i = 0; i <= MAXCHAR; i++)     /* print histogram labels */
-		if (characters[i] != EMPTY)
-			printf ("%c ", i + '0');
-	printf("\n");
 	return 0;
 }
