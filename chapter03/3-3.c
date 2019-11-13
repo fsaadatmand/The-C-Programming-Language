@@ -10,7 +10,6 @@
 
 #include <stdio.h>
 #include <ctype.h>
-#include <string.h>
 
 #define MAXLEN 1000
 
@@ -37,7 +36,8 @@ int getLine(char s[], int lim)
 	return i;
 }
 
-/* isValidRange: check if begin and end make a valid range */
+/* isValidRange: check if begin and end make a valid range: begin is less than
+ * end, and the range is between letters of either case and between digits */
 int isValidRange(char begin, char end)
 {
 	return begin < end && ((isdigit(begin) && isdigit(end))
@@ -48,20 +48,16 @@ int isValidRange(char begin, char end)
 
 void expand(char s1[], char s2[])
 {
-	int i, j, prevCh, nextCh, len;
+	int i, j, k, dist;
 
-	len = strlen(s1);
-	for (i = 1, j = 0; s1[i] != '\0' ; ++i, ++j) { /* note that i starts at 1 */
-		prevCh = s2[j] = s1[i - 1];  /* copy previous character */
-		nextCh = s1[i + 1];
-		if (len > 2 && s1[i] == '-' && isValidRange(prevCh, nextCh)) {
-			while (++prevCh != nextCh)
-				s2[++j] = prevCh; /* expand '-' into characters in-between */
-			++i; /* skip '-' character */
-		}
-	}
-	s2[j] = s1[i - 1]; /* copy the character before '\0' */
-	s2[++j] = '\0';
+	for (i = j = 0; s1[i] != '\0' ; ++i)
+		if (i != 0 && s1[i] == '-' && isValidRange(s1[i - 1], s1[i + 1])) {
+			dist = s1[i + 1] - s1[i - 1];
+			for (k = 1; k < dist; ++k, ++j)
+				s2[j] = s1[i - 1] + k; /* expand the shorthand */
+		} else
+			s2[j++] = s1[i]; /* copy the character */
+	s2[j] = '\0';
 }
 
 int main(void)
