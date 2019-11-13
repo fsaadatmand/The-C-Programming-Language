@@ -2,75 +2,61 @@
  * Exercise 1-13. Write a program to print a histogram of the lengths of words
  * in its input. It is easy to draw the histogram with the bars horizontal; a
  * vertical orientation is more challenging.
+ *
  * By Faisal Saadatmand
  */
 
+/* Horizontal Histogram. See 1-13a.c for a vertical histogram implementation */
+
 #include <stdio.h>
 
+#define SIZE 5    /* size of lengths array */
+#define SCALE 1   /* adjust to accommodate large input */
 #define OUT  1    /* outside of a word */
 #define IN   0    /* inside of a word */
 
 int main(void)
 {
-	int c, i, j, nChar = 0, state, longestBar; 
-	int lengths[10];
+	int c, i, j, count, state;
+	int lengths[SIZE]; /* words length ranges */
 
-	for (i = 0; i <= 4; ++i)
+	for (i = 0; i <= SIZE; ++i)
 		lengths[i] = 0;
 
 	state = OUT;
-
+	count = 0;
 	while ((c = getchar()) != EOF) {
 
-		if (state == IN)
-			++nChar;
-
-		if (c == ' ' || c == '\t' || c =='\n') {
-			if (state == IN) {
-				if (nChar < 4)
-					++lengths[0];
-				else if (nChar >= 4 && nChar < 8)
-					++lengths[1];
-				else if (nChar >= 8 && nChar < 12)
-					++lengths[2];
-				else if (nChar >= 12 && nChar < 14)
-					++lengths[3];
-				if (nChar >= 14)
-					++lengths[4];
-
-				nChar = 0;
-			}
-		state = OUT;
-		} else if (state == OUT)
+		if (c == ' ' || c == '\t' || c == '\n')
+			state = OUT;
+		else
 			state = IN;
+
+		if (state == IN)
+			++count;
+
+		if (state == OUT) {
+			if (count < 4)
+				++lengths[0];
+			else if (count >= 4 && count < 8)
+				++lengths[1];
+			else if (count >= 8 && count < 12)
+				++lengths[2];
+			else if (count >= 12 && count < 14)
+				++lengths[3];
+			if (count >= 14)
+				++lengths[4];
+			count = 0;
+		}
 	}	
 
-	/* print the value of each bar */
-	for (i = 0; i <= 4; ++i)
-		printf("%i ", lengths[i]);
-	printf("\n");
-
 	printf("\nHorizontal Histogram\n");
-	for (i = 0; i <= 4; ++i) {
-		for (j = 1; j <= lengths[i]; ++j)
-			printf("* ");
+	for (i = 0; i < SIZE; ++i) {
+		printf(" %i\t", lengths[i]);
+		for (j = 0; j < lengths[i] / SCALE; ++j)
+			printf(" *");
 		printf("\n");
 	}
 
-	printf("\nVertical Histogram:\n");
-	longestBar = lengths[0];
-	for (i = 0; i <= 4; ++i)                 /* find the longestBar */
-		if (longestBar < lengths[i] )
-			longestBar = lengths[i];
-
-	while (longestBar != 0) {
-		for (i = 0; i <= 4; ++i)
-			if (lengths[i] - longestBar < 0)
-				printf("  ");
-			else
-				printf("* ");
-		--longestBar;
-		printf("\n");
-	}	
 	return 0;
 }			
