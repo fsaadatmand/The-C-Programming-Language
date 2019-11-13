@@ -13,16 +13,16 @@ void strCat(char *, char *);
 /* concatenate t to end of s; s must be big enough */
 void strCat(char *s, char *t)
 {
-  while (s && *s) /* find end of s */
+  while (*s) /* find end of s */
 	  ++s;
-  while (s && t && (*s++ = *t++)) /* copy t */
+  while ((*s++ = *t++)) /* copy t */
     ;
 }
 
 int main(void)
 {
-	char str1[64] = { "conca" };
-	char str2[] = { "tonate" };
+	char str1[64] = "conca";
+	char str2[] = "tenate";
 
 	strCat(str1, str2);
 	printf("%s\n", str1);
