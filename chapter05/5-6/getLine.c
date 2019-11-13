@@ -3,10 +3,11 @@
  * exercises with pointers instead of array indexing. Good possibilities
  * include getLine (chapter 1 and 4), atoi, itoa, and their variants (Chapters
  * 2, 3 and 4), reverse (Chapter 3), and strindex and gettop (Chapter 4)
+ *
  * By Faisal Saadatmand
  */
 
-/* getLine (Chapter 1) */
+/* getLine (Chapter 1 - 4) */
 
 #include <stdio.h>
 #include <string.h>
@@ -36,11 +37,10 @@ int getLine(char *s, int lim)
 
 int main(void)
 {
-	int len;
 	char line[MAXLINE];
 
-	while ((len = getLine(line, MAXLINE)) > 0) {
+	while (getLine(line, MAXLINE) > 0)
 		printf("%s", line);
-	}
+
 	return 0;
 }
