@@ -1,48 +1,48 @@
 /*
  * Exercise 5-7. Rewrite readlines to store lines in an array supplied by main,
  * rather than calling alloc to maintain storage. How much faster is the
- * program? 
- * Answer: With the current implementation both clock_t and unix time command
- * report similar runtimes.  Perhaps a much bigger data would show a
- * discrepancy in runtimes.
+ * program?
+ *
  * By Faisal Saadatmand
+ */
+
+/*
+ * Answer: With the current implementation both clock_t and unix time command
+ * report similar runtimes. This readlines, however, should be faster because
+ * it doesn't have the overhead of calling the alloc function on each iteration
+ * of its loop.
  */
 
 #include <stdio.h>
 #include <string.h>
 
-#define MAXLINES  5000       /* max #lines to be stored */
-#define MAXLEN    1000       /* max length of any input line */
-#define ALLOCSIZE 100000      /* storage for alloc */
+#define MAXLINES 5000 /* max #lines to be stored */
+#define MAXLEN 1000 /* max length of any input line */
+#define MAXSIZE 10000 /* size of available space */
 
 /* functions */
-int  readlines(char *[], int, char *);
+int  readlines(char *[], int, char []);
 void writelines(char *[], int);
 int  getLine(char *, int);
 void qsort(char *[], int, int);
 void swap(char *[], int, int);
 
-/* globals */
-char *lineptr[MAXLINES];    /* pointers to text lines */
-
 /* readlines: read input lines */
-int readlines(char *lineptr[], int maxlines, char *p)
+int readlines(char *lineptr[], int maxlines, char text[])
 {
-	int len, nlines, usedMemory;
-	char line[MAXLEN];
+	int len, nlines;
+	char *p, line[MAXLEN];
 
-	usedMemory = 0;
+	p = text;
 	nlines = 0;
-	while ((len = getLine(line, MAXLEN)) > 0)
-		if (nlines >= maxlines || ALLOCSIZE - usedMemory < len)
+	while ((len = getLine(line, MAXLEN)) > 0) {
+		if (nlines >= maxlines || p >= text + MAXSIZE)
 			return -1;
-		else {
-			line[len - 1] = '\0';   /* delete newline character */
-			strcpy(p, line);
-			lineptr[nlines++] = p;
-			p += len;               /* increment pointer */
-			usedMemory += len;      /* track memory usage */
-		}
+		line[len - 1] = '\0'; /* delete newline character */
+		strcpy(p, line);
+		lineptr[nlines++] = p;
+		p += len;
+	}
 	return nlines;
 }
 
@@ -76,13 +76,10 @@ void qsort(char *v[], int left, int right)
 {
 	int i, last;
 	void swap(char *v[], int i, int j);
-	
-	if (left >= right)            /* do nothing if array contains */
-		return;                   /* fewer than two elements */
-
+	if (left >= right) /* do nothing if array contains */
+		return; /* fewer than two elements */
 	swap(v, left, (left + right) / 2);
 	last = left;
-
 	for (i = left + 1; i <= right; i++)
 		if (strcmp(v[i], v[left]) < 0)
 			swap(v, ++last, i);
@@ -104,15 +101,15 @@ void swap(char *v[], int i, int j)
 /* sort lines */
 int main(void)
 {
-	int nlines;                   /* number of input lines read */
-	char memory[ALLOCSIZE];       /* stored lines */
+	int nlines;
+	char *lineptr[MAXLINES]; /* pointers to text lines */
+	char text[MAXSIZE]; /* array to store lines */
 
-	if ((nlines = readlines(lineptr, MAXLINES, memory)) >= 0) {
-		qsort(lineptr, 0, nlines - 1);
-		writelines(lineptr, nlines);
-		return 0;
-	} else {
+	if ((nlines = readlines(lineptr, MAXLINES, text)) < 0) {
 		printf("error: input too big to sort\n");
-		return 1;
+		return -1;
 	}
+	qsort(lineptr, 0, nlines - 1);
+	writelines(lineptr, nlines);
+	return 0;
 }
