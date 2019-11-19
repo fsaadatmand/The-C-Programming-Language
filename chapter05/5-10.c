@@ -2,10 +2,16 @@
  * Exercise 5-10. Write the program expr, which evaluates a reverse Polish
  * expression from the command line, where each operator or operand is a
  * separate argument. For example,
+ *
  * 		expr 2 3 4 + *
+ *
  * evaluates 2 * (3 + 4).
+ *
  * By Faisal Saadatmand
  */
+
+/* NOTE: * and % must be included in equation marks at the command prompt,
+ * otherwise they will be interpreted by the shell as wildcard characters */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,12 +21,12 @@
 #define MAXVAL 100
 
 /* functions */
-void   push(double);
+void push(double);
 double pop(void);
 
 /* globals */
-int    sp = 0;               /* next free stack position */
-double val[MAXVAL];          /* value stack */
+int sp = 0; /* next free stack position */
+double val[MAXVAL]; /* value stack */
 
 /* push: push f onto value stack */
 void push(double f)
@@ -44,27 +50,23 @@ double pop(void)
 
 int main(int argc, char *argv[])
 {
-	int type, error = 0;
-	double op2;
+	int type;
+	double num, op2;
 
 	if (argc < 4) {
-		printf("Usage: expr operand1 operand2 operator operand3 operator ...\n");
+		printf("Usage: %s <expr>...\n", *argv);
 		return -1;
 	}
 
 	while (--argc > 0) {
-		++argv;                  /* skip program name */
-		if (*(argv)[0] == '-' && isdigit(*(*argv + 1)))
+		++argv;           /* skip program name */
+		if ((num = atof(*argv)))
 			type = NUMBER;
-		if (isdigit(*(argv)[0]))
-			type = NUMBER;
-		if (*(argv)[0] == '.' && isdigit(*(*argv + 1)))
-			type = NUMBER;
-		if (!isdigit(*(argv)[0]) && *(argv)[0] != '-' && *(argv)[0] != '.')
-			type = *(argv)[0];
+		else
+			type = **argv; /* first character in *argv string */
 		switch (type) {
 		case NUMBER:
-			push(atof(*argv));
+			push(num);
 			break;
 		case '*':
 			push(pop() * pop());
@@ -81,8 +83,8 @@ int main(int argc, char *argv[])
 			if (op2 != 0.0)
 				push(pop() / op2);
 			else {
-				printf("error: division by zero\n");
-				error = 1;
+				printf("error: zero divisor\n");
+				argc = 1;
 			}
 			break;
 		case '%':
@@ -90,17 +92,16 @@ int main(int argc, char *argv[])
 			if (op2 != 0.0)
 				push((long) pop() % (long) op2);
 			else {
-				printf("error: division by zero\n");
-				error = 1;
+				printf("error: zero divisor\n");
+				argc = 1;
 			}
 			break;
 		default:
-			printf("error: unknown parameter\n");
-			error = 1;
+			printf("error: unknown command %s\n", *argv);
+			argc = 1;
 			break;
 		}
 	}
-	if (!error)
-		printf("%g\n", pop());
+	printf(" %.8g\n", pop()); /* print result */
 	return 0;
 }
