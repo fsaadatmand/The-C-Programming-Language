@@ -2,157 +2,111 @@
  * Exercise 5-11. Modify the program and detab (written in exercises in Chapter
  * 1) to accept a list of tab stops as arguments. Use the default tab setting
  * if there are no arguments.
+ *
  * By Faisal Saadatmand
  */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
 
-#define MAXLINE 1000
-#define MAXARG  20                  /* max number of tabstop arguments */
+#define MAXLEN 1000 /* max length of input/output line */
+#define MAXTABS 100 /* max number of tab stop positions */
+#define N 4 /* default tabstops (every n columns) */
 
 /* functions */
-int  getLine(char *, int);
-int  count(char *, char);
-int  isDigitStr(char *[]);
+int getLine(char *, int);
 void entab(char *, char *, int *, int);
+int setTabList(int, char **, int *);
 
-/* globals */
-int n = 4;                          /* default tabstop for every n columns */
-
-/* getLine: get line into s, return length of s -- pointer version */
+/* getLine function: read a line into s, return length */
 int getLine(char *s, int lim)
 {
-	int c, len;
+	int c;
+	char *len;
 
-	len = 0;
-	while (--lim > 0 && (c = getchar()) != EOF && c != '\n') {
+	len = s;
+	while (--lim > 0 && (c = getchar()) != EOF && c != '\n')
 		*s++ = c;
-		++len;
-	}
-	if ( c == '\n') {
+	if (c == '\n')
 		*s++ = c;
-		++len;
-	}
 	*s = '\0';
-	return len;
+	return strlen(len);
 }
 
-/* count function: counts the occurrences of a character in a string - pointer
- * version */ 
-int count(char *s, char c)
-{
-	int nC = 0;               /* number of c occurrences in s[] */
-
-	while (*s++ == c)
-		++nC;
-
-	return nC;
-}
-
-/* isDigitStr: check if string is made of positive integers characters. Return
- * 1 if true; 0 if false */
-int isDigitStr(char *s[])
+/* setTabStops: extracts topstops positions from command line arguments and
+ * store them in tabList. Return size of tabList, 0 if no tabstop list was
+ * provided, or -1 if arg is an invalid tabstop value. */
+int setTabList(int count, char **arg, int *tabList)
 {
 	int i;
 
-		for (i = 0; (*s)[i]; ++i)   /* omitted '\0', since s is a pointer */
-			if (!isdigit((*s)[i]))
-				return 0;
-	return 1;
+//	if (count < 2) /* tab list was not provided */
+//		return 0; /* signal to use default N */
+	for (i = 0; --count > 0; ++i)
+		if (!(tabList[i] = atoi(*++arg)) || tabList[i] < 0) {
+			printf("Invalid tabstop: %s\n", *arg);
+			return -1; 
+		}
+	return i; /* i is 0 if no tablist */
 }
 
-/* entab function: replaces blanks with the minimum of number tabs and blanks */
-void entab(char *line, char *modLine, int *list, int listSize)
+/* tabStopPos: return the next tab stop position from tabList, or if not
+ * tablist, return default tab stop. */
+int tabStopPos(int column, int *tabList, int tlSize)
 {
-	int toNextTabStop;        /* number of blanks to the next tab stop */
-	int column;               /* current column number/location */
-	int spaces;               /* size of the string of blanks */
-	int nTabs;                /* number of tabs to replace blanks */
-	int nblanks;              /* number of remaining blanks */
-
-	column = 0;	
-	while (*line != '\0') {
-		if ((spaces = count(line, ' ')) > 1) {   /* count blank characters */
-
-			while (column >= *list && listSize > 0) { /* find column in list */
-				++list;
-				--listSize;
-			}
-			if (listSize > 0)
-				toNextTabStop = *list - column;
-			else
-				toNextTabStop = n - (column % n); /* default tab stop setting */
-
-			nTabs = spaces / n;                  /* number of needed tabs */
-			nblanks = spaces % n;                /* remaining blanks */ 
-
-			if (toNextTabStop < n) {
-				++nTabs;
-				nblanks = 0;
-			}
-			if (toNextTabStop == n) {
-				*modLine++ = ' ';
-				--nblanks;
-			}
-
-			while (nTabs-- > 0)                   /* insert tab(s) */
-				*modLine++ = '\t';
-
-			while (nblanks-- > 0)                 /* insert blank(s) */
-				*modLine++ = ' ';
-
-			line += spaces;                       /* skip spaces */
-			column += spaces;                     /* track column position */
-
-		} else {
-			*modLine++ = *line++;
-			++column;
-		}
+	if (!tlSize)
+		return N;
+	/* if list exists, find the next tab stop position in it */
+	while (column >= *tabList) {
+		++tabList;
+		--tlSize;
 	}
-	*modLine = '\0';
+	return *tabList - column;
+}
+
+/* entab function: replaces blanks with the minimum number of tabs and blanks */
+void entab(char *in, char *out, int *tabList, int tlSize)
+{
+	int i; /* index for read line */
+	int j; /* index for modified (written) line */
+	int nblanks; /* number of required blanks */
+	int ntabs; /* number of required tabs */
+	int tabStop; /* next tabstop position */
+	
+	for (i = j = 0; in[i] != '\0'; ++i) {
+		if (in[i] == ' ') {
+			for (nblanks = ntabs = 0; in[i] == ' '; ++i) { /* count blanks */
+				tabStop = tabStopPos(i, tabList, tlSize);
+				if ((i + 1) % tabStop == 0) { /* replace every N blanks with a tab */
+					++ntabs;
+					nblanks = 0; /* reset */
+				} else
+					++nblanks;
+			}
+			--i; /* adjust position after the loop */
+			while (ntabs-- > 0) /* insert tabs */
+				out[j++] = '\t';
+			while (nblanks-- > 0) /* insert remaining blanks */
+				out[j++] = ' ';
+		} else 
+			out[j++] = in[i]; /* copy all other characters */
+	}
+	out[j] = '\0';
 }
 
 int main(int argc, char *argv[])
 {
-	char line[MAXLINE];              /* currently read line */
-	char modLine[MAXLINE];           /* modified line */
-	static int tabStopList[MAXARG];  /* list of tab stops (column numbers) */
-	int tabStopsNumb;                /* number of command-line arguments */ 
-	int *pTablist;                   /* pointers to tabStopList */
-	int type;                        /* type of argument operator */
+	char in[MAXLEN]; /* currently read line */
+	char out[MAXLEN]; /* modified line */
+	int tabList[MAXTABS]; /* a list of tab stop positions */
+	int tlSize; /* size of tablist */
 
-	pTablist = tabStopList;
-	tabStopsNumb = 0;
-	while (--argc > 0) {
-		type = *(++argv)[0];
-		switch (type) {
-		case ('-'):
-			if (*++argv[0] == 'l' && (int) strlen(*argv) == 1) {
-				while (--argc > 0)
-					if (isDigitStr(++argv)) {
-						*pTablist++ = atoi(*argv);  /* store tab stops list */
-						tabStopsNumb += 1;
-					} else {
-						printf("detab: invalid tab stop setting %s\n", *argv);
-						return -1;
-					}
-			} else {
-				printf("detab: illegal option %s\n", *argv);
-				return -1;
-			}
-			break;
-		default:
-			printf("detab: illegal operator %c\n", *argv[0]);
-			return -1;
-			break;                 /* superfluous */
-		}
-	}
-	while (getLine(line, MAXLINE) > 0) {
-		entab(line, modLine, tabStopList, tabStopsNumb);
-		printf("%s", modLine);
+	if ((tlSize = setTabList(argc, argv, tabList)) < 0)
+		return 1;
+	while (getLine(in, MAXLEN) > 0) {
+		entab(in, out, tabList, tlSize);
+		printf("%s", out);
 	}
 	return 0;
 }
