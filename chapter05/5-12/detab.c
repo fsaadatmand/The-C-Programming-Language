@@ -1,150 +1,99 @@
 /* 
  * Exercise 5-12. Extend entab and detab to accept the shorthand
- * 	entab -m +n
- * 	to mean tab stops every n columns, starting at column m. Choose convenient
- * 	(for the user) default behaviour.
+ *
+ * 		entab -m +n
+ *
+ * to mean tab stops every n columns, starting at column m. Choose convenient
+ * (for the user) default behaviour.
+ *
  * By Faisal Saadatmand
  */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
 
-#define MAXLINE 1000
-#define MAXARG  1000                /* max number of tab stop arguments */
+#define MAXLEN 1000 /* max length of input/output line */
 
 /* functions */
-int  getLine(char *, int);
-int  isDigitStr(char *[]);
-void detabList(char *, char *, int *, int);
+int getLine(char *, int);
+int expandArg(int, char **, int *, int *);
+void detab(char *, char *, int *, int *);
 
-/* globals */
-int n = 4;                          /* default tab stop for every n columns */
-
-/* getLine: get line into s, return length of s -- pointer version */
+/* getLine function: read a line into s, return length */
 int getLine(char *s, int lim)
 {
-	int c, len;
+	int c;
+	char *len;
 
-	len = 0;
-	while (--lim > 0 && (c = getchar()) != EOF && c != '\n') {
+	len = s;
+	while (--lim > 0 && (c = getchar()) != EOF && c != '\n')
 		*s++ = c;
-		++len;
-	}
-	if ( c == '\n') {
+	if (c == '\n')
 		*s++ = c;
-		++len;
-	}
 	*s = '\0';
-	return len;
+	return strlen(len);
 }
 
-/* detabList function: replaces tabs with the proper number of blanks; reads from
- * line, writes to modLine. Uses default tab stop (every N column) if no list.
- * is supplied */
-void detabList(char *line, char *modLine, int *list, int listSize)
+int expandArg(int count, char **list, int *n, int *m)
 {
-	int toNextTabStop;              /* number of spaces to the next tab stop */
-	int column;                     /* current column number/location */
+	int posError;
+	char *prog = *list;
 
-	column = 0;                     /* must starts at 0 or algorithm breaks */
-	while (*line) {
-		if (*line == '\t') {
-			while (column >= *list && listSize > 0) {  /* find column in list */
-				++list;
-				--listSize;
+	posError = 0;
+	while (--count > 0) {
+		if (strcmp(*++list, "-m") == 0) {
+			if ((*m = atoi(*++list)) < 1) {
+				posError = 1;
+				break;
 			}
-			if (listSize > 0)
-				toNextTabStop = *list - column;
-			else
-				toNextTabStop = n - (column % n); /* default tab stop setting */
-			while (toNextTabStop-- > 0) {
-				*modLine++ = ' ';
-				++column;
+			--count;
+		} else if (strcmp(*list, "+n") == 0) {
+			if ((*n = atoi(*++list)) < 1) {
+				posError = 1;
+				break;
 			}
+			--count;
 		} else {
-			*modLine++ = *line;
-			++column;
+			printf("Usage: %s [-m pos] [+n pos]\n", prog);
+			return 0;
 		}
-		++line;
 	}
-	*modLine = '\0';
+	if (posError) {
+		printf("%s: invalid position: %s\n", prog, *list);
+		return 0;
+	}
+	return 1;
 }
 
-/* isDigitStr: check if string is made of positive integers characters. Return
- * 1 if true; 0 if false */
-int isDigitStr(char *s[])
+/* detab function: replaces tabs with the proper number of blanks */
+void detab(char *in, char *out, int *n, int *m)
 {
-	int i;
+	int i; /* index for read line */
+	int j; /* index for modified (written) line */
+	int nblanks; /* number of required blanks */
 
-		for (i = 0; (*s)[i]; ++i)   /* omitted '\0', since s is a pointer */
-			if (!isdigit((*s)[i]))
-				return 0;
-	return 1;
+	for (i = j = 0; in[i] != '\0'; ++i)
+		if ((j + 1) >= *m && in[i] == '\t') {
+			nblanks =  *n - (j % *n);
+			while (nblanks-- > 0)
+				out[j++] = ' ';
+		} else 
+			out[j++] = in[i];
+	out[j] = '\0';
 }
 
 int main(int argc, char *argv[])
 {
-	char line[MAXLINE];             /* currently read line */
-	char modLine[MAXLINE];          /* modified line */
-	static int tabStopList[MAXARG]; /* list of tab stops (column numbers) */
-	int tabStopsNumb;               /* number of entered tab stops */ 
-	int *pTablist;                  /* pointer to tabStopList */
-	int type;                       /* type of argument operator */
-	int mShorthand,nShorthand;      /* flag variables */            
-	int c;                          /* temp variable to increment pointer */
+	char in[MAXLEN]; /* currently read line */
+	char out[MAXLEN]; /* modified line */
+	int n = 4; /* default tabstops (every n columns) */
+	int m = 1; /* default starting position for tabstops */
 
-	pTablist = tabStopList;
-
-	mShorthand = nShorthand = tabStopsNumb= 0;
-	while (--argc > 0) {
-		type = *(++argv)[0];
-		switch (type) {
-		case ('-'):
-			if (*++argv[0] == 'l' && (int) strlen(*argv) == 1) {
-				while (--argc > 0)
-					if (isDigitStr(++argv)) {
-						*pTablist++ = atoi(*argv);  /* store tab stops list */
-						tabStopsNumb += 1;
-					} else {
-						printf("detab: invalid tab stop setting %s\n", *argv);
-						return -1;
-					}
-			} else if  (isdigit(*argv[0])) {
-				if (isDigitStr(argv) && !mShorthand) {
-					mShorthand = 1;
-					*pTablist = atoi(*argv);  /* store tabs tops list */
-					tabStopsNumb = 1;
-				} else {
-					printf("detab: illegal shorthand -%s\n", *argv);
-					return -1;
-				}
-			} else {
-				printf("detab: illegal option %s\n", *argv);
-				return -1;
-			}
-			break;
-		case ('+'):
-			c = *++argv[0];
-			if (isDigitStr(argv) && !nShorthand) {
-				nShorthand = 1;
-				n = atoi(*argv);
-			} else {
-				printf("detab: illegal shorthand +%s\n", *argv);
-				return -1;
-			}
-			break;
-		default:
-			printf("detab: illegal operator %c\n", *argv[0]);
-			return -1;
-			break;                        /* superfluous */
+	if (expandArg(argc, argv, &n, &m))
+		while (getLine(in, MAXLEN) > 0) {
+			detab(in, out, &n, &m);
+			printf("%s", out);
 		}
-	}
-	
-	while (getLine(line, MAXLINE) > 0) {
-		detabList(line, modLine, tabStopList, tabStopsNumb);
-		printf("%s", modLine);
-	}
 	return 0;
 }
