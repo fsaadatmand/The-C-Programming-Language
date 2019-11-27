@@ -41,8 +41,6 @@ int setTabList(int count, char **arg, int *tabList)
 {
 	int i;
 
-//	if (count < 2) /* tab list was not provided */
-//		return 0; /* signal to use default N */
 	for (i = 0; --count > 0; ++i)
 		if (!(tabList[i] = atoi(*++arg)) || tabList[i] < 0) {
 			printf("Invalid tabstop: %s\n", *arg);
