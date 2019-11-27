@@ -8,14 +8,15 @@
  */
 
 /*
- * Answer: a signal space is given preference, because otherwise a change to
- * the value of the tab stop (n) would distort the single space.
+ * Answer: with this implementation a tab is inserted when only 1 space is
+ * needed to the next tab stop. See line 51 below. This way we don't have worry
+ * about any special cases.
  */
 
 #include <stdio.h>
 
-#define MAXLINE 1000
-#define N       4             /* default tabstop for every n columns */
+#define MAXLEN 1000
+#define N 4 /* default tabstop for every n columns */
 
 /* functions */
 int  getLine(char [], int);
@@ -37,44 +38,41 @@ int getLine(char s[], int lim)
 }
 
 /* entab function: replaces blanks with the minimum number of tabs and blanks */
-void entab(char line[], char output[])
+void entab(char in[], char out[])
 {
-	int i;                    /* index for read line */
-	int j = 0;                /* index for modified (written) line */
-	int nblanks;              /* number of blanks in a series of blanks */
-	int tabs, remaing_blanks;
+	int i; /* index for read line */
+	int j; /* index for modified (written) line */
+	int nblanks; /* number of required blanks */
+	int ntabs; /* number of required tabs */
 	
-	j = 0;
-	for (i = 0; line[i] != '\0'; ++i) {
-		if (line[i] == ' ') {
-			nblanks = 1;
-			/* count the number trailing blanks, if any */
-			while (line[++i] == ' ')
-				++nblanks;
-			--i;
-			tabs = nblanks / N;
-			remaing_blanks = nblanks % N;
-			/* insert tabs */
-			while (tabs-- > 0)
-				output[j++] = '\t';
-			/* insert remaining blanks */
-			while (remaing_blanks-- > 0)
-				output[j++] = ' ';
+	for (i = j = 0; in[i] != '\0'; ++i) {
+		if (in[i] == ' ') {
+			for (nblanks = ntabs = 0; in[i] == ' '; ++i) { /* count blanks */
+				if ((i + 1) % N == 0) { /* replace every N blanks with a tab */
+					++ntabs;
+					nblanks = 0; /* reset */
+				} else
+					++nblanks;
+			}
+			--i; /* adjust position after the loop */
+			while (ntabs-- > 0) /* insert tabs */
+				out[j++] = '\t';
+			while (nblanks-- > 0) /* insert remaining blanks */
+				out[j++] = ' ';
 		} else 
-			output[j++] = line[i];
+			out[j++] = in[i]; /* copy all other characters */
 	}
-	output[j] = '\0';
+	out[j] = '\0';
 }
 
 int main(void)
 {
-	char line[MAXLINE];       /* currently read line */
-	char modLine[MAXLINE];    /* modified line */
+	char in[MAXLEN]; /* currently read line */
+	char out[MAXLEN]; /* modified line */
 
-	while (getLine(line, MAXLINE) > 0) {
-		entab(line, modLine);
-		printf("%s", modLine);
+	while (getLine(in, MAXLEN) > 0) {
+		entab(in, out);
+		printf("%s", out);
 	}
-
 	return 0;
 }
