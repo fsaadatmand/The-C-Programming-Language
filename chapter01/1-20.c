@@ -8,15 +8,15 @@
  */
 
 /*
- * Answer: n should be a symbolic parameter, for the value of n should remain
- * constant throughout the duration of the program. A change in n would break
- * the algorithm.
+ * Answer: Here, n should be a symbolic constant, for the value of n
+ * should remain constant throughout the duration of the program. It could also
+ * be a const int.
  */
 
 #include <stdio.h>
 
-#define MAXLINE 1000
-#define N       4          /* tabstop for every n columns */
+#define MAXLEN 1000
+#define N 4 /* tabstop for every n columns */
 
 /* functions */
 int getLine(char [], int);
@@ -37,30 +37,30 @@ int getLine(char s[], int lim)
 }
 
 /* detab function: replaces tabs with the proper number of blanks */
-void detab(char line[], char modLine[])
+void detab(char in[], char out[])
 {
-	int i;                    /* index for read line */
-	int j;                    /* index for modified (written) line */
-	int blanksToTabStop;      /* number of blanks to the next tab stop */
+	int i; /* index for read line */
+	int j; /* index for modified (written) line */
+	int nblanks; /* number of blanks to the next tab stop */
 
-	for (i = j = 0; line[i] != '\0'; ++i)
-		if (line[i] == '\t') {
-			blanksToTabStop = N - (j % N);
-			while (blanksToTabStop-- > 0)
-				modLine[j++] = ' ';
+	for (i = j = 0; in[i] != '\0'; ++i)
+		if (in[i] == '\t') {
+			nblanks = N - (j % N);
+			while (nblanks-- > 0)
+				out[j++] = ' ';
 		} else 
-			modLine[j++] = line[i];
-	modLine[j] = '\0';
+			out[j++] = in[i];
+	out[j] = '\0';
 }
 
 int main(void)
 {
-	char line[MAXLINE];        /* currently read line */
-	char modLine[MAXLINE];     /* modified line */
+	char in[MAXLEN]; /* currently read line */
+	char out[MAXLEN]; /* modified line */
 
-	while (getLine(line, MAXLINE) > 0) {
-		detab(line, modLine);
-		printf("%s", modLine);
+	while (getLine(in, MAXLEN) > 0) {
+		detab(in, out);
+		printf("%s", out);
 	}
 	return 0;
 }
