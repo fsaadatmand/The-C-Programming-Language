@@ -2,34 +2,35 @@
  * Exercise 6-1. Our version of getword does not properly handle underscores,
  * string constants, comments, or preprocessor control lines. Write a better
  * version.
- * Note: getword underscore, string constant, comments and preprocessor control
- * line could be improved.
+ *
  * By Faisal Saadatmand
  */
 
-#include <stdio.h>
 #include <ctype.h>
+#include <stdio.h>
 #include <string.h>
 
-#define MAXWORD 100
-#define NKEYS (sizeof keytab / sizeof keytab[0])
-#define NSYMBOLS (sizeof symbol / sizeof symbol[0])
-/* or */
-/* #define NKEYS (sizeof keytab / sizeof(struct key)) */
-#define BUFSIZE     100
+#define MAXWORD  100
+#define BUFSIZE  100
+#define NKEYS (int) (sizeof keytab / sizeof keytab[0])
 
-/* globals */
-int    buf[BUFSIZE];         /* buffer from ungetch */
-int    bufp = 0;             /* next free position in buf */
-
+/* types */
 struct key {
 	char *word;
 	int count;
 };
 
+/* functions */
+int binsearch(char *, struct key[], int);
+int getword(char *, int);
+
+/* globals */
+int buf[BUFSIZE];         /* buffer from ungetch */
+int bufp = 0;             /* next free position in buf */
+
 struct key keytab[] = {
 	{ "auto", 0 },
-	{ "break", 0 },
+	
 	{ "case", 0 },
 	{ "char", 0 },
 	{ "const", 0 },
@@ -61,19 +62,6 @@ struct key keytab[] = {
 	{ "while", 0 },
 };
 
-struct key symbol[] = {                /* array is sorted for binary search */
-	{ "\"", 0 },
-	{ "#", 0 },
-	{ "*", 0 },
-	{ "/", 0 },
-	{ "\\", 0 },
-	{ "_", 0 },
-};
-
-/* functions */
-int  getword(char *, int);
-int  binsearch(char *, struct key *, int);
-
 /* binsearch: find word in tab[0]...tab[n-1] */
 int binsearch(char *word, struct key tab[], int n)
 {
@@ -82,7 +70,6 @@ int binsearch(char *word, struct key tab[], int n)
 
 	low = 0;
 	high = n - 1;
-
 	while (low <= high) {
 		mid = (low + high) / 2;
 		if ((cond = strcmp(word, tab[mid].word)) < 0)
@@ -95,72 +82,52 @@ int binsearch(char *word, struct key tab[], int n)
 	return -1;
 }
 
-int getch(void)              /* get a (possibly pushed back) character */
+/* getword: get next word or character from input */
+int getword(char *word, int lim)
+{
+	int c, getch(void);
+	void ungetch(int);
+	char *w = word;
+
+	while (isspace(c = getch()))
+		;
+	if (c != EOF)
+		*w++ = c;
+
+	if (isalpha(c) || c == '_' || c == '#') {
+		for ( ; --lim > 0; ++w)
+			if (!isalnum(*w = getch()) && *w != '_') {
+				ungetch(*w);
+				break;
+			}
+	} else if (c == '\'') /* skip character constants */
+		while ((c = getch()) != '\'')
+			;
+	else if (c == '\"')  { /* skip string constants */
+		while ((c = getch()) != '\"')
+			if (c == '\\')
+				getch();
+	} else if (c == '/' && (c = getch()) == '*') /* skip comments */
+		while ((c = getch()) != EOF)
+			if (c == '*' && (c = getch()) == '/')
+				break;
+	*w ='\0';
+	return c;
+}
+
+/* get a (possibly pushed back) character */
+int getch(void)
 {
 	return (bufp > 0) ? buf[--bufp] : getchar();
 }
 
-void ungetch(int c)          /* push character back on input */
+/* push character back on input */
+void ungetch(int c)
 {
 	if (bufp >= BUFSIZE)
 		printf("ungetch: too many characters\n");
 	else
 		buf[bufp++] = c;
-}
-
-/* getword: get next word or character from input */
-int getword(char *word, int lim)
-{
-	int   c, n = -1, getch(void);
-	void  ungetch(int);
-	char  *w = word;
-
-	while (isspace(c = getch()))
-		;
-	
-	if (c != EOF) {
-		*w++ = c;
-		*w = '\0';
-	} else
-		return c;
-
-	if (!isalpha(c) && (n = binsearch(word , symbol, NSYMBOLS)) < 0)
-		return c;
-
-	switch (c) {
-	case '\\':                          /* handle escape sequences */
-		c = getch();
-		break;
-	case '\"':                          /* skip words inside string constant */
-		while ((c = getch()) != '\"')
-			if (c == EOF)
-				return c;
-		break;
-	case '#':                          /* skip preprocessor control lines */
-		while ((c = getch()) != '\n')
-			;
-		ungetch(c);
-		break;
-	case '/':                          /* skip words inside C comments */
-		if ((c = getch()) == '*') {
-			while ((c = getch()))
-				if	(c == '*' && (c = getch()) == '/')
-					break; 
-				else if (c == EOF)
-					return c;
-		}
-		break;
-	default:
-		for ( ; --lim > 0; w++)
-			if (!isalnum(*w = getch()) && *w != '_') {
-				ungetch(*w);
-				break;
-			}
-		break;
-	}
-
-	*w = '\0';
-	return word[0];
 }
 
 /* count C keywords */
@@ -172,11 +139,9 @@ int main(void)
 	while (getword(word, MAXWORD) != EOF)
 		if (isalpha(word[0]))
 			if ((n = binsearch(word, keytab, NKEYS)) >= 0)
-				keytab[n].count++;
-
-	for (n = 0; n < (int) NKEYS; n++)
+				++keytab[n].count;
+	for (n = 0; n < NKEYS; ++n)
 		if (keytab[n].count > 0)
 			printf("%4d %s\n", keytab[n].count, keytab[n].word);
-
 	return 0;
 }
