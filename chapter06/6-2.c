@@ -4,46 +4,45 @@
  * 6 characters, but different somewhere thereafter. Don't count words within
  * string and comments. Make 6 a parameter that can be set from the command
  * line.
- * Note: getword comment detection could be improved.
+ *
  * By Faisal Saadatmand
  */
 
-#include <stdio.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>                   /* for malloc && atoi */
 #include <string.h>
-#include <stdlib.h>                    /* for malloc && atoi */
 
 #define MAXWORD 100
 #define BUFSIZE 100
-#define NKEYS   (sizeof keytab / sizeof keytab[0])
-#define NSYMBOLS (sizeof symbol / sizeof symbol[0])
+#define NKEYS (int) (sizeof keytab / sizeof keytab[0])
 
-/* functions */
-struct tnode *addtree(struct tnode *, char *);
-void   treeprint(struct tnode *);
-int    getword(char *, int);
-struct tnode *talloc(void);            /* alocate memory to new tree node */
-char   *strDup(char *);                /* copy string into safe place */
-struct key *binsearch(char *, struct key *, int); 
-void   findVariables(struct tnode *, int);
-struct tnode *freetree(struct tnode *);
-
-/* globals */
-int    buf[BUFSIZE];                   /* buffer from ungetch */
-int    bufp = 0;                       /* next free position in buf */
-
-struct tnode {                         /* the tree node: */
-	char   *word;                      /* points to the text */
-	int    count;                      /* number of occurrences */
-	int    match;                      /* matching word */
-	struct tnode *left;                /* left child */
-	struct tnode *right;               /* right child */
+/* types */
+struct tnode {                     /* the tree node: */
+	char *word;                    /* points to the text */
+	int match;                     /* number of occurrences */
+	struct tnode *left;            /* left child */
+	struct tnode *right;           /* right child */
 };
 
 struct key {
 	char *word;
 	int count;
 };
+
+/* functions */
+int getword(char *, int);
+struct key *binsearch(char *, struct key *, int); 
+struct tnode *addtree(struct tnode *, char *, size_t n);
+struct tnode *talloc(void);        /* alocate memory to new tree node */
+char *strDup(char *);              /* copy string into safe place */
+void checkmatch(char *, struct tnode *, size_t, int *);
+void printtree(struct tnode *);
+void freetree(struct tnode *);
+
+/* globals */
+int buf[BUFSIZE];                   /* buffer from ungetch */
+int bufp = 0;                       /* next free position in buf */
 
 struct key keytab[] ={
 	{ "auto", 0 },
@@ -80,141 +79,71 @@ struct key keytab[] ={
 	{ "while", 0 },
 };
 
-struct key symbol[] = {                /* array is sorted for binary search */
-	{ "\"", 0 },
-	{ "#", 0 },
-	{ "*", 0 },
-	{ "/", 0 },
-	{ "\\", 0 },
-	{ "_", 0 },
-};
-
 /* addtree: add a node with w, at or below p */
-struct tnode *addtree(struct tnode *p, char *w)
+struct tnode *addtree(struct tnode *p, char *w, size_t n)
 {
 	int cond;
+	static int found;
 
-	if (p == NULL) {                   /* a new word has arrived */
-		p = talloc();                  /* make a new node */
-		p->word = strDup(w);           /* copy data to it */
-		p->count = 1;
-		p->match = 0;                  /* initialize match */
+	if (!p) {                 /* a new word has arrived */
+		p = talloc();         /* make a new node */
+		p->word = strDup(w);  /* copy data to it */
+		p->match = *(&found); /* p->match = value pointed to by &found */
 		p->left = p->right = NULL;
-	} else if ((cond = strcmp(w, p->word)) == 0)
-		p->count++;                    /* repeated word */
-	else if (cond < 0)                 /* less thant into left subtree */
-		p->left = addtree(p->left, w);
-	else 
-		p->right = addtree(p->right, w);
-
+	} else if ((cond = strcmp(w, p->word)) < 0) { /* less than ? */
+		checkmatch(w, p, n, &found);
+		p->left = addtree(p->left, w, n); /* go left */
+	} else if (cond > 0) {     /* greater than */
+		checkmatch(w, p, n, &found);
+		p->right = addtree(p->right, w, n); /* go right */
+	}
+	found = 0; /* reset */
 	return p;
 }
 
-/* treeprint: in-order print of tree p */
-void treeprint(struct tnode *p)
+/* checkmatch: set current node's flag variable and the found variable to 1, if
+ * w matches a word in the tree */
+void checkmatch(char *w, struct tnode *p, size_t n, int *found)
 {
-	if (p != NULL) {
-		treeprint(p->left);
-		if (p->match > 0)
-			printf("%4d %4d  %s\n", p->count, p->match, p->word);
-		treeprint(p->right);
-	}
+	if (!strncmp(w, p->word, n)) /* is w a match? */
+		p->match = *found = 1; /* mark the current and the next nodes */
 }
 
-int getch(void)              /* get a (possibly pushed back) character */
+/* printree: in-order print of tree p */
+void printree(struct tnode *p)
 {
-	return (bufp > 0) ? buf[--bufp] : getchar();
-}
-
-void ungetch(int c)          /* push character back on input */
-{
-	if (bufp >= BUFSIZE)
-		printf("ungetch: too many characters\n");
-	else
-		buf[bufp++] = c;
-}
-
-/* getword: get next word or character from input */
-int getword(char *word, int lim)
-{
-	int   c, getch(void);
-	void  ungetch(int);
-	char  *w = word;
-	struct key *p; 
-
-	while (isspace(c = getch()))
-		;
-	
-	if (c != EOF) {
-		*w++ = c;
-		*w = '\0';
-	} else
-		return c;
-
-	if (!isalpha(c) && (p = binsearch(word, symbol, NSYMBOLS)) == NULL)
-		return c;
-
-	switch (c) {
-	case '\\':                          /* handle escape sequences */
-		c = getch();
-		break;
-	case '\"':                          /* skip words inside string constant */
-		while ((c = getch()) != '\"')
-			if (c == EOF)
-				return c;
-		break;
-	case '#':                          /* skip preprocessor control lines */
-		while ((c = getch()) != '\n')
-			;
-		ungetch(c);
-		break;
-	case '/':                          /* skip words inside C comments */
-		if ((c = getch()) == '*') {
-			while ((c = getch()))
-				if	(c == '*' && (c = getch()) == '/')
-					break; 
-				else if (c == EOF)
-					return c;
-		} else                         /* don't skip pointer variables */
-			ungetch(c);
-		break;
-	default:
-		for ( ; --lim > 0; w++)
-			if (!isalnum(*w = getch()) && *w != '_') {
-				ungetch(*w);
-				break;
-			}
-		break;
-	}
-
-	*w = '\0';
-	return word[0];
+	if (!p) /* exist condition */
+		return;
+	printree(p->left);
+	if (p->match)
+		printf(" %s\n", p->word);
+	printree(p->right);
 }
 
 /* talloc: make a tnode */
 struct tnode *talloc(void)
 {
-	return (struct tnode *) malloc(sizeof(struct tnode));
+	return malloc(sizeof(struct tnode));
 }
 
 /* freetree: free allocated heap memory of node tree */
-struct tnode *freetree(struct tnode *node)
+void freetree(struct tnode *node)
 {
-	if (node != NULL) {
-		freetree(node->left);
-		freetree(node->right);
-		free(node->word);
-		free(node);
-	}
-	return node;
+	if (!node)
+		return;
+	freetree(node->left);
+	freetree(node->right);
+	free(node->word);
+	free(node);
 }
+
 /*strDup: make a duplicate of s */
 char *strDup(char *s)
 {
 	char *p;
 
-	p = (char *) malloc(strlen(s) + 1); /* +1 for '\0' */
-	if (p != NULL)
+	p = malloc(strlen(s) + 1); /* +1 for '\0' */
+	if (p)
 		strcpy(p, s);
 	return p;
 }
@@ -239,49 +168,68 @@ struct key *binsearch(char *word, struct key *tab, int n)
 	return NULL;
 }
 
-/* findVariables: finds matching variables in a binary search tree, using LDR
- * (inorder) traversal */
-void findVariables(struct tnode *p, int n)
+/* getword: get next word or character from input */
+int getword(char *word, int lim)
 {
-	if (p != NULL) {
-		findVariables(p->left, n);
-		if (p->left != NULL)
-			if (strncmp(p->word, p->left->word, n) == 0)
-				p->match = p->left->match = 1;
-		if (p->right != NULL)
-			if (strncmp(p->word, p->right->word, n) == 0)
-				p->match = p->right->match = 1;
-		findVariables(p->right, n);
-	}
+	int c, getch(void);
+	void ungetch(int);
+	char *w = word;
+
+	while (isspace(c = getch()))
+		;
+	if (c != EOF)
+		*w++ = c;
+	if (isalpha(c) || c == '_' || c == '#') {
+		for ( ; --lim > 0; ++w)
+			if (!isalnum(*w = getch()) && *w != '_') {
+				ungetch(*w);
+				break;
+			}
+	} else if (c == '\'') /* skip character constants */
+		while ((c = getch()) != '\'')
+			;
+	else if (c == '\"')  { /* skip string constants */
+		while ((c = getch()) != '\"')
+			if (c == '\\')
+				getch();
+	} else if (c == '/' && (c = getch()) == '*') /* skip comments */
+		while ((c = getch()) != EOF)
+			if (c == '*' && (c = getch()) == '/')
+				break;
+	*w ='\0';
+	return c;
 }
 
-/* word frequency count */
+/* get a (possibly pushed back) character */
+int getch(void)
+{
+	return (bufp > 0) ? buf[--bufp] : getchar();
+}
+
+/* push character back on input */
+void ungetch(int c) 
+{
+	if (bufp >= BUFSIZE)
+		printf("ungetch: too many characters\n");
+	else
+		buf[bufp++] = c;
+}
+
 int main(int argc, char *argv[])
 {
-	struct tnode *root;                /* root node */
-	struct key *p;                     /* currently searched word */
-	char   word[MAXWORD];              /* currently read word */
-	int    nChar;                      /* number of characters to match */
+	struct tnode *root;             /* root node */
+	char word[MAXWORD];             /* currently read word */
+	size_t nChar;                   /* number of characters to match */
 
-	if (argc != 2)
-		nChar = 6;
-	else
-		nChar = atoi(argv[1]);
-
-	root = NULL;                       /* initialize root node */
+	nChar = (--argc == 1) ? atoi(*++argv) : 6; /* Note: no input error check */
+	root = NULL;
 	while (getword(word, MAXWORD) != EOF)
-		if ((isalpha(word[0]) || word[0] == '_' || word[0] == '*')
-				&& (int) strlen(word) > nChar) {
-			if ((p = binsearch(word, keytab, NKEYS)) == NULL) /* skip C */
-				root = addtree(root, word);                   /* reserved words */
-			else
-				++p->count;            /* not necessary */
-		}
-	findVariables(root, nChar);
-	treeprint(root);
-	root = freetree(root);             /* clean up */
-
-	for (size_t i = 0; i < sizeof(keytab) / sizeof(keytab[0]); ++i)
-		printf("%s %i\n", keytab[i].word, keytab[i].count);
+		if ((isalpha(word[0]) || word[0] == '_') && strlen(word) >= nChar &&
+				!binsearch(word, keytab, NKEYS)) /* skip reserved words */
+			root = addtree(root, word, nChar);                  
+	printree(root);
+	/* clean up */
+	freetree(root);
+	root = NULL;
 	return 0;
 }
