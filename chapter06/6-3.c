@@ -6,32 +6,46 @@
  * By Faisal Saadatmand
  */
 
-#include <stdio.h>
-#include <string.h>
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MAXWORD 100
 #define BUFSIZE 100
 #define NKEYS   (sizeof noisetab / sizeof noisetab[0])
 
-struct tnode {
-	char *word;
-	struct list *line;
-	int count;
-	struct tnode *left;
-	struct tnode *right;
-};
-
+/* types */
 struct list {
 	int number;
 	struct list *next;
+};
+
+struct tnode {
+	char *word;
+	struct list *lines;
+	struct tnode *left;
+	struct tnode *right;
 };
 
 struct key {
 	char *word;
 	int  count;
 };
+
+/* functions */
+int getword(char *, int);
+struct tnode *talloc(void);          /* allocate memory to new tree node */
+char *strDup(char *);                /* copy string into safe place */
+struct tnode *addtree(struct tnode *, char *, int);
+void treeprint(struct tnode *);
+void printList(struct list *);
+struct key *binsearch(char *, struct key *, int);
+void freetree(struct tnode *);
+
+/* globals */
+int    buf[BUFSIZE];                   /* buffer from ungetch */
+int    bufp = 0;                       /* next free position in buf */
 
 struct key noisetab[] = {
 	{ "a", 0 },
@@ -46,38 +60,22 @@ struct key noisetab[] = {
 	{ "with", 0},
 };
 
-/* functions */
-int    getword(char *, int, int *);
-struct tnode *talloc(void);            /* allocate memory to new tree node */
-char   *strDup(char *);                /* copy string into safe place */
-struct tnode *addtree(struct tnode *, char *, int);
-void   treeprint(struct tnode *);
-void   printList(struct list *);
-struct key *binsearch(char *, struct key *, int);
-struct tnode *freetree(struct tnode *);
-struct list *freelist(struct list *);
-
-/* globals */
-int    buf[BUFSIZE];                   /* buffer from ungetch */
-int    bufp = 0;                       /* next free position in buf */
-
 /* getword: get next word or character from input */
-int getword(char *word, int lim, int *ln)
+int getword(char *word, int lim)
 {
 	int c, getch(void);
 	void ungetch(int);
 	char *w = word;
 
-	while (isspace(c = getch()))
-		if (c == '\n')
-			(*ln)++;
+	while (isblank(c = getch()))
+		;
 	if (c != EOF)
 		*w++ = c;
 	if (!isalpha(c)) {
 		*w = '\0';
 		return c;
 	}
-	for ( ; --lim > 0; w++)
+	for ( ; --lim > 0; ++w)
 		if (!isalnum(*w = getch())) {
 			ungetch(*w);
 			break;
@@ -86,12 +84,14 @@ int getword(char *word, int lim, int *ln)
 	return word[0];
 }
 
-int getch(void)              /* get a (possibly pushed back) character */
+/* get a (possibly pushed back) character */
+int getch(void)
 {
 	return (bufp > 0) ? buf[--bufp] : getchar();
 }
 
-void ungetch(int c)          /* push character back on input */
+/* push character back on input */
+void ungetch(int c)
 {
 	if (bufp >= BUFSIZE)
 		printf("ungetch: too many characters\n");
@@ -119,13 +119,12 @@ char *strDup(char *s)
 /* addList: add a node with ln, at or before p */
 struct list *addlist(struct list *p, int ln)
 {
-	if (p == NULL) {
+	if (!p) {
 		p = malloc(sizeof(struct list));
 		p->number = ln;
 		p->next = NULL;
 	} else if (p->number != ln)        /* skip multi-occurrence on same line */  
 		p->next = addlist(p->next, ln); 
-	
 	return p;
 }
 
@@ -135,16 +134,14 @@ struct tnode *addtree(struct tnode *p, char *w, int ln)
 	int cond;
 	struct list *first = NULL;
 
-	if (p == NULL) {                   /* a new word has arrived */
+	if (!p) {                          /* a new word has arrived */
 		p = talloc();                  /* make a new node */
 		p->word = strDup(w);           /* copy data to it */
-		p->count = 1;
-		p->line = addlist(first, ln);
+		p->lines = addlist(first, ln);
 		p->left = p->right = NULL;
-	} else if ((cond = strcmp(w, p->word)) == 0) {
-		p->count++;                    /* repeated word */
-		p->line = addlist(p->line, ln);
-	} else if (cond < 0)               /* less than into left subtree */
+	} else if (!(cond = strcmp(w, p->word)))
+		p->lines = addlist(p->lines, ln);
+	else if (cond < 0)               /* less than into left subtree */
 		p->left = addtree(p->left, w, ln);
 	else  
 		p->right = addtree(p->right, w, ln);
@@ -154,22 +151,22 @@ struct tnode *addtree(struct tnode *p, char *w, int ln)
 /* treeprint: in-order print of tree p */
 void treeprint(struct tnode *p)
 {
-	if (p != NULL) {
-		treeprint(p->left);
-		printf("%4d %s ", p->count, p->word);
-		printList(p->line);
-		printf("\n");
-		treeprint(p->right);
-	}
+	if (!p)
+		return;
+	treeprint(p->left);
+	printf(" %s ", p->word);
+	printList(p->lines);
+	printf("\n");
+	treeprint(p->right);
 }
 
 /* printList: preorder print of list p */
 void printList(struct list *p)
 {
-	if (p != NULL) {
-		printf("%d ", p->number);
-		printList(p->next);
-	}
+	if (!p)
+		return;
+	printf("%d ", p->number);
+	printList(p->next);
 }
 
 /* binsearch: find word in tab[0]...tab[n - 1] */
@@ -193,43 +190,43 @@ struct key *binsearch(char *word, struct key *tab, int n)
 }
 
 /* freellist: frees allocated heap memory of linked list */
-struct list *freelist(struct list *node)
+void freelist(struct list *node)
 {
-	if (node != NULL) {
-		freelist(node->next);
-		free(node);
-	}
-	return node;
+	if (!node)
+		return;
+	freelist(node->next);
+	free(node);
 }
 
 /* freetree: frees allocated heap memory of tree */
-struct tnode *freetree(struct tnode *node)
+void freetree(struct tnode *node)
 {
-	if (node != NULL) {
-		freetree(node->left);
-		freetree(node->right);
-		free(node->word);
-		freelist(node->line);          /* delete linked list in nodes */
-		free(node);
-	}
-	return node;
+	void freelist(struct list *);
+
+	if (!node)
+		return;
+	freetree(node->left);
+	freetree(node->right);
+	free(node->word);
+	freelist(node->lines);          /* delete linked list in nodes */
+	free(node);
 }
 
 int main(void)
 {
 	struct tnode *root;                /* root node */
-	struct key *sought;                /* currently sought after word */
 	char word[MAXWORD];                /* currently read word */
-	int lineNo = 1;                    /* currently searched line */
+	int lineno = 1;                    /* currently searched line */
 
 	root = NULL;
-	while (getword(word, MAXWORD, &lineNo) != EOF) {
-		sought = binsearch(word, noisetab, NKEYS);    /* skip noise words */
-		if (isalpha(word[0]) && !sought)
-			root = addtree(root, word, lineNo);
-	}
+	while (getword(word, MAXWORD) != EOF)
+		if (isalpha(word[0]) && !binsearch(word, noisetab, NKEYS))
+			root = addtree(root, word, lineno);
+		else if (word[0] == '\n')
+			++lineno;
 	treeprint(root);
-	root = freetree(root);             /* clean up */
+	/* clean up */
+	freetree(root);
 	root = NULL;
 	return 0;
 }
