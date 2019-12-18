@@ -1,98 +1,43 @@
 /*
  * Exercise 5-18. Make dcl recover from input error.
+ *
  * By Faisal Saadatmand
  */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
 
-#define MAXTOKEN        100
-#define BUFSIZE         100
-#define EMPTY_LINE      (tokentype == '\n')
-#define RECOVER(c)       while (((c) = getch()) != '\n')
-#define SKIP_BLANKS(c)  while (((c) = getch()) == ' ' || (c) == '\t')
+#define BUFSIZE   100
+#define MAXLEN    1000
+#define MAXTOKEN  100
 
-enum { NAME, PARENS, BRACKETS, ERROR };
+enum { NAME, PARENS, BRACKETS };
+enum { GOOD, FAIL };
 
 /* functions */
-int  gettoken(void);
 void dcl(void);
 void dirdcl(void);
-int  getch(void);
-void ungetch(int);
+int gettoken();
+void errmsg(const char *);
 
 /* globals */
-char token[MAXTOKEN];                  /* last token string */
-int  tokentype;                        /* type of last token */
-char name[MAXTOKEN];                   /* identifier name */
-char datatype[MAXTOKEN];               /* data type = char, int, etc. */
-char out[1000];
-int  buf[BUFSIZE];                     /* buffer from ungetch */
-int  bufp;                             /* next free position in buf */
-int  pushedEOF;                        /* signals EOF has been pushed-back */
-
-/* gettoekn: return next token */
-int gettoken(void)
-{
-	int c, getch(void);
-	void ungetch(int);
-	char *p = token;
-
-	SKIP_BLANKS(c);
-
-	if (c == '(') {
-		SKIP_BLANKS(c);                /* allow spaces in parens */
-		if (c == ')') {
-			strcpy(token, "()");
-			return tokentype = PARENS;
-		} else {
-			ungetch(c);
-			return tokentype = '(';
-		}
-	} else if (c == '[') {
-		for (*p++ = c; (*p = getch()) != ']'; p++)
-			if (*p == '\n')            /* error check: missing ']' */
-				return *p;
-		*++p = '\0';
-		return tokentype = BRACKETS;
-	} else if (isalpha(c)) {
-		for (*p++ = c; isalnum(c = getch()); p++)
-			*p = c;
-		*p = '\0';
-		ungetch(c);
-		return tokentype = NAME;
-	} else
-		return tokentype = c;
-}
-
-/* getch: get a (possibly pushed back) character */
-int getch(void)
-{
-	return (bufp > 0) ? buf[--bufp] : (pushedEOF) ? EOF : getchar();
-}
-
-/* ungerch: push character back on input */
-void ungetch(int c)
-{
-	if (c == EOF) {
-		pushedEOF = 1;
-		return;
-	}
-
-	if (bufp >= BUFSIZE)
-		printf("ungetch: too many characters\n");
-	else
-		buf[bufp++] = c;
-}
+int buf[BUFSIZE];         /* buffer from ungetch */
+int bufp = 0;             /* next free position in buf */
+int tokentype;            /* type of last token */
+char token[MAXTOKEN];     /* last token string */
+char name[MAXTOKEN];      /* identifier name */
+char datatype[MAXTOKEN];  /* data type = char, int, etc. */
+char out[MAXLEN];         /* composed output string */
+char state;               /* flag to propagate the current state of parsing */
 
 /* dcl: parse a declarator */
-void dcl (void)
+void dcl(void)
 {
-	int ns;
+	int ns; /* number of asterisks */
 
-	for (ns = 0; gettoken() == '*'; )  /*count *'s */
-		ns++;
+	for (ns = 0; gettoken() == '*'; ++ns) /* count *'s */
+		;
 	dirdcl();
 	while (ns-- > 0)
 		strcat(out, " pointer to");
@@ -103,48 +48,95 @@ void dirdcl(void)
 {
 	int type;
 	
-	if (tokentype == '(') {            /* ( dcl ) */
-		dcl ();
-		if (tokentype != ')') {
-			printf("error: missing )\n");
-			tokentype = ERROR;
-		}
-	} else if (tokentype == NAME) {    /* variable name */
+	if (tokentype == '(') {         /* ( dcl ) */
+		dcl();
+		if (tokentype != ')')
+			errmsg("error: missing )\n");
+	} else if (tokentype == NAME) /* variable name */
 		strcpy(name, token);
-	} else {
-		printf("error: expected name or (dcl)\n");
-		tokentype = ERROR;
-	}
-
-	if (tokentype == ERROR)
-		return;
-
+	else 
+		errmsg("error: expected name of (dcl)\n");
 	while ((type = gettoken()) == PARENS || type == BRACKETS)
 		if (type == PARENS)
 			strcat(out, " function returning");
 		else {
-		strcat(out, " array");
-		strcat(out, token);
-		strcat(out, " of");
+			strcat(out, " array");
+			strcat(out, token);
+			strcat(out, " of");
+		}
+}
+
+/* errmsg: print error message, set state flag to FAIL */
+void errmsg(const char *msg)
+{
+	printf("%s", msg);
+	state = FAIL; /* propagate state of parsing to allow for error recovery */
+}
+
+/* gettoken: return next token */
+int gettoken(void)
+{
+	int c, getch(void);
+	void ungetch(int);
+	char *p = token;
+
+	if (state == FAIL) {
+		state = GOOD;
+		return tokentype; /* push back the previous token */
 	}
+	while ((c = getch()) == ' ' || c == '\t')
+		;
+	if (c == '(') {
+		if ((c = getch()) == ')') {
+			strcpy(token, "()");
+			return tokentype = PARENS;
+		}
+		ungetch(c);
+		return tokentype = '(';
+	} 
+	if (c == '[') {
+		for (*p++ = c; (*p++ = getch()) != ']'; )
+			;
+		*p = '\0';
+		return tokentype = BRACKETS;
+	}
+	if (isalpha(c)) {
+		for (*p++ = c; isalnum(c = getch()); )
+			*p++ = c;
+		*p = '\0';
+		ungetch(c);
+		return tokentype = NAME;
+	}
+	return tokentype = c;
+}
+
+/* getch: get a (possibly pushed back) character */
+int getch(void)
+{
+	return (bufp > 0) ? buf[--bufp] : getchar();
+}
+
+/* ungerch: push character back on input */
+void ungetch(int c)
+{
+	if (bufp >= BUFSIZE)
+		printf("ungetch: too many characters\n");
+	else
+		buf[bufp++] = c;
 }
 
 /* convert declaration to words */
-int main(void)               
+int main(void)
 {
-	int c;
-
-	while (gettoken() != EOF) {        /* last token on line */
-		strcpy(datatype, token);       /* is the datatype */
+	while (gettoken() != EOF) {  /* first token on line */
+		if (tokentype == '\n')   /* skip empty lines */
+			continue;
+		strcpy(datatype, token); /* is the datatype */
 		out[0] = '\0';
-		if (EMPTY_LINE)
-			continue;                  /* skip empty input lines */
-		dcl();
-		if (tokentype != '\n') {
-			printf("syntax error\n");
-//			RECOVER(c);
-//			ungetch(c);
-		} else
+		dcl();                   /* parse rest of line */
+		if (tokentype != '\n')
+			printf("%s", "syntax error\n");
+		else if (state == GOOD)
 			printf("%s: %s %s\n", name, out, datatype);
 	}
 	return 0;
