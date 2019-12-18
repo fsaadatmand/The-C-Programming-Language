@@ -2,33 +2,38 @@
  * Exercise 7-1. Write a program that converts upper case to lower or lower
  * case to upper, depending on the name it is invoked with, as found in
  * argv[0].
+ *
  * By Faisal Saadatmand
  */
 
-#include <stdio.h>
 #include <ctype.h>
+#include <stdio.h>
 #include <string.h>
+
+/* parsename: if program name starts with '.', parse it, i.e. trim the full
+ * pathname and return name only, otherwise return name as is. */
+char *parsename(char *name)
+{
+	return name[0] == '.' ? strrchr(name, '/') + 1 : name;
+}
 
 int main(int argc, char *argv[])
 {
-	int c, function;
-	char *pname;                       /* program name */
+	int c;
+	int (*func)(int);  /* function pointer to tolower or toupper */
+	char *prog;        /* program name */
 
-	if (argc != 1)
-		return -1;
-
-	pname = (strrchr(*argv, '/')) + 1; /* parse program name */
-
-	if (strcmp("tolower", pname) == 0)
-		function = 0;
-	else if (strcmp("toupper", pname) == 0)
-		function = 1;
+	--argc;
+	prog = parsename(argv[0]);
+	if (!strcmp("tolower", prog))
+		func = tolower;
+	else if (!strcmp("toupper", prog))
+		func = toupper;
 	else {
-		printf("%s: Unknown function: ", pname);
-		printf("Rename program to tolower or toupper.\n");
+		printf("Error: rename program to tolower or toupper\n");
 		return -1;
 	}
 	while ((c = getchar()) != EOF)
-		putchar((function) ? toupper(c) : tolower(c)); 
+		putchar(func(c));
 	return 0;
 }
