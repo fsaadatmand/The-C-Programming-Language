@@ -5,57 +5,68 @@
  * By Faisal Saadatmand
  */
 
-#define MAXFILES  3
-#define MAXLEN    1000
+#define MAXLEN   1000    /* maximum line length */
+#define MAXNAME  100     /* maximum length of file name */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+/* types */
+typedef struct {
+	char name[MAXNAME];  /* file name */
+	FILE *fptr;          /* file pointer */
+	char line[MAXLEN];   /* currently read line */
+	int lineno;          /* number of read lines */
+} File;
+
+/* globals */
+char *prog;              /* program name */
+
+/* functions */
+void openfile(const char *, File *);
+void comparefiles(File *, File *);
+
+void openfile(const char *filename, File *file)
+{
+	if (!(file->fptr = fopen(filename, "r"))) {
+		fprintf(stderr, "%s: ca't open %s\n", prog, filename);
+		exit(EXIT_FAILURE);
+	}
+	strcpy(file->name, filename);
+	file->lineno = 0;
+}
+
+void comparefiles(File *f1, File *f2)
+{
+	do {
+		if (fgets(f1->line, MAXLEN, f1->fptr))
+			++f1->lineno;
+		if (fgets(f2->line, MAXLEN, f2->fptr))
+			++f2->lineno;
+		if (!feof(f1->fptr) && !feof(f2->fptr)) /* are there lines? */
+			if (strcmp(f1->line, f2->line)) /* compare lines */
+				break; /* lines differ */
+	} while (!feof(f1->fptr) && !feof(f2->fptr)); /* until either return EOF */
+	if (!feof(f1->fptr))
+		fprintf(stdout, "\n%s:%i: %s", f1->name, f1->lineno, f1->line);
+	if (!feof(f2->fptr))
+		fprintf(stdout, "\n%s:%i: %s", f2->name, f2->lineno, f2->line);
+}
+
 int main(int argc, char *argv[])
 {
-	FILE *file[MAXFILES];                  /* array to store files */
-	char *prog = argv[0];                  /* program name for errors */
-	char *f1name = argv[1];                /* file 1 name for printing line */
-	char *f2name = argv[2];                /* file 2 name for printing line */
-	char f1line[MAXLEN], f2line[MAXLEN];   /* currently read line */
-	int  f1lnum, f2lnum;                   /* currently read line number */
-	int i;
-	
-	/* check cli argument */
-	if (argc != 3) {
+	File file_1, file_2;
+
+	prog = *argv++;         /* program name for errors */
+	if (--argc != 2) {      /* check cli argument */
 		fprintf(stderr, "Usage: %s <file1> <file2>\n", prog);
 		exit(EXIT_FAILURE);
 	}
-
-	/* open files */
-	for (i = 1; --argc > 0; ++i)           /* skip file[0] for readability */
-		if (!(file[i] = fopen(*++argv, "r"))) {
-			fprintf(stderr, "%s: can't open %s\n", prog, *argv);
-			exit(EXIT_FAILURE);
-		}
-
-	f1lnum = f2lnum = 0;
-	while (!feof(file[1]) && !feof(file[2])) { 
-		/* read lines and count successfully read lines */
-		if (fgets(f1line, MAXLEN, file[1]))
-			f1lnum++;
-		if (fgets(f2line, MAXLEN, file[2]))
-			f2lnum++;
-		/* compare lines */
-		if (f1lnum > f2lnum)                   /* file 1 is longer */
-			fprintf(stdout, "\n%s: %i: %s", f1name, f1lnum, f1line);
-		else if (f1lnum < f2lnum)              /* file 2 is longer */
-			fprintf(stdout, "\n%s: %i: %s", f2name, f2lnum, f2line);
-		else if (strcmp(f1line, f2line)) {
-			fprintf(stdout, "\n%s: %i: %s\n", f1name, f1lnum, f1line);
-			fprintf(stdout, "\n%s: %i: %s\n", f2name, f2lnum, f2line);
-			break;                         /* break at first difference */
-		}
-	}
-
-	fclose(file[1]);
-	fclose(file[2]);
-
+	openfile(*argv++, &file_1);
+	openfile(*argv, &file_2);
+	comparefiles(&file_1, &file_2);
+	fclose(file_1.fptr);
+	fclose(file_2.fptr);
 	exit(EXIT_SUCCESS);
 }
