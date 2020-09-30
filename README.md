@@ -7,7 +7,7 @@ Please let me know if you found a mistake or a bug.
 
 Cheers!
 
-### Contents
+### Index
 
 - [Chapter 1. A Tutorial Introduction](chapter01/)
 - [Chapter 2. Types, Operators, and Expressions](chapter02)
