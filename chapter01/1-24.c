@@ -3,210 +3,138 @@
  * errors like unmatched parentheses, brackets and braces. Don't forget about
  * quotes, both single and double, escape sequences, and comments. (This
  * program is hard if you do it in full generality.)
+ *
  * By Faisal Saadatmand
  */
 
+
+/* NOTE: this is not full generality solution */
+
 #include <stdio.h>
 
-#define MAXLINE              1000
-#define YES                     1
-#define NO                      0
-#define SLASH_ASTERISK          1
-#define ASTERISK_SLASH          0
-#define IN                      1
-#define OUT                     0  
+#define YES                    1
+#define NO                     0  
+
+/* globals */
+int leftParens = 0;
+int rightParens = 0;
+int leftBrackets = 0;
+int rightBrackets = 0;
+int leftBraces = 0;
+int rightBraces = 0;
 
 /* functions */
-int  getLine(char [], int);
-int  findComment(char [], int);
-int  delComment(char [], char [], int , int);
-void findCharacter(char [], char [], int [], int);
-void checkSyntax(char [], int [], int);
+void printInfo();
+int  skipChar(int);
+void checkSymbolsBallance(void);
+void countSymbols(void);
+int  skipComment(int);
+int  skipQuote(int);
 
-/* getLine function: read a line into s, return length */
-int getLine(char s[], int lim)
+/* skipChar: skips n characters in the input stream */
+int skipChar(int n)
 {
-	int c, i;
+	int c;
 
-	for (i = 0; i < lim - 1 && (c = getchar()) != EOF && c != '\n'; ++i)
-		s[i] = c;
+	while (n--)
+		c = getchar();
+	return c ;
+}
 
-	if (c == '\n') {
-		s[i] = c;
-		++i;
+/* skipComment: skip characters in the input stream until encountered the
+ * ending symbol of a c-style comment */
+int skipComment(int c)
+{
+	int stop = NO;
+
+	while (stop == NO && (c = getchar()) != EOF)
+		if (c == '*' && (c = getchar()) == '/')
+			stop = YES;
+	return c;
+}
+
+/* skipComment: skip characters in the input stream until encountered the
+ * ending character of a c-style quote (single or double) */
+int skipQuote(int type)
+{
+	int c, stop = NO, step = 2;
+
+	while (stop == NO && (c = getchar()) != EOF) {
+		if (c == '\\')
+			c = skipChar(step);
+		if (c == type)
+			stop = YES;
 	}
-
-	s[i] = '\0';
-
-	return i;
+	return c;
 }
 
-/* findComment function: searches line[] for the first occurrence of the first
- * character of a C comment notation and returns the location on finding a single
- * line comment or -1 on failure */
-int findComment(char line[], int notation)
-{
-	int i, j;
-	int quoteStart;           /* location of the start of the quotation mark */
-	int quoteEnd;             /* location of the end of quotation mark */
-	int location;             /* location of C comment notation */
-	int comment[2];           /* notation type: start or end */
-	int lookForQuote;         /* flag variable */
+/* countSymbols: count c-style demarcating symbols for comments and quote */
+void countSymbols(void) {
+	extern int leftParens, rightParens, leftBrackets, rightBrackets,
+		       leftBraces, rightBraces;
+	int c;
 
-	location = quoteStart = quoteEnd = -1;
-	/* set the appropriate notation */
-	if (notation == SLASH_ASTERISK) {
-		comment[0] = '/'; 
-		comment[1] = '*';
-	} else if (notation == ASTERISK_SLASH) {
-		comment[0] = '*';
-		comment[1] = '/';
+	while ((c = getchar()) != EOF) {
+		if (c == '/' && (c = getchar()) == '*') /* skip comments */
+			c = skipComment(c);
+		if (c == '"')  /* skip double quotes */
+			c = skipQuote(c);
+		if (c == '\'') /* slip single quotes */
+			c = skipQuote(c);
+		if (c == '(')
+			++leftParens;
+		if (c == ')')
+			++rightParens;
+		if (c == '[')
+			++leftBrackets;
+		if (c == ']')
+			++rightBrackets;
+		if (c == '{')
+			++leftBraces;
+		if (c == '}')
+			++rightBraces;
 	}
-
-	lookForQuote  = YES;
-	/* line[x - 1] check handles escape sequences. It is unnecessary for the
-	 * start of the quote but is added for the sake of correctness. */
-	for (i = 0; line[i] != '\0'; ++i) {
-		if (line[i] == comment[0] && line[i + 1] == comment[1]) {
-			if (notation == ASTERISK_SLASH)
-				location = i + 1;      /* end of comment including notation */
-			else
-				location = i;          /* start of comment including notation */
-		}
-		if (line[i] == '\"' && line[i - 1] != '\\' && lookForQuote == YES) {
-			quoteStart = i;
-			for (j = i + 1; line[j] != '\0'; ++j)
-				if (line[j] == '\"' && line[j - 1] != '\\')
-					quoteEnd = j;
-			lookForQuote = NO;
-		}
-	}
-			
-	/* check if notation is inside a double quotation marks */
-	if (location >= 0 && quoteStart >= 0)
-		if (location > quoteStart && location < quoteEnd)
-			location = -1;       /* not a C comment */
-
-	/* check if notation is inside a multi-line double quotation marks */
-	if (location >= 0 && quoteStart >= 0 && quoteEnd < 0)
-//		if (location < quoteStart)
-			location = -1;       /* not a C comment */
-
-	return location;
 }
 
-/* delComment function: deletes C comments from line string stores result in
- * modLine */
-int delComment(char line[], char modLine[], int start, int end)
+/* checkSymbolsBallance: check if number of c-style demarcating symbols for
+ * comments and quotes are balanced. Print an error message if not. */
+void checkSymbolsBallance(void)
 {
-	int i, j;
-	int status;
+	extern int leftParens, rightParens, leftBrackets, rightBrackets,
+		       leftBraces, rightBraces;
 
-	i = j = 0;
-
-	/* no notation - delete entire line */
-	if (start < 0 && end < 0)
-		for (i = 0; line[i] != '\0'; ++i)
-			modLine[i] = '\0';
-	/* start but no end - delete rest of line */
-	else if (start >= 0 && end < 0)
-		for (i = 0; i < start; ++i)
-			modLine[i] = line[i];
-	/* end but no start - move text after comment to the beginning  of line */
-	else if (start < 0 && end >= 0)
-		for (j = end + 1; line[j] != '\0'; ++j)  {
-			modLine[i] = line[j];
-			++i;
-		}
-	/* full comment embedded - move text after comment to start location */
-	else if (start >= 0 && end >= 0) {
-		for (i = 0; i < start; ++i)
-			modLine[i] = line[i];
-		for (j = end + 1; line[j] != '\0'; ++j) {
-			modLine[i] = line[j];
-			++i;
-		}
-	}
-
-	/* end of line formatting */
-	if (start < 0 && end < 0)
-		modLine[0] = '\n';
-	else if (start >= 0 && end < 0) {
-		modLine[i] = '\n';
-		modLine[i + 1] = '\0';
-	} else 
-		modLine[i] = '\0';
-
-	/* status of the current deleted comment: single or multi-line */
-	status = 0;
-	if ((start >= 0 && end < 0) || (start < 0 && end < 0))
-		status = 1;
-	else if (start < 0 && end >= 0)
-		status = 0;
-
-	return status;
+	if (leftParens - rightParens < 0)
+		printf("Error: missing '('\n");
+	else if (leftParens - rightParens > 0)
+		printf("Error: missing ')'\n");
+	if (leftBrackets - rightBrackets < 0)
+		printf("Error: missing '['\n");
+	else if (leftBrackets - rightBrackets > 0)
+		printf("Error: missing ']'\n");
+	if (leftBraces - rightBraces < 0)
+		printf("Error missing '{'\n");
+	else if (leftBraces - rightBraces > 0)
+		printf("Error missing '}'\n");
 }
 
-/* findCharcter function: counts the occurrence of a characters from symbol in
- * line and stores results in charsCount. len is the length of symbol array */
-void findCharacter(char line[], char symbol[], int charsCount[], int len)
+/* printInfo: print the number of demarcating symbols for comments and quotes */
+void printInfo(void)
 {
-	int  i, j;
-	static int quoteState;               /* double quote state flag */
+	extern int leftParens, rightParens, leftBrackets, rightBrackets,
+		       leftBraces, rightBraces;
 
-	quoteState = OUT;
-	for (i = 0; i <= len ; ++i)
-		/* line[x - 1] check handles escape sequences. */
-		for (j = 0; line[j] != '\0'; ++j)
-			if (quoteState == OUT && line[j] == '\"' && line[j - 1] != '\\')
-				quoteState = IN;
-			else if (quoteState == IN && line[j] == '\"' && line[j - 1] != '\\')
-				quoteState = OUT;
-			else if (line[j] == symbol[i] && line[j + 1] != '\'' && quoteState
-					== OUT)
-				++charsCount[i];
+	printf("'(': %i ')': %i Total: %i\n",
+			leftParens, rightParens, leftParens + rightParens);
+	printf("'[': %i ']': %i Total: %i\n",
+			leftBrackets, rightBrackets, leftBrackets + rightBrackets);
+	printf("'{': %i '}': %i Total: %i\n",
+			leftBraces, rightBraces, leftBraces + rightBraces);
 }
 
-void checkSyntax(char symbol[], int charsCount[], int len)
-{
-	int i, syntaxError = 0;
-
-	for (i = 0; i <= len; i += 2)
-		if (charsCount[i] != charsCount[i + 1]) {
-			printf("Syntax ERROR: unbalanced number of %c %c\n",
-					symbol[i], symbol[i + 1]);
-			syntaxError = 1;
-		}
-	if (syntaxError != 1)
-		printf("Syntax check: no errors found\n");
-}
 int main(void)
 {
-	int  len;                              /* current line length */
-	int  start;                            /* comment's beginning */
-	int  end;                              /* comment's end */
-	int  status;                           /* multi-line comments flag */
-	char line[MAXLINE];                    /* current input line */
-	char modLine[MAXLINE];                 /* modified output line */
-	int  charsCount[6];
-	char symbol[6] = { '{', '}', '(', ')', '[', ']' };
-	
-	for (len = 0; len <= 6 ; ++len)        /* use len temporarily as an index */
-		charsCount[len] = 0;
-
-	status = 0;
-	while ((len = getLine(line, MAXLINE)) > 0) {
-
-		start = findComment(line, SLASH_ASTERISK);
-		end   = findComment(line, ASTERISK_SLASH);
-
-		if (start < 0 && end < 0 && status == 0)    /* no comment found */
-			findCharacter(line, symbol, charsCount, 5);
-		else {
-			status = delComment(line, modLine, start, end);
-			findCharacter(modLine, symbol, charsCount, 5);
-		}
-	}
-	checkSyntax(symbol, charsCount, 5);
+	countSymbols();
+	printInfo();
+	checkSymbolsBallance();
 	return 0;
 }
