@@ -8,7 +8,7 @@
  */
 
 
-/* NOTE: this is not full generality solution */
+/* NOTE: this is not done in full generality */
 
 #include <stdio.h>
 
