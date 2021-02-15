@@ -60,7 +60,7 @@ int needsParens()
 void undcl(void)
 {
 	int type;
-	char temp[MAXTOKEN];
+	char temp[MAXLEN];
 
 	while ((type = gettoken()) != '\n')
 		if (type == PARENS || type == BRACKETS)
