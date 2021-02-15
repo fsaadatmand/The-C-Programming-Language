@@ -34,6 +34,7 @@ void openfile(const char *filename, File *file)
 		exit(EXIT_FAILURE);
 	}
 	strcpy(file->name, filename);
+	*file->line = '\0';
 	file->lineno = 0;
 }
 
