@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
-
+#include<conio.h>
 #define MAXLEN 1000
 
 void itoa(unsigned, char []);

@@ -27,17 +27,17 @@ int main(void)
 	count = 0;
 	while ((c = getchar()) != EOF) {
 
-		if (c == ' ' || c == '\t' || c == '\n')
+		if(c == ' ' || c == '\t' || c == '\n')
 			state = OUT;
-		else
-			state = IN;
+		
+		else state = IN;
 
-		if (state == IN)
+		if(state == IN)
 			++count;
 
-		if (state == OUT) {
+		if(state == OUT) {
 			if (count < 4)
-				++lengths[0];
+	        		++lengths[0];
 			else if (count >= 4 && count < 8)
 				++lengths[1];
 			else if (count >= 8 && count < 12)
@@ -52,22 +52,22 @@ int main(void)
 
 	printf("\nVertical Histogram:\n");
 	longestBar = lengths[0];
-	for (i = 0; i < SIZE; ++i)       /* find the longestBar */
-		if (lengths[i] > longestBar )
+	for(i = 0; i < SIZE; ++i)  /* find the longestBar */
+		if(lengths[i] > longestBar )
 			longestBar = lengths[i];
-	longestBar /= SCALE;
+	longestBar/= SCALE;
 
 	/* print vertical histogram  */
 	while (longestBar > 0) {
 		for (i = 0; i < SIZE; ++i)
 			if (lengths[i] != 0) {
 				if (lengths[i] / SCALE < longestBar)
-					printf(" %2c", ' ');
+					printf(" %2c",' ');
 				else
 					printf(" %2c", '*');
 			}
 		printf("\n");
-		--longestBar;
+		  longestBar--;
 	}
 	
 	/* print value of each element (bar) */
