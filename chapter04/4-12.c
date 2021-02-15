@@ -9,7 +9,7 @@
 /*
  * NOTE: We could have made i a static variable; however, that is problematic
  * because its value will persists throughout the entire life of the program, and
- * thus, multiple calls to itoa will use the value of i from the previous call,
+ * thus, multiple calls to itoar will use the value of i from the previous call,
  * which will result in an undesirable outcome.
  */
 
@@ -20,18 +20,24 @@
 #define MAXLEN 1000
 
 /* functions */
-int itoa(unsigned, char [], int);
+void itoa(int, char []);
+int itoar(int, char [], int);
 
-int itoa(unsigned n, char s[], int i)
+/* itoa: interface function to itoar */
+void itoa(int n, char s[])
 {
-	int sign;
+	itoar(n, s, 0);
+}
 
-	if ((sign = n) < 0) {
+/* itoar: convert n to characters in s, recursive version */
+int itoar(int n, char s[], int i)
+{
+	if (n < 0) {
 		s[i++] = '-';
 		n = -n;
 	}
 	if (n / 10)
-		i = itoa(n / 10, s, i); /* recursive call */
+		i = itoar(n / 10, s, i); /* recursive call */
 	s[i++] = n % 10 + '0';
 	s[i] = '\0';
 	return i; /* return the updated value of i */
@@ -41,16 +47,16 @@ int main(void)
 {
 	char str[MAXLEN];
 
-	itoa(996, str, 0);
+	itoa(996, str);
 	printf("%s\n", str);
 
-	itoa(-2345, str, 0);
+	itoa(-2345, str);
 	printf("%s\n", str);
 
-	itoa(INT_MAX, str, 0);
+	itoa(INT_MAX, str);
 	printf("%s\n", str);
 
-	itoa(INT_MIN, str, 0);
+	itoa(INT_MIN, str);
 	printf("%s\n", str);
 
 	return 0;
