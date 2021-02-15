@@ -11,30 +11,40 @@
 #define MAXLEN 1000
 
 /* functions */
-void reverse(char []);
+void reverse(char s[]);
+void reverse_inplace(char str[], int begin, int end);
+void swap(char arr[], size_t i, size_t j);
 
-/* reverse function: reverse string s in place, recursive version */
+/* reverse: interface function to reverse_inplace */
 void reverse(char s[])
 {
-	int c;
-	static unsigned long i = 0, j = 0;
+	reverse_inplace(s, 0, strlen(s) - 1);
+}
+
+/* reverse_inplace: reverse string s in place, recursive version */
+void reverse_inplace(char str[], int begin, int end)
+{
+	if (begin > end) /* exit condition */
+		return;
+	swap(str, begin, end);
+	reverse_inplace(str, ++begin, --end);
+}
+
+/* swap: interchange v[i] and v[j] */
+void swap(char v[], size_t i, size_t j)
+{
+	char tmp;
 	
-	if (j < strlen(s) - 1) {
-		++j;
-		reverse(s);
-	}
-	if (i < j) {
-		c = s[i];
-		s[i++] = s[j];
-		s[j--] = c;
-	}
+	tmp = v[i];
+	v[i] = v[j];
+	v[j] = tmp;
 }
 
 int main(void)
 {
 	char str[MAXLEN];
 
-	printf("Enter a string to reverse:\n");
+	printf("Enter a string to reverse: ");
 	scanf("%s", str);
 	reverse(str);
 	printf("%s\n", str);	
