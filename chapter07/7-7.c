@@ -4,24 +4,24 @@
  * the standard input. Should the file name be printed when a matching line is
  * found?
  *
- * Answer: of course!
- *
  * By Faisal Saadatmand
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+ /* Answer: only when files are named as arguments */
 
-#define MAXLINE 1000
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAXLEN 1000
 
 /* globals */
-char *progName;
+char *prog;  /* program name */
 
 /* functions */
 int getLine(char *, size_t, FILE *);
 FILE* loadFile(char *);
-int findPattern(FILE *, char *, char *, int, int);
+int findPattern(FILE *, const char *, const char *, const int, const int);
 
 /* getLine: read line, return length - file pointer version */
 int getLine(char *line, size_t max, FILE *fp)
@@ -35,38 +35,44 @@ FILE* loadFile(char *fileName)
 {
 	FILE* fp;
 	if (!(fp = fopen(fileName, "r"))) {
-		fprintf(stderr, "%s: can't open %s\n", progName, fileName);
+		fprintf(stderr, "%s: can't open %s\n", prog, fileName);
 		exit(EXIT_FAILURE);
 	}
 	return fp;
 }
 
-int findPattern(FILE *fp, char *fileName, char *pattern, int except, int number)
+int findPattern(FILE *fp, const char *fileName, const char *pattern,
+		const int except, const int number)
 {
-	char line[MAXLINE];
-	long int lineno, found = 0;
+	char line[MAXLEN];
+	long lineno;
+	int found;
 
-	for (lineno = 1; getLine(line, MAXLINE, fp) > 0; lineno++)
+	lineno = found = 0;
+	while (getLine(line, MAXLEN, fp) > 0) {
+		++lineno;
 		if ((strstr(line, pattern) != NULL) != except) {
 			if (fileName)
-				printf("%s:", fileName);
+				fprintf(stdout, "%s:", fileName);
 			if (number)
-				printf ("%ld:", lineno);
-			printf("%s", line);
-			found++;
+				fprintf (stdout, "%ld:", lineno);
+			fprintf(stdout, "%s", line);
+			++found;
 		}
+	}
 	return found;
 }
 
 /* find: print lines that match pattern from 1s arg */
 int main(int argc, char *argv[])
 {
-	int c, except = 0, number = 0, found = 0;
-	char *pattern = NULL;
-	FILE *file = NULL;
+	int c, except, number, found;
+	char *pattern;
+	FILE *file;
 
-	progName = argv[0];
-	while (--argc > 0 && (*++argv)[0] == '-')    /* check for flags */
+	prog = argv[0];
+	except = number = found = 0;
+	while (--argc > 0 && (*++argv)[0] == '-')  /* check for flags */
 		while ((c = *++argv[0]))
 			switch (c) {
 			case 'x':
@@ -76,20 +82,19 @@ int main(int argc, char *argv[])
 				number = 1;
 				break;
 			default:
-				printf("%s: illegal option %c\n", progName, c);
+				fprintf(stderr, "%s: illegal option %c\n", prog, c);
 				argc = 0;
 				found = -1;
 				break;
 			}
-
-	pattern = *argv;                   /* save a pointer to the pattern */
+	pattern = *argv++;          /* save a pointer to the pattern */
 	if (argc < 1)
-		printf("Usage: %s -x -n pattern\n", progName);
-	else if (argc == 1)                /* input from stdin */
+		fprintf(stderr, "Usage: %s [-xn] PATTERN [FILE...]\n", prog);
+	else if (argc == 1)         /* input from stdin */
 		found += findPattern(stdin, NULL, pattern, except, number);
-	else                               /* input from file or set of files */
+	else                        /* input from file or set of files */
 		while (argc-- > 1) {
-			file = loadFile(*++argv);
+			file = loadFile(*argv++);
 			found += findPattern(file, *argv, pattern, except, number);
 			fclose(file);
 		}
