@@ -2,9 +2,11 @@
  * Exercise 8-1. Rewrite the program cat from Chapter 7 using read, write, open
  * and close instead of their standard library equivalents. Perform experiments
  * to determine the relative speeds of the two version.
- * Note: this version of cat is faster.
+ *
  * By Faisal Saadatmand
  */
+
+ /* Note: this version of cat is faster */
 
 #include <unistd.h>                    /* for read and write */
 #include <fcntl.h>                     /* for open and close */

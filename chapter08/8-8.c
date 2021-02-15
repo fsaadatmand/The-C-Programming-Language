@@ -195,8 +195,8 @@ int main(void)
 		printf("*** Add array's memory block to free list ***\n");
 		nblocks++;
 		for (p = &base, i = 1; i <= nblocks; p = p->s.ptr, i++)
-			printf("block %i (address: %p size: %u ptr: %p)\n"
-					, i, p, p->s.size, p->s.ptr);
+			printf("block %i (address: %p size: %u ptr: %p)\n", i, (void *) p,
+					p->s.size, (void *) p->s.ptr);
 		printf("\n");
 	}
 
@@ -206,8 +206,8 @@ int main(void)
 	else {
 		printf("*** allocate freed memory with knr_malloc ***\n");
 		for (p = &base, i = 1; i <= nblocks; p = p->s.ptr, i++)
-			printf("block %i (address: %p size: %u ptr: %p)\n"
-					, i, p, p->s.size, p->s.ptr);
+			printf("block %i (address: %p size: %u ptr: %p)\n", i, (void *) p,
+					p->s.size, (void *) p->s.ptr);
 		printf("\n");
 	}
 	
